@@ -51,6 +51,8 @@ class StrategyPlayer(Player):
       self.action = PlayerAction.STAY
 
   def __del__(self):
+    self.pout.write("-1 -1 -1 -1")
+
     self.pin.close()
     if os.path.exists("../pipes/{}_strategy".format(self.pipe_name)):
       os.remove("../pipes/{}_strategy".format(self.pipe_name))
