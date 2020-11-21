@@ -26,10 +26,20 @@ typedef long long ll;
 typedef unsigned long long ull;
 
 
+class Bomb {
+  public:
+
+    Bomb(int x, int y, int owner_id, int timer, int range) : x(x), y(y), owner_id(owner_id), timer(timer), range(range) {}
+
+    int x, y;
+    int owner_id;
+    int timer, range;
+};
+
 enum PlayerMove {
-  PLAYER_STAY, 
-  PLAYER_LEFT, 
-  PLAYER_RIGHT, 
+  PLAYER_STAY,
+  PLAYER_LEFT,
+  PLAYER_RIGHT,
   PLAYER_DOWN,
   PLAYER_UP,
   PLAYER_BOMB
@@ -40,12 +50,14 @@ class Player {
 
     Player(int x, int y, int owner_id, int bombs, int range) : x(x), y(y), owner_id(owner_id), bombs(bombs), range(range) {
       // TODO: fix it
+      this -> max_bombs = bombs;
       this -> range = 2;
     }
 
     int x, y;
     int owner_id;
     int max_bombs, bombs, range;
+    PlayerMove action = PLAYER_STAY;
 };
 
 enum CellType {
@@ -88,7 +100,7 @@ class Game {
     Player *me = nullptr;
     Field field;
     vector<Player> players;
-    // vector<Bomb> bombs;
+    vector<Bomb> bombs;
     // vector<Monster> monsters;
 
   public:
@@ -120,9 +132,9 @@ class Game {
         }
       }
 
-      // clean
+      // clear
       players.clear();
-      // bombs.clear();
+      bombs.clear();
       // monsters.clear();
 
       int entities;
@@ -137,42 +149,60 @@ class Game {
             this -> me = &players.back();
           }
         }
+        if (type == 'b') {
+          bombs.pb(Bomb(x, y, owner_id, param1, param2));
+        }
       }
       this -> tick = tick;
     }
 
-    void next() {
+    void prepare() {
       if(this -> tick == 1) {
-        printf("right\n");
+        me -> action = PLAYER_RIGHT;
       } else
       if(this -> tick == 2) {
-        printf("right\n");
+        me -> action = PLAYER_RIGHT;
       } else
       if(this -> tick == 3) {
-        printf("bomb\n");
+        me -> action = PLAYER_BOMB;
       } else
       if(this -> tick == 6) {
-        printf("left\n");
+        me -> action = PLAYER_LEFT;
       } else
       if(this -> tick == 7) {
-        printf("left\n");
+        me -> action = PLAYER_LEFT;
       } else
       if(this -> tick == 8) {
-        printf("down\n");
-      } else {
-        printf("stay\n");
+        me -> action = PLAYER_DOWN;
       }
-      fflush(stdout);
-      read_state();
     }
 
-  
+    void apply() {
+      switch (me -> action)  {
+        case PLAYER_STAY:
+          printf("stay\n"); break;
+        case PLAYER_LEFT:
+          printf("left\n"); break;
+        case PLAYER_RIGHT:
+          printf("right\n"); break;
+        case PLAYER_DOWN:
+          printf("down\n"); break;
+        case PLAYER_UP:
+          printf("up\n"); break;
+        case PLAYER_BOMB:
+          printf("bomb\n"); break;
+      }
+      fflush(stdout);
+      me -> action = PLAYER_STAY;
+      read_state();
+    }
 };
 
 int main() {
   Game game;
   while(true) {
-    game.next();
+    game.prepare();
+    game.apply();
   }
 
   return 0;
