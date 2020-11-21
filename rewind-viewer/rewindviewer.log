@@ -1,0 +1,57 @@
+arguments: ./rewindviewer
+Current dir: /home/mika/work/projects/bomberman/rewind-viewer
+File verbosity level: 0
+date       time         ( uptime  ) [ thread name/id ]                   file:line     v| 
+2020-11-21 17:05:28.315 (   0.002s) [main thread     ]             loguru.hpp:1971     0| Logging to 'rewindviewer.log', mode: 'w', verbosity: 0
+2020-11-21 17:05:28.315 (   0.002s) [main thread     ]               main.cpp:35       0| Init GLFW
+2020-11-21 17:05:29.196 (   0.883s) [main thread     ]               main.cpp:95       0| Create main window
+2020-11-21 17:05:29.555 (   1.242s) [main thread     ]               main.cpp:115      0| Setup application icon
+2020-11-21 17:05:29.556 (   1.244s) [main thread     ]               main.cpp:47       0| Load OpenGL functions
+2020-11-21 17:05:29.557 (   1.245s) [main thread     ]               main.cpp:53       0| OpenGL 3.3.0 NVIDIA 450.80.02, GLSL 3.30 NVIDIA via Cg compiler
+2020-11-21 17:05:29.557 (   1.245s) [main thread     ]               main.cpp:55       0| Driver NVIDIA Corporation, Renderer GeForce GTX 1060/PCIe/SSE2
+2020-11-21 17:05:29.558 (   1.245s) [main thread     ]               main.cpp:66       0| Setup vertical sync to 60fps
+2020-11-21 17:05:29.558 (   1.245s) [main thread     ]               main.cpp:69       0| Start main draw loop
+2020-11-21 17:05:29.558 (   1.245s) [main thread     ]               main.cpp:126      0| Try load configuration file
+2020-11-21 17:05:29.575 (   1.262s) [main thread     ]               main.cpp:130      0| Create camera
+2020-11-21 17:05:29.575 (   1.263s) [main thread     ]               main.cpp:134      0| Create Resource manager
+2020-11-21 17:05:29.575 (   1.263s) [main thread     ]               main.cpp:138      0| Create Scene
+2020-11-21 17:05:29.576 (   1.263s) [main thread     ]           Renderer.cpp:65       0| Initialize needed attributes
+2020-11-21 17:05:29.576 (   1.263s) [main thread     ]           Renderer.cpp:71       0| Compile shaders
+2020-11-21 17:05:29.576 (   1.263s) [main thread     ]             Shader.cpp:111      0| Start compiling shader in directory 'resources/shaders/': vertex=color_pos.vert, fragment=color_pos.frag
+2020-11-21 17:05:29.576 (   1.263s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
+2020-11-21 17:05:29.576 (   1.263s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
+2020-11-21 17:05:29.576 (   1.263s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
+2020-11-21 17:05:29.577 (   1.264s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
+2020-11-21 17:05:29.577 (   1.264s) [main thread     ]             Shader.cpp:133      0| Link shader program
+2020-11-21 17:05:29.577 (   1.264s) [main thread     ]             Shader.cpp:108      0| Start compiling shader in directory 'resources/shaders/': vertex=circle.vert, fragment=circle.frag, geometry=circle.geom
+2020-11-21 17:05:29.577 (   1.264s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
+2020-11-21 17:05:29.577 (   1.264s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
+2020-11-21 17:05:29.577 (   1.264s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
+2020-11-21 17:05:29.577 (   1.264s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
+2020-11-21 17:05:29.577 (   1.265s) [main thread     ]             Shader.cpp:127      0| Load Geometry shader
+2020-11-21 17:05:29.578 (   1.265s) [main thread     ]             Shader.cpp:129      0| Compile Geometry shader
+2020-11-21 17:05:29.578 (   1.265s) [main thread     ]             Shader.cpp:133      0| Link shader program
+2020-11-21 17:05:29.578 (   1.265s) [main thread     ]             Shader.cpp:111      0| Start compiling shader in directory 'resources/shaders/': vertex=simple.vert, fragment=uniform_color.frag
+2020-11-21 17:05:29.578 (   1.265s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
+2020-11-21 17:05:29.579 (   1.267s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
+2020-11-21 17:05:29.579 (   1.267s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
+2020-11-21 17:05:29.580 (   1.267s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
+2020-11-21 17:05:29.580 (   1.267s) [main thread     ]             Shader.cpp:133      0| Link shader program
+2020-11-21 17:05:29.580 (   1.267s) [main thread     ]           Renderer.cpp:75       0| Create rectangle for future rendering
+2020-11-21 17:05:29.580 (   1.267s) [main thread     ]           Renderer.cpp:99       0| Create Uniform buffer
+2020-11-21 17:05:29.580 (   1.268s) [main thread     ]           Renderer.cpp:107      0| Bind Uniform buffer to shaders
+2020-11-21 17:05:29.580 (   1.268s) [main thread     ]               main.cpp:141      0| Create GUI controller
+2020-11-21 17:05:29.626 (   1.313s) [main thread     ]               main.cpp:149      0| Create network protocol handler: working with JSON protocol
+2020-11-21 17:05:29.626 (   1.313s) [main thread     ]               main.cpp:154      0| Start networking thread
+2020-11-21 17:05:29.626 (   1.313s) [main thread     ]               main.cpp:167      0| Start render loop
+2020-11-21 17:05:29.626 (   1.313s) [        C8A77640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-11-21 17:18:22.246 ( 773.933s) [        C8A77640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:19163
+2020-11-21 17:18:26.392 ( 778.079s) [        C8A77640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-11-21 17:19:29.484 ( 841.171s) [        C8A77640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:26843
+2020-11-21 17:19:33.560 ( 845.247s) [        C8A77640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-11-21 17:19:39.461 ( 851.149s) [        C8A77640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:28379
+2020-11-21 17:19:43.701 ( 855.388s) [        C8A77640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-11-21 17:19:51.146 ( 862.834s) [        C8A77640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:30427
+2020-11-21 17:19:55.244 ( 866.931s) [        C8A77640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-11-21 17:20:10.923 ( 882.610s) [        C8A77640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:32475
+2020-11-21 17:20:13.213 ( 884.900s) [        C8A77640]        NetListener.cpp:34       0| NetClient:: Start listening
