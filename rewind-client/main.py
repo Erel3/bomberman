@@ -2,6 +2,7 @@
 
 from models import Field, Bomb, Monster, MonsterAction, Player, PlayerAction
 from players import StrategyPlayer
+from monsters import DummyMonster
 from draw_helper import DrawHelper
 from colors import Color
 from config import config
@@ -17,7 +18,22 @@ def init():
   helper = DrawHelper(field)
   players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
   bombs = []
-  monsters = []
+  monsters = [
+    DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10), 
+  DummyMonster(12, 10)]
   entities = players + bombs + monsters
   helper.client.message(str(config.tick))
   helper.redraw(field, entities)
@@ -92,6 +108,9 @@ def next_tick_players(field, players, bombs, monsters):
     player.recalculate(field, players, bombs, monsters)
   for player in players:
     player.tick(field, players, bombs, monsters)
+
+
+def next_apply_players(field, players, bombs, monsters):
   for player in players:
     player.apply(field, players, bombs, monsters)
 
@@ -99,7 +118,7 @@ def next_tick_players(field, players, bombs, monsters):
 if __name__ == "__main__":
   helper, field, players, bombs, monsters = init()
 
-  for config.tick in range(1, 401):
+  for config.tick in range(1, config.max_ticks + 1):
     helper.client.message(str(config.tick))
 
     # bombs
@@ -112,14 +131,13 @@ if __name__ == "__main__":
       helper.current_step("bombs", field, players + bombs + monsters)
 
     # monsters
+    next_tick_players(field, players, bombs, monsters)
     next_tick_monsters(field, players, bombs, monsters)
+    next_tick_monsters_kill_players(field, players, bombs, monsters)
+    next_apply_players(field, players, bombs, monsters)
     next_tick_monsters_kill_players(field, players, bombs, monsters)
     if config.every_step_redraw:
       helper.current_step("monsters", field, players + bombs + monsters)
-
-    # players
-    next_tick_players(field, players, bombs, monsters)
-    next_tick_monsters_kill_players(field, players, bombs, monsters)
     if config.every_step_redraw:
       helper.current_step("players", field, players + bombs + monsters)
     helper.redraw(field, players + bombs + monsters)

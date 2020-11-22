@@ -55,6 +55,7 @@ class Player(Entity):
       return
     if self.action == PlayerAction.BOMB:
       bombs.append(Bomb(self))
+      self.current_bomb_count -= 1
       return
     if self.action == PlayerAction.LEFT:
       if self.x > 0 and field.data[self.y][self.x - 1] == '.':
@@ -79,6 +80,7 @@ class Player(Entity):
     block_size = config.block_size
     player_radius = config.player_radius
     client.circle(block_size * self.x + block_size // 2, block_size * self.y + block_size // 2, player_radius, self.color.value, True)
+    client.circle_popup(block_size * self.x + block_size // 2, block_size * self.y + block_size // 2, player_radius, "mb: {}, b:{}, r:{}".format(self.bomb_count, self.current_bomb_count, self.bomb_range))
 
 
 class Bomb(Entity):
@@ -129,6 +131,7 @@ class Bomb(Entity):
     block_size = config.block_size
     bomb_radius = config.bomb_radius
     client.circle(block_size * self.x + block_size // 2, block_size * self.y + block_size // 2, bomb_radius, Color.BLACK.value, True)
+    client.circle_popup(block_size * self.x + block_size // 2, block_size * self.y + block_size // 2, bomb_radius, "t: {}, r: {}".format(self.timer, self.range))
 
 
 class MonsterAction(Enum):
