@@ -40,6 +40,28 @@ def init():
   return helper, field, players, bombs, monsters
 
 
+def init_from_file(file="../maps/level05.txt"):
+  field = Field()
+  players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
+  bombs = []
+  monsters = []
+  with open(file, "r") as f:
+    line = f.readline()
+    w, h = map(int, line.split())
+    field.width, field.height = w, h
+    for id, line in enumerate(f.readlines()):
+      for i in range(w):
+        field.data[id][i] = line[i]
+        if field.data[id][i] == 'm':
+          field.data[id][i] = '.'
+          monsters.append(DummyMonster(i, id))
+  helper = DrawHelper(field)
+  entities = players + bombs + monsters
+  helper.client.message(str(config.tick))
+  helper.redraw(field, entities)
+  return helper, field, players, bombs, monsters
+
+
 def next_tick_bombs(field, players, bombs, monsters):
   scan = True
   while scan:
@@ -116,6 +138,7 @@ def next_apply_players(field, players, bombs, monsters):
 
 
 if __name__ == "__main__":
+  # helper, field, players, bombs, monsters = init_from_file()
   helper, field, players, bombs, monsters = init()
 
   for config.tick in range(1, config.max_ticks + 1):
