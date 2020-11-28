@@ -19,21 +19,22 @@ def init():
   players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
   bombs = []
   monsters = [
-    DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10), 
-  DummyMonster(12, 10)]
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10), 
+    # DummyMonster(12, 10)
+  ]
   entities = players + bombs + monsters
   helper.client.message(str(config.tick))
   helper.redraw(field, entities)

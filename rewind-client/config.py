@@ -25,4 +25,4 @@ config.bomb_range = 2
 # run variables
 
 config.tick = 0
-config.max_ticks = 2000
+config.max_ticks = 400

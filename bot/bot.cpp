@@ -231,7 +231,7 @@ class Game {
                     }
                   destroy_map[layer][to_y][to_x] = 1;
                   current_map[layer][to_y][to_x] = 0;
-                  if (this -> field.cells[to_y][to_x].type == CELL_BOX) {
+                  if (this -> field.cells[to_y][to_x].type == CELL_BOX && current_map[layer - 1][to_y][to_x] == 1) {
                     break;
                   }
                   
@@ -263,7 +263,7 @@ class Game {
                       }
                     destroy_map[layer][to_y][to_x] = 1;
                     current_map[layer][to_y][to_x] = 0;
-                    if (this -> field.cells[to_y][to_x].type == CELL_BOX) {
+                    if (this -> field.cells[to_y][to_x].type == CELL_BOX && current_map[layer - 1][to_y][to_x] == 1) {
                       break;
                     }
                   }
@@ -404,24 +404,29 @@ class Game {
       return box;
     }
 
-    PlayerMove get_action_by_target(int la, int x, int y) {
-      while (la > 1) {
-        int dir = action_id[la][y][x];
-        int nx = x - dx[dir % 10], ny = y - dy[dir % 10];
-        x = nx, y = ny, la -= dir < 10 ? 1 : 0;
-      }
-      int dir = action_id[la][y][x] % 10;
-      switch (dir) {
-        case 0:
-          return PLAYER_UP;
-        case 1:
-          return PLAYER_LEFT;
-        case 2:
-          return PLAYER_RIGHT;
-        case 3:
-          return PLAYER_DOWN;
-        case 4:
-          return PLAYER_STAY;
+    PlayerMove get_action_by_target(int x, int y) {
+      for(int i = 1; i < layers_to_check; i++) {
+        if (shortest_paths[i][y][x] != -1) {
+          while (i > 1) {
+            int dir = action_id[i][y][x];
+            int nx = x - dx[dir % 10], ny = y - dy[dir % 10];
+            x = nx, y = ny, i -= dir < 10 ? 1 : 0;
+          }
+          int dir = action_id[i][y][x] % 10;
+          switch (dir) {
+            case 0:
+              return PLAYER_UP;
+            case 1:
+              return PLAYER_LEFT;
+            case 2:
+              return PLAYER_RIGHT;
+            case 3:
+              return PLAYER_DOWN;
+            case 4:
+              return PLAYER_STAY;
+          }
+          assert(0);
+        }
       }
       assert(0);
     }
@@ -457,21 +462,11 @@ class Game {
         } else {
           cerr << "shit" << endl;
           gox = 0, goy = 0;
-          for(int i = 1; i < layers_to_check; i++) {
-            if (shortest_paths[i][goy][gox] != -1) {
-              this -> me -> action = get_action_by_target(i, gox, goy);
-              break;
-            }
-          }
+          this -> me -> action = get_action_by_target(gox, goy);
         }
       } else {
         cerr << "t4 " << (this -> me -> x) << " " << (this -> me -> y) << " - " << gox << " " << goy << endl;
-        for(int i = 1; i < layers_to_check; i++) {
-          if (shortest_paths[i][goy][gox] != -1) {
-            this -> me -> action = get_action_by_target(i, gox, goy);
-            break;
-          }
-        }
+        this -> me -> action = get_action_by_target(gox, goy);
       }
     }
 
@@ -484,18 +479,7 @@ class Game {
     }
 
     void prepare() {
-      // if(this -> tick == 1) {
-      //   me -> action = PLAYER_RIGHT;
-      //   return;
-      // } else
-      // if(this -> tick == 2) {
-      //   me -> action = PLAYER_RIGHT;
-      //   return;
-      // } else
-      // if(this -> tick == 3) {
-      //   me -> action = PLAYER_BOMB;
-      //   return;
-      // }
+ 
       shortest_path();
 
 
@@ -555,81 +539,71 @@ class Game {
       // }
       
 
-      // // box/monster destroy
-      // int gox = -1, goy, dd = 10000;
-      // for (Monster monster: this -> monsters) {
-      //   for (int jj = 0; jj < 5; jj++) {
-      //     int ix = monster.x + dx[jj], iy = monster.y + dy[jj];
-      //     for (int dir = 0; dir < 4; dir++) {
-      //       for (int i = 1; i <= this -> me -> range; i++) {
-      //         int to_x = ix + dx[dir] * i, to_y = iy + dy[dir] * i;
-      //         if (to_x < 0 || to_x >= this -> field.width ||
-      //           to_y < 0 || to_y >= this -> field.height || this -> field.cells[to_y][to_x].type == CELL_BLOCK || this -> field.cells[to_y][to_x].type == CELL_BOX) {
-      //             break;
-      //           }
+      // box/monster destroy
+      int gox = -1, goy, dd = 10000;
+      for (Monster monster: this -> monsters) {
+        for (int jj = 0; jj < 5; jj++) {
+          int ix = monster.x + dx[jj], iy = monster.y + dy[jj];
+          for (int dir = 0; dir < 4; dir++) {
+            for (int i = 1; i <= this -> me -> range; i++) {
+              int to_x = ix + dx[dir] * i, to_y = iy + dy[dir] * i;
+              if (to_x < 0 || to_x >= this -> field.width ||
+                to_y < 0 || to_y >= this -> field.height || this -> field.cells[to_y][to_x].type == CELL_BLOCK || this -> field.cells[to_y][to_x].type == CELL_BOX) {
+                  break;
+                }
                   
-      //         for (int l = 0; l < layers_to_check; l++) {
-      //           if (shortest_paths[l][to_y][to_x] != -1 && dd > shortest_paths[l][to_y][to_x]) {
-      //             dd = shortest_paths[l][to_y][to_x];
-      //             gox = to_x;
-      //             goy = to_y;
-      //           }
-      //         }
+              for (int l = 0; l < layers_to_check; l++) {
+                if (shortest_paths[l][to_y][to_x] != -1 && dd > shortest_paths[l][to_y][to_x]) {
+                  dd = shortest_paths[l][to_y][to_x];
+                  gox = to_x;
+                  goy = to_y;
+                }
+              }
 
-      //       }
-      //     }
-      //   }
-      // }
+            }
+          }
+        }
+      }
 
-      // if(gox == -1)
-      // for (int iy = 0; iy < this -> field.height; iy++) {
-      //   for (int ix = 0; ix < this -> field.width; ix++) {
-      //     if (this -> field.cells[iy][ix].type == CELL_BOX)
-      //     for (int dir = 0; dir < 4; dir++) {
-      //       for (int i = 1; i <= this -> me -> range; i++) {
-      //         int to_x = ix + dx[dir] * i, to_y = iy + dy[dir] * i;
-      //         if (to_x < 0 || to_x >= this -> field.width ||
-      //           to_y < 0 || to_y >= this -> field.height || this -> field.cells[to_y][to_x].type == CELL_BLOCK || this -> field.cells[to_y][to_x].type == CELL_BOX) {
-      //             break;
-      //           }
+      if(gox == -1)
+      for (int iy = 0; iy < this -> field.height; iy++) {
+        for (int ix = 0; ix < this -> field.width; ix++) {
+          if (this -> field.cells[iy][ix].type == CELL_BOX)
+          for (int dir = 0; dir < 4; dir++) {
+            for (int i = 1; i <= this -> me -> range; i++) {
+              int to_x = ix + dx[dir] * i, to_y = iy + dy[dir] * i;
+              if (to_x < 0 || to_x >= this -> field.width ||
+                to_y < 0 || to_y >= this -> field.height || this -> field.cells[to_y][to_x].type == CELL_BLOCK || this -> field.cells[to_y][to_x].type == CELL_BOX) {
+                  break;
+                }
                   
-      //         for (int l = 0; l < layers_to_check; l++) {
-      //           if (shortest_paths[l][to_y][to_x] != -1 && dd > shortest_paths[l][to_y][to_x]) {
-      //             dd = shortest_paths[l][to_y][to_x];
-      //             gox = to_x;
-      //             goy = to_y;
-      //           }
-      //         }
+              for (int l = 0; l < layers_to_check; l++) {
+                if (shortest_paths[l][to_y][to_x] != -1 && dd > shortest_paths[l][to_y][to_x]) {
+                  dd = shortest_paths[l][to_y][to_x];
+                  gox = to_x;
+                  goy = to_y;
+                }
+              }
 
-      //       }
-      //     }
-      //   }
-      // }
+            }
+          }
+        }
+      }
 
 
-      // if (gox == this -> me -> x && goy == this -> me -> y) {
-      //   cerr << "t3" << endl;
-      //   if (this -> me -> bombs) {
-      //     this -> me -> action = PLAYER_BOMB;
-      //   } else {
-      //     cerr << "shit" << endl;
-      //     gox = 0, goy = 0;
-      //     for(int i = 1; i < layers_to_check; i++) {
-      //       if (shortest_paths[i][goy][gox] != -1) {
-      //         this -> me -> action = get_action_by_target(i, gox, goy);
-      //         break;
-      //       }
-      //     }
-      //   }
-      // } else {
-      //   cerr << "t4 " << (this -> me -> x) << " " << (this -> me -> y) << " - " << gox << " " << goy << endl;
-      //   for(int i = 1; i < layers_to_check; i++) {
-      //     if (shortest_paths[i][goy][gox] != -1) {
-      //       this -> me -> action = get_action_by_target(i, gox, goy);
-      //       break;
-      //     }
-      //   }
-      // }
+      if (gox == this -> me -> x && goy == this -> me -> y) {
+        cerr << "t3" << endl;
+        if (this -> me -> bombs) {
+          this -> me -> action = PLAYER_BOMB;
+        } else {
+          cerr << "shit" << endl;
+          gox = 0, goy = 0;
+          this -> me -> action = get_action_by_target(gox, goy);
+        }
+      } else {
+        cerr << "t4 " << (this -> me -> x) << " " << (this -> me -> y) << " - " << gox << " " << goy << endl;
+        this -> me -> action = get_action_by_target(gox, goy);
+      }
 
 
 
