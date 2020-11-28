@@ -1,17 +1,60 @@
 from config import config
 from colors import Color
+from enum import Enum
 import random
+
+class FieldType(Enum):
+  DEFAULT = 'default'
+  SNAKE = 'snake'
+  NO_BLOCKS = 'no-blocks'
+  FULL = 'full'
+
+def _no_blocks_gen(self, width, height):
+  return [
+      ['.' if random.randint(0, 1) == 0 else ';' for i in range(width)]
+        for j in range(height)
+    ]
+
+def _full_gen(self, width, height):
+  return [
+      [';' for i in range(width)]
+        for j in range(height)
+    ]
+
+def _snake_gen(self, width, height):
+  return [
+      ['!' if (j&1) and ((i > 0 and j % 4 == 1) or (i < width - 1 and j % 4 == 3)) else ('.' if random.randint(0, 1) == 0 else ';') for i in range(width)]
+        for j in range(height)
+    ]
+
+def _default_gen(self, width, height):
+  return [
+      ['!' if (i&1) and (j&1) else ('.' if random.randint(0, 1) == 0 else ';') for i in range(width)]
+        for j in range(height)
+    ]
+
+class FieldConstructor():
+
+  def __init__(self, ftype):
+    if (ftype == FieldType.SNAKE):
+      self.construct = _snake_gen
+    elif (ftype == FieldType.NO_BLOCKS):
+      self.construct = _no_blocks_gen
+    elif (ftype == FieldType.FULL):
+      self.construct = _full_gen
+    else:
+      self.construct = _default_gen
+
+  def create_field(self, width, height):
+    return self.construct(self, width, height)
 
 
 class Field():
 
-  def __init__(self, use_blocks = True):
+  def __init__(self, constructor):
     self.width = config.width
     self.height = config.height
-    self.data = [
-        ['!' if (i&1) and (j&1) else ('.' if not use_blocks or random.randint(0, 1) == 0 else ';') for i in range(self.width)]
-          for j in range(self.height)
-      ]
+    self.data = constructor.create_field(self.width, self.height)
     self.destroy_data = [
         [False for i in range(self.width)]
           for j in range(self.height)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from models import Field, Bomb, Monster, MonsterAction, Player, PlayerAction
+from models import Field, FieldType, FieldConstructor, Bomb, Monster, MonsterAction, Player, PlayerAction
 from players import StrategyPlayer
 from monsters import DummyMonster
 from draw_helper import DrawHelper
@@ -14,7 +14,7 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 def init():
-  field = Field()
+  field = Field(FieldConstructor(FieldType.FULL))
   helper = DrawHelper(field)
   players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
   bombs = []
@@ -42,7 +42,7 @@ def init():
 
 
 def init_from_file(file="../maps/level05.txt"):
-  field = Field()
+  field = Field(FieldConstructor(FieldType.DEFAULT))
   players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
   bombs = []
   monsters = []
