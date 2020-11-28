@@ -14,7 +14,7 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 def init():
-  field = Field(FieldConstructor(FieldType.FULL))
+  field = Field(FieldConstructor(FieldType.NO_BLOCKS))
   helper = DrawHelper(field)
   players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
   bombs = []
