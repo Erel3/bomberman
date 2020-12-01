@@ -110,6 +110,21 @@ def next_apply_players(field, players, bombs, monsters, features):
   for player in players:
     player.apply(field, players, bombs, monsters, features)
 
+def next_apply_features(field, players, bombs, monsters, features):
+  id = 0
+  while id < len(features):
+    used = False
+    for player in players:
+      if player.x == features[id].x and player.y == features[id].y:
+        used = True
+        if features[id].type == "f_a":
+          player.bomb_count+=1
+        else:
+          player.bomb_range+=1
+    if used:
+      features.pop(id)
+    else:
+      id += 1
 
 def run():
   # helper, field, players, bombs, monsters = init_from_file()
@@ -133,6 +148,7 @@ def run():
     next_tick_monsters_kill_players(field, players, bombs, monsters, features)
     next_apply_players(field, players, bombs, monsters, features)
     next_tick_monsters_kill_players(field, players, bombs, monsters, features)
+    next_apply_features(field, players, bombs, monsters, features)
     if config.every_step_redraw:
       helper.current_step("monsters", field, players + bombs + monsters + features)
     if config.every_step_redraw:
@@ -162,6 +178,7 @@ if __name__ == "__main__":
     next_tick_monsters_kill_players(field, players, bombs, monsters, features)
     next_apply_players(field, players, bombs, monsters, features)
     next_tick_monsters_kill_players(field, players, bombs, monsters, features)
+    next_apply_features(field, players, bombs, monsters, features)
     if config.every_step_redraw:
       helper.current_step("monsters", field, players + bombs + monsters + features)
     if config.every_step_redraw:
