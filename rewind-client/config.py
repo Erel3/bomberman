@@ -26,3 +26,6 @@ config.bomb_range = 2
 
 config.tick = 0
 config.max_ticks = 400
+
+# feature config
+config.feature_percent = 30

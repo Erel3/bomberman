@@ -12,7 +12,7 @@ class Entity():
     self.x = 0
     self.y = 0
   
-  def tick(self, field, players, bombs, monsters):
+  def tick(self, field, players, bombs, monsters, features):
     pass
 
 
@@ -39,16 +39,16 @@ class Player(Entity):
     self.action = None
     self.color = color
 
-  def recalculate(self, field, players, bombs, monsters):
+  def recalculate(self, field, players, bombs, monsters, features):
     self.current_bomb_count = self.bomb_count
     for bomb in bombs:
       if bomb.owner == self.owner:
         self.current_bomb_count -= 1
 
-  def tick(self, field, players, bombs, monsters):
+  def tick(self, field, players, bombs, monsters, features):
     self.action = random.choice(list(PlayerAction)[1:])
 
-  def apply(self, field, players, bombs, monsters):
+  def apply(self, field, players, bombs, monsters, features):
     nx = self.x
     ny = self.y
     if self.action == PlayerAction.STAY:
@@ -94,7 +94,7 @@ class Bomb(Entity):
     self.timer = config.bomb_timer # bomb timer
     self.range = player.bomb_range # bomb radius
 
-  def tick(self, field, players, bombs, monsters):
+  def tick(self, field, players, bombs, monsters, features):
     if self.timer == 0:
       return
     self.timer -= 1
@@ -152,10 +152,10 @@ class Monster(Entity):
     self.y = y
     self.action = None
 
-  def tick(self, field, players, bombs, monsters):
+  def tick(self, field, players, bombs, monsters, features):
     self.action = random.choice(list(MonsterAction)[1:])
 
-  def apply(self, field, players, bombs, monsters):
+  def apply(self, field, players, bombs, monsters, features):
     nx = self.x
     ny = self.y
     if self.action == MonsterAction.STAY:
@@ -183,3 +183,25 @@ class Monster(Entity):
     block_size = config.block_size
     monster_radius = config.monster_radius
     client.circle(block_size * self.x + block_size // 2, block_size * self.y + block_size // 2, monster_radius, Color.PURPLE.value, True)
+
+  
+class FeatureAdd:
+  def __init__(self, x, y):
+    Entity.__init__(self)
+    self.type = "f_a"
+    self.owner = -1
+    self.x = x
+    self.y = y
+    self. = None
+  #todo draw 
+    
+class FeatureRange
+  def __init__(self, x, y):
+    Entity.__init__(self)
+    self.type = "f_r"
+    self.owner = -1
+    self.x = x
+    self.y = y
+    self.action = None
+  #todo draw
+    

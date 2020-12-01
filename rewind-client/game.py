@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from models import Field, FieldType, FieldConstructor, Bomb, Monster, MonsterAction, Player, PlayerAction
+from models import Field, FieldType, FieldConstructor, Bomb, Monster, MonsterAction, Player, PlayerAction, FeatureAdd, FeatureRange
 from players import StrategyPlayer
 from monsters import DummyMonster
 from draw_helper import DrawHelper
@@ -18,39 +18,24 @@ def init():
   helper = DrawHelper(field)
   players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
   bombs = []
-  monsters = [
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10)
-  ]
-  entities = players + bombs + monsters
+  monsters = []
+  features = []
+  entities = players + bombs + monsters + features
   helper.client.message(str(config.tick))
   helper.redraw(field, entities)
-  return helper, field, players, bombs, monsters
+  return helper, field, players, bombs, monsters, features
 
 
-def next_tick_bombs(field, players, bombs, monsters):
+def next_tick_bombs(field, players, bombs, monsters, features):
   scan = True
   while scan:
     scan = False
     for bomb in bombs:
-      bomb.tick(field, players, bombs, monsters)
+      bomb.tick(field, players, bombs, monsters, features)
     for bomb in bombs:
       if bomb.timer != 0 and field.destroy_data[bomb.y][bomb.x]:
         bomb.timer = 1
-        bomb.tick(field, players, bombs, monsters)
+        bomb.tick(field, players, bombs, monsters, features)
         scan = True
   id = 0
   while id < len(bombs):
@@ -60,14 +45,21 @@ def next_tick_bombs(field, players, bombs, monsters):
       id += 1
 
 
-def next_tick_field(field, players, bombs, monsters):
+def next_tick_field(field, players, bombs, monsters, features):
   for i in range(field.height):
     for j in range(field.width):
       if field.destroy_data[i][j]:
+        if field.data[i][j] == ';':
+          int rand = random.randInt(0, 100)
+          if rand <= config.update_percent:
+            if random.randInt(0, 1):
+              features.append(FeatureAdd(self))
+            else:
+              features.append(FeatureRange(self))
         field.data[i][j] = '.'
     
 
-def next_tick_entities(field, players, bombs, monsters):
+def next_tick_entities(field, players, bombs, monsters, features):
   id = 0
   while id < len(players):
     if field.destroy_data[players[id].y][players[id].x]:
@@ -83,14 +75,14 @@ def next_tick_entities(field, players, bombs, monsters):
       id += 1
 
 
-def next_tick_monsters(field, players, bombs, monsters):
+def next_tick_monsters(field, players, bombs, monsters, features):
   for monster in monsters:
-    monster.tick(field, players, bombs, monsters)
+    monster.tick(field, players, bombs, monsters, features)
   for monster in monsters:
-    monster.apply(field, players, bombs, monsters)
+    monster.apply(field, players, bombs, monsters, features)
 
 
-def next_tick_monsters_kill_players(field, players, bombs, monsters):
+def next_tick_monsters_kill_players(field, players, bombs, monsters, features):
   id = 0
   while id < len(players):
     killed = False
@@ -104,42 +96,42 @@ def next_tick_monsters_kill_players(field, players, bombs, monsters):
       id += 1      
 
 
-def next_tick_players(field, players, bombs, monsters):
+def next_tick_players(field, players, bombs, monsters, features):
   for player in players:
-    player.recalculate(field, players, bombs, monsters)
+    player.recalculate(field, players, bombs, monsters, features)
   for player in players:
-    player.tick(field, players, bombs, monsters)
+    player.tick(field, players, bombs, monsters, features)
 
 
-def next_apply_players(field, players, bombs, monsters):
+def next_apply_players(field, players, bombs, monsters, features):
   for player in players:
-    player.apply(field, players, bombs, monsters)
+    player.apply(field, players, bombs, monsters, features)
 
 
 if __name__ == "__main__":
   # helper, field, players, bombs, monsters = init_from_file()
-  helper, field, players, bombs, monsters = init()
+  helper, field, players, bombs, monsters, features = init()
 
   for config.tick in range(1, config.max_ticks + 1):
     helper.client.message(str(config.tick))
 
     # bombs
-    next_tick_bombs(field, players, bombs, monsters)
-    next_tick_field(field, players, bombs, monsters)
-    next_tick_entities(field, players, bombs, monsters)
+    next_tick_bombs(field, players, bombs, monsters, features)
+    next_tick_field(field, players, bombs, monsters, features)
+    next_tick_entities(field, players, bombs, monsters, features)
     field.draw_destroy_data(helper.client)
     field.clean_destroy_data()
     if config.every_step_redraw:
-      helper.current_step("bombs", field, players + bombs + monsters)
+      helper.current_step("bombs", field, players + bombs + monsters + features)
 
     # monsters
-    next_tick_players(field, players, bombs, monsters)
-    next_tick_monsters(field, players, bombs, monsters)
-    next_tick_monsters_kill_players(field, players, bombs, monsters)
-    next_apply_players(field, players, bombs, monsters)
-    next_tick_monsters_kill_players(field, players, bombs, monsters)
+    next_tick_players(field, players, bombs, monsters, features)
+    next_tick_monsters(field, players, bombs, monsters, features)
+    next_tick_monsters_kill_players(field, players, bombs, monsters, features)
+    next_apply_players(field, players, bombs, monsters, features)
+    next_tick_monsters_kill_players(field, players, bombs, monsters, features)
     if config.every_step_redraw:
-      helper.current_step("monsters", field, players + bombs + monsters)
+      helper.current_step("monsters", field, players + bombs + monsters + features)
     if config.every_step_redraw:
-      helper.current_step("players", field, players + bombs + monsters)
-    helper.redraw(field, players + bombs + monsters)
+      helper.current_step("players", field, players + bombs + monsters + features)
+    helper.redraw(field, players + bombs + monsters + features)
