@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from models import Field, FieldType, FieldConstructor, Bomb, Monster, MonsterAction, Player, PlayerAction
 from players import StrategyPlayer
 from monsters import DummyMonster
@@ -9,9 +7,6 @@ from config import config
 
 import os
 
-abspath = os.path.abspath(__file__)
-dname = os.path.dirname(abspath)
-os.chdir(dname)
 
 def init():
   field = Field(FieldConstructor(FieldType.DEFAULT))
@@ -19,21 +14,21 @@ def init():
   players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
   bombs = []
   monsters = [
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10), 
-    # DummyMonster(12, 10)
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10),
+      # DummyMonster(12, 10)
   ]
   entities = players + bombs + monsters
   helper.client.message(str(config.tick))
@@ -65,7 +60,7 @@ def next_tick_field(field, players, bombs, monsters):
     for j in range(field.width):
       if field.destroy_data[i][j]:
         field.data[i][j] = '.'
-    
+
 
 def next_tick_entities(field, players, bombs, monsters):
   id = 0
@@ -101,7 +96,7 @@ def next_tick_monsters_kill_players(field, players, bombs, monsters):
     if killed:
       players.pop(id)
     else:
-      id += 1      
+      id += 1
 
 
 def next_tick_players(field, players, bombs, monsters):
@@ -114,6 +109,34 @@ def next_tick_players(field, players, bombs, monsters):
 def next_apply_players(field, players, bombs, monsters):
   for player in players:
     player.apply(field, players, bombs, monsters)
+
+
+def run():
+  helper, field, players, bombs, monsters = init()
+
+  for config.tick in range(1, config.max_ticks + 1):
+    helper.client.message(str(config.tick))
+
+    # bombs
+    next_tick_bombs(field, players, bombs, monsters)
+    next_tick_field(field, players, bombs, monsters)
+    next_tick_entities(field, players, bombs, monsters)
+    field.draw_destroy_data(helper.client)
+    field.clean_destroy_data()
+    if config.every_step_redraw:
+      helper.current_step("bombs", field, players + bombs + monsters)
+
+    # monsters
+    next_tick_players(field, players, bombs, monsters)
+    next_tick_monsters(field, players, bombs, monsters)
+    next_tick_monsters_kill_players(field, players, bombs, monsters)
+    next_apply_players(field, players, bombs, monsters)
+    next_tick_monsters_kill_players(field, players, bombs, monsters)
+    if config.every_step_redraw:
+      helper.current_step("monsters", field, players + bombs + monsters)
+    if config.every_step_redraw:
+      helper.current_step("players", field, players + bombs + monsters)
+    helper.redraw(field, players + bombs + monsters)
 
 
 if __name__ == "__main__":
