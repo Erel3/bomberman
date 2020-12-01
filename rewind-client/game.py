@@ -12,7 +12,7 @@ import os
 def init():
   field = Field(FieldConstructor(FieldType.DEFAULT))
   helper = DrawHelper(field)
-  players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
+  players = [StrategyPlayer(1, 0, 0, Color.BLUE, "../strategies/bot")]
   bombs = []
   monsters = []
   features = []

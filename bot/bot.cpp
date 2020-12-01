@@ -145,9 +145,12 @@ public:
 
   void read_state(bool create = false)
   {
+    fprintf(stderr, "reading\n");
+    fflush(stderr);
     int width, height, owner_id, tick;
     scanf("%d%d%d%d", &width, &height, &owner_id, &tick);
-
+    fprintf(stderr, "%d\n", width);
+    fflush(stderr);
     if (width == -1 && height == -1)
     {
       fprintf(stderr, "max time: %.3lf ms\n", max_tick_time);
@@ -915,6 +918,8 @@ public:
 
 int main()
 {
+  fprintf(stderr, "started\n");
+  fflush(stderr);
   Game game;
   while (true)
   {
