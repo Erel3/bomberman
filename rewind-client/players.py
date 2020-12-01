@@ -110,7 +110,7 @@ class StrategyPlayer(Player):
         self.proc.stdin.write("{} {} {} {} {} {}\n".format(monster.type, monster.owner, monster.x, monster.y, 0, 0))
       self.proc.stdin.flush()
     except:
-      print("error writing state to player".format(self.owner))
+      print("error writing state to player {}".format(self.owner))
       pass
 
   def tick(self, field, players, bombs, monsters, features):
