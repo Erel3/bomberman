@@ -2,374 +2,50 @@ arguments: ./rewindviewer
 Current dir: /home/mika/work/projects/bomberman/rewind-viewer
 File verbosity level: 0
 date       time         ( uptime  ) [ thread name/id ]                   file:line     v| 
-2020-11-28 20:42:12.764 (   0.006s) [main thread     ]             loguru.hpp:1971     0| Logging to 'rewindviewer.log', mode: 'w', verbosity: 0
-2020-11-28 20:42:12.764 (   0.006s) [main thread     ]               main.cpp:35       0| Init GLFW
-2020-11-28 20:42:13.389 (   0.632s) [main thread     ]               main.cpp:95       0| Create main window
-2020-11-28 20:42:13.520 (   0.763s) [main thread     ]               main.cpp:115      0| Setup application icon
-2020-11-28 20:42:13.522 (   0.765s) [main thread     ]               main.cpp:47       0| Load OpenGL functions
-2020-11-28 20:42:13.524 (   0.766s) [main thread     ]               main.cpp:53       0| OpenGL 3.3.0 NVIDIA 450.80.02, GLSL 3.30 NVIDIA via Cg compiler
-2020-11-28 20:42:13.524 (   0.766s) [main thread     ]               main.cpp:55       0| Driver NVIDIA Corporation, Renderer GeForce GTX 1060/PCIe/SSE2
-2020-11-28 20:42:13.524 (   0.766s) [main thread     ]               main.cpp:66       0| Setup vertical sync to 60fps
-2020-11-28 20:42:13.524 (   0.766s) [main thread     ]               main.cpp:69       0| Start main draw loop
-2020-11-28 20:42:13.524 (   0.766s) [main thread     ]               main.cpp:126      0| Try load configuration file
-2020-11-28 20:42:13.526 (   0.769s) [main thread     ]               main.cpp:130      0| Create camera
-2020-11-28 20:42:13.526 (   0.769s) [main thread     ]               main.cpp:134      0| Create Resource manager
-2020-11-28 20:42:13.526 (   0.769s) [main thread     ]               main.cpp:138      0| Create Scene
-2020-11-28 20:42:13.526 (   0.769s) [main thread     ]           Renderer.cpp:65       0| Initialize needed attributes
-2020-11-28 20:42:13.526 (   0.769s) [main thread     ]           Renderer.cpp:71       0| Compile shaders
-2020-11-28 20:42:13.526 (   0.769s) [main thread     ]             Shader.cpp:111      0| Start compiling shader in directory 'resources/shaders/': vertex=color_pos.vert, fragment=color_pos.frag
-2020-11-28 20:42:13.526 (   0.769s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
-2020-11-28 20:42:13.526 (   0.769s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
-2020-11-28 20:42:13.526 (   0.769s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
-2020-11-28 20:42:13.528 (   0.771s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
-2020-11-28 20:42:13.528 (   0.771s) [main thread     ]             Shader.cpp:133      0| Link shader program
-2020-11-28 20:42:13.529 (   0.771s) [main thread     ]             Shader.cpp:108      0| Start compiling shader in directory 'resources/shaders/': vertex=circle.vert, fragment=circle.frag, geometry=circle.geom
-2020-11-28 20:42:13.529 (   0.771s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
-2020-11-28 20:42:13.529 (   0.772s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
-2020-11-28 20:42:13.529 (   0.772s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
-2020-11-28 20:42:13.529 (   0.772s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
-2020-11-28 20:42:13.529 (   0.772s) [main thread     ]             Shader.cpp:127      0| Load Geometry shader
-2020-11-28 20:42:13.529 (   0.772s) [main thread     ]             Shader.cpp:129      0| Compile Geometry shader
-2020-11-28 20:42:13.529 (   0.772s) [main thread     ]             Shader.cpp:133      0| Link shader program
-2020-11-28 20:42:13.530 (   0.773s) [main thread     ]             Shader.cpp:111      0| Start compiling shader in directory 'resources/shaders/': vertex=simple.vert, fragment=uniform_color.frag
-2020-11-28 20:42:13.530 (   0.773s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
-2020-11-28 20:42:13.530 (   0.773s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
-2020-11-28 20:42:13.530 (   0.773s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
-2020-11-28 20:42:13.530 (   0.773s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
-2020-11-28 20:42:13.530 (   0.773s) [main thread     ]             Shader.cpp:133      0| Link shader program
-2020-11-28 20:42:13.531 (   0.773s) [main thread     ]           Renderer.cpp:75       0| Create rectangle for future rendering
-2020-11-28 20:42:13.531 (   0.774s) [main thread     ]           Renderer.cpp:99       0| Create Uniform buffer
-2020-11-28 20:42:13.531 (   0.774s) [main thread     ]           Renderer.cpp:107      0| Bind Uniform buffer to shaders
-2020-11-28 20:42:13.531 (   0.774s) [main thread     ]               main.cpp:141      0| Create GUI controller
-2020-11-28 20:42:13.582 (   0.825s) [main thread     ]               main.cpp:149      0| Create network protocol handler: working with JSON protocol
-2020-11-28 20:42:13.582 (   0.825s) [main thread     ]               main.cpp:154      0| Start networking thread
-2020-11-28 20:42:13.582 (   0.825s) [main thread     ]               main.cpp:167      0| Start render loop
-2020-11-28 20:42:13.583 (   0.825s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:42:26.713 (  13.956s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:59592
-2020-11-28 20:42:30.804 (  18.047s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:43:33.028 (  80.271s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:10953
-2020-11-28 20:43:36.609 (  83.851s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:44:58.970 ( 166.213s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:31945
-2020-11-28 20:45:02.480 ( 169.723s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:47:06.925 ( 294.168s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:60617
-2020-11-28 20:47:11.337 ( 298.580s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:49:20.228 ( 427.470s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:27850
-2020-11-28 20:49:23.199 ( 430.442s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:49:40.316 ( 447.558s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:32970
-2020-11-28 20:49:44.750 ( 451.993s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:51:19.223 ( 546.465s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:58058
-2020-11-28 20:51:23.731 ( 550.974s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:52:57.566 ( 644.809s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:15563
-2020-11-28 20:53:02.113 ( 649.356s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:54:07.937 ( 715.180s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:32459
-2020-11-28 20:54:11.552 ( 718.794s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:55:13.199 ( 780.442s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:48331
-2020-11-28 20:55:16.818 ( 784.061s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:56:02.550 ( 829.792s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:60107
-2020-11-28 20:56:07.051 ( 834.294s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:56:24.150 ( 851.393s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:65227
-2020-11-28 20:56:27.880 ( 855.123s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 20:56:58.048 ( 885.291s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:7372
-2020-11-28 20:57:01.622 ( 888.865s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:06:36.903 (1464.146s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:206
-2020-11-28 21:06:43.330 (1470.572s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:06:50.680 (1477.923s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:3278
-2020-11-28 21:06:56.061 (1483.304s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:07:27.131 (1514.373s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:13006
-2020-11-28 21:07:56.609 (1543.852s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:07:56.609 (1543.852s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:16078
-2020-11-28 21:08:04.267 (1551.510s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:09:19.961 (1627.204s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:37582
-2020-11-28 21:09:29.210 (1636.452s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:11:34.669 (1761.911s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:3279
-2020-11-28 21:11:38.185 (1765.428s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:20:12.503 (2279.746s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:56016
-2020-11-28 21:20:16.071 (2283.314s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:31:32.843 (2960.086s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:13011
-2020-11-28 21:31:36.278 (2963.521s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:44:19.318 (3726.561s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:4310
-2020-11-28 21:44:22.729 (3729.972s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:45:10.552 (3777.795s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:17110
-2020-11-28 21:45:14.114 (3781.357s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:45:20.904 (3788.146s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:20182
-2020-11-28 21:45:24.704 (3791.946s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:49:39.016 (4046.259s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:18135
-2020-11-28 21:49:42.906 (4050.149s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:49:49.805 (4057.047s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:20695
-2020-11-28 21:49:53.130 (4060.373s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:51:33.467 (4160.710s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:47319
-2020-11-28 21:51:37.343 (4164.586s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:52:09.511 (4196.753s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:55511
-2020-11-28 21:52:13.383 (4200.626s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:52:23.200 (4210.442s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:59607
-2020-11-28 21:52:27.038 (4214.280s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:52:55.180 (4242.422s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:1240
-2020-11-28 21:52:59.297 (4246.540s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:53:06.376 (4253.619s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:4312
-2020-11-28 21:53:10.524 (4257.767s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:53:15.241 (4262.484s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:6872
-2020-11-28 21:53:19.328 (4266.571s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:53:24.070 (4271.313s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:9432
-2020-11-28 21:53:28.099 (4275.342s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:53:32.955 (4280.198s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:12504
-2020-11-28 21:53:36.824 (4284.067s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:53:42.290 (4289.532s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:15064
-2020-11-28 21:53:45.864 (4293.107s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:53:51.072 (4298.315s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:17112
-2020-11-28 21:53:54.989 (4302.232s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:53:59.847 (4307.090s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:19672
-2020-11-28 21:54:03.839 (4311.082s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:54:08.496 (4315.739s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:22232
-2020-11-28 21:54:12.716 (4319.958s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:54:17.116 (4324.359s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:24792
-2020-11-28 21:54:20.653 (4327.896s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:54:39.684 (4346.927s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:30424
-2020-11-28 21:54:43.707 (4350.949s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:54:48.466 (4355.709s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:32984
-2020-11-28 21:54:52.569 (4359.811s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:54:57.719 (4364.961s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:35544
-2020-11-28 21:55:01.570 (4368.813s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:55:06.846 (4374.089s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:38616
-2020-11-28 21:55:10.578 (4377.820s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:56:48.487 (4475.729s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:60120
-2020-11-28 21:56:52.484 (4479.727s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:57:01.522 (4488.765s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:63192
-2020-11-28 21:57:05.762 (4493.004s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:57:14.036 (4501.279s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:1241
-2020-11-28 21:57:17.566 (4504.809s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:57:33.742 (4520.984s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:7385
-2020-11-28 21:57:37.314 (4524.557s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 21:57:56.735 (4543.978s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:13017
-2020-11-28 21:58:00.299 (4547.541s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:16:49.883 (5677.126s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:56028
-2020-11-28 22:16:53.723 (5680.966s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:17:06.335 (5693.578s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:61148
-2020-11-28 22:17:10.390 (5697.632s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:20:54.220 (5921.463s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:50909
-2020-11-28 22:20:57.541 (5924.784s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:24:12.607 (6119.850s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:28382
-2020-11-28 22:24:15.893 (6123.135s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:24:33.748 (6140.991s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:34014
-2020-11-28 22:24:37.042 (6144.285s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:24:50.408 (6157.651s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:38110
-2020-11-28 22:24:54.269 (6161.511s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:25:09.651 (6176.894s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:43742
-2020-11-28 22:25:13.005 (6180.248s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:25:49.406 (6216.648s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:53982
-2020-11-28 22:25:52.759 (6220.002s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:26:52.810 (6280.052s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:2783
-2020-11-28 22:26:56.200 (6283.442s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:27:40.092 (6327.335s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:13023
-2020-11-28 22:27:43.456 (6330.698s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:28:34.765 (6382.007s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:24799
-2020-11-28 22:28:38.463 (6385.705s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:30:07.001 (6474.243s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:45279
-2020-11-28 22:30:10.337 (6477.580s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:30:23.794 (6491.036s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:49375
-2020-11-28 22:30:27.265 (6494.508s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:31:20.208 (6547.451s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:61663
-2020-11-28 22:31:23.580 (6550.823s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:31:32.386 (6559.629s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:65247
-2020-11-28 22:31:35.735 (6562.978s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:31:42.750 (6569.992s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:2272
-2020-11-28 22:31:46.131 (6573.374s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:31:52.795 (6580.038s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:4832
-2020-11-28 22:31:56.270 (6583.513s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:33:18.333 (6665.575s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:22752
-2020-11-28 22:33:21.931 (6669.173s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:35:16.811 (6784.053s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:49888
-2020-11-28 22:35:20.181 (6787.424s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:35:28.489 (6795.732s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:52960
-2020-11-28 22:35:32.056 (6799.298s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:36:54.339 (6881.581s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:6881
-2020-11-28 22:36:57.774 (6885.017s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:37:11.658 (6898.901s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:10465
-2020-11-28 22:37:15.092 (6902.335s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:37:28.210 (6915.453s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:15073
-2020-11-28 22:37:31.644 (6918.887s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:39:58.877 (7066.120s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:49377
-2020-11-28 22:40:02.365 (7069.608s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:41:43.496 (7170.739s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:6882
-2020-11-28 22:41:46.829 (7174.071s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:41:53.250 (7180.493s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:9442
-2020-11-28 22:41:56.959 (7184.201s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:42:11.993 (7199.235s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:14562
-2020-11-28 22:42:15.352 (7202.595s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:42:20.605 (7207.848s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:16098
-2020-11-28 22:42:23.978 (7211.220s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:42:30.301 (7217.544s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:19170
-2020-11-28 22:42:33.677 (7220.920s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:43:49.725 (7296.967s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:39138
-2020-11-28 22:43:53.063 (7300.306s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:44:07.055 (7314.298s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:44258
-2020-11-28 22:44:10.420 (7317.662s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:44:45.468 (7352.711s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:52450
-2020-11-28 22:44:48.876 (7356.119s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:46:38.604 (7465.847s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:14563
-2020-11-28 22:46:42.075 (7469.318s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 22:48:14.666 (7561.908s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:38627
-2020-11-28 22:48:18.818 (7566.060s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 23:50:28.865 (11296.108s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:46209
-2020-11-28 23:50:34.312 (11301.555s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 23:50:39.908 (11307.150s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:48769
-2020-11-28 23:50:43.523 (11310.766s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 23:53:25.253 (11472.496s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:21122
-2020-11-28 23:53:28.762 (11476.005s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 23:54:07.646 (11514.889s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:31874
-2020-11-28 23:54:12.401 (11519.644s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 23:54:43.074 (11550.316s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:40066
-2020-11-28 23:54:47.039 (11554.281s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-28 23:55:39.228 (11606.470s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:52354
-2020-11-28 23:55:43.225 (11610.468s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:05:09.105 (12176.348s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:54404
-2020-11-29 00:05:14.495 (12181.738s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:06:20.947 (12248.190s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:5765
-2020-11-29 00:06:25.007 (12252.250s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:11:09.295 (12536.538s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:5766
-2020-11-29 00:11:13.054 (12540.297s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:11:46.388 (12573.631s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:13958
-2020-11-29 00:11:50.053 (12577.296s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:14:20.970 (12728.212s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:47750
-2020-11-29 00:14:24.586 (12731.829s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:14:35.916 (12743.159s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:51334
-2020-11-29 00:14:40.937 (12748.180s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:15:38.318 (12805.560s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:65158
-2020-11-29 00:15:42.072 (12809.315s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:16:08.211 (12835.453s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:6791
-2020-11-29 00:16:12.098 (12839.341s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:23:40.649 (13287.892s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:38024
-2020-11-29 00:23:43.697 (13290.939s) [        9E93A640]        JsonHandler.cpp:321   WARN| JsonClient::Exception: parse error - unexpected ':'; expected end of input
-2020-11-29 00:23:45.674 (13292.917s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:24:04.703 (13311.946s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:43656
-2020-11-29 00:24:08.344 (13315.586s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:24:18.127 (13325.370s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:47240
-2020-11-29 00:24:21.871 (13329.114s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:24:32.215 (13339.458s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:50824
-2020-11-29 00:24:36.005 (13343.247s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:26:17.358 (13444.601s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:8329
-2020-11-29 00:26:21.018 (13448.260s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:26:32.223 (13459.466s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:11913
-2020-11-29 00:26:37.238 (13464.480s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:28:05.140 (13552.382s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:30857
-2020-11-29 00:28:08.656 (13555.898s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:32:30.496 (13817.738s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:21130
-2020-11-29 00:32:34.165 (13821.408s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:33:32.442 (13879.684s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:35466
-2020-11-29 00:33:36.173 (13883.416s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:36:44.554 (14071.797s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:11915
-2020-11-29 00:36:48.068 (14075.311s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:37:02.741 (14089.984s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:16523
-2020-11-29 00:37:06.293 (14093.536s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:37:16.903 (14104.146s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:20107
-2020-11-29 00:37:20.499 (14107.742s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:37:31.266 (14118.509s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:22667
-2020-11-29 00:37:34.920 (14122.163s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:37:45.048 (14132.290s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:26763
-2020-11-29 00:37:48.676 (14135.918s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:54:02.193 (15109.436s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:38030
-2020-11-29 00:54:05.765 (15113.008s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:54:33.508 (15140.751s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:45710
-2020-11-29 00:54:37.223 (15144.466s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:55:09.120 (15176.362s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:54414
-2020-11-29 00:55:12.671 (15179.914s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:55:40.348 (15207.591s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:61070
-2020-11-29 00:55:44.000 (15211.242s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:57:18.077 (15305.320s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:19087
-2020-11-29 00:57:23.275 (15310.518s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:57:38.278 (15325.521s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:25743
-2020-11-29 00:57:45.203 (15332.446s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:58:59.655 (15406.898s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:43663
-2020-11-29 00:59:06.668 (15413.910s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:59:16.977 (15424.220s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:49295
-2020-11-29 00:59:23.993 (15431.236s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 00:59:57.934 (15465.176s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:59023
-2020-11-29 01:00:04.764 (15472.007s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 01:38:07.284 (17754.527s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:32409
-2020-11-29 01:38:14.440 (17761.682s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:24:15.109 (24122.351s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:46768
-2020-11-29 03:24:21.584 (24128.826s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:26:29.420 (24256.663s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:24753
-2020-11-29 03:26:32.456 (24259.698s) [        9E93A640]        JsonHandler.cpp:321   WARN| JsonClient::Exception: parse error - unexpected 'r'
-2020-11-29 03:26:33.170 (24260.413s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:27:04.474 (24291.717s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:33969
-2020-11-29 03:27:08.407 (24295.650s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:27:24.136 (24311.378s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:39089
-2020-11-29 03:27:28.008 (24315.251s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:27:41.015 (24328.258s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:42673
-2020-11-29 03:27:44.770 (24332.013s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:27:56.815 (24344.057s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:47281
-2020-11-29 03:28:00.505 (24347.748s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:40:34.034 (25101.277s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:46260
-2020-11-29 03:40:37.447 (25104.690s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:41:57.195 (25184.437s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:181
-2020-11-29 03:42:00.593 (25187.835s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:42:34.621 (25221.864s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:9909
-2020-11-29 03:42:37.637 (25224.880s) [        9E93A640]        JsonHandler.cpp:321   WARN| JsonClient::Exception: parse error - unexpected 't'
-2020-11-29 03:42:38.403 (25225.646s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:43:02.785 (25250.028s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:16565
-2020-11-29 03:43:06.222 (25253.464s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:43:31.727 (25278.969s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:23221
-2020-11-29 03:43:35.166 (25282.409s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:44:10.322 (25317.565s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:32949
-2020-11-29 03:44:13.760 (25321.003s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:45:19.691 (25386.934s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:49845
-2020-11-29 03:45:23.089 (25390.332s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:46:23.669 (25450.911s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:2230
-2020-11-29 03:46:27.121 (25454.364s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:47:03.903 (25491.146s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:11446
-2020-11-29 03:47:07.316 (25494.558s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:47:27.122 (25514.365s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:18614
-2020-11-29 03:47:30.557 (25517.800s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:49:41.647 (25648.889s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:54454
-2020-11-29 03:49:45.064 (25652.307s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:51:32.533 (25759.776s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:15543
-2020-11-29 03:51:35.924 (25763.167s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:52:21.738 (25808.981s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:26807
-2020-11-29 03:52:25.159 (25812.401s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:52:44.329 (25831.572s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:32951
-2020-11-29 03:52:47.707 (25834.950s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:52:56.865 (25844.108s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:36535
-2020-11-29 03:53:00.241 (25847.484s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:53:15.252 (25862.495s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:40119
-2020-11-29 03:53:18.699 (25865.942s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:53:32.630 (25879.873s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:46263
-2020-11-29 03:53:36.001 (25883.243s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:54:24.220 (25931.463s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:59063
-2020-11-29 03:54:27.663 (25934.905s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:54:40.076 (25947.319s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:64183
-2020-11-29 03:54:43.498 (25950.740s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:55:19.753 (25986.996s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:9400
-2020-11-29 03:55:23.105 (25990.347s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:55:35.515 (26002.758s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:15032
-2020-11-29 03:55:40.449 (26007.692s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:55:57.543 (26024.785s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:21688
-2020-11-29 03:56:01.009 (26028.252s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:56:14.978 (26042.221s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:28344
-2020-11-29 03:56:18.362 (26045.605s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:56:31.568 (26058.811s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:33976
-2020-11-29 03:56:34.913 (26062.156s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:56:46.496 (26073.738s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:37560
-2020-11-29 03:56:49.858 (26077.101s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:56:59.552 (26086.795s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:41144
-2020-11-29 03:57:02.945 (26090.187s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:57:15.182 (26102.424s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:44728
-2020-11-29 03:57:18.543 (26105.785s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 03:59:12.728 (26219.970s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:6329
-2020-11-29 03:59:16.224 (26223.466s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 04:02:35.474 (26422.717s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:54969
-2020-11-29 04:02:38.883 (26426.126s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 04:19:41.871 (27449.114s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:17597
-2020-11-29 04:19:45.129 (27452.372s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 04:20:14.624 (27481.867s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:25789
-2020-11-29 04:20:19.406 (27486.649s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 04:20:42.765 (27510.007s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:33981
-2020-11-29 04:20:47.418 (27514.660s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 04:21:53.499 (27580.742s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:53437
-2020-11-29 04:21:56.508 (27583.751s) [        9E93A640]        JsonHandler.cpp:321   WARN| JsonClient::Exception: parse error - unexpected ':'; expected end of input
-2020-11-29 04:21:58.186 (27585.429s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 04:22:35.571 (27622.814s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:64701
-2020-11-29 04:22:39.035 (27626.277s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 04:23:07.099 (27654.342s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:7870
-2020-11-29 04:23:10.460 (27657.703s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-11-29 04:23:53.546 (27700.788s) [        9E93A640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:22718
-2020-11-29 04:23:56.950 (27704.193s) [        9E93A640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-01 15:30:01.326 (   0.049s) [main thread     ]             loguru.hpp:1971     0| Logging to 'rewindviewer.log', mode: 'w', verbosity: 0
+2020-12-01 15:30:01.326 (   0.049s) [main thread     ]               main.cpp:35       0| Init GLFW
+2020-12-01 15:30:01.955 (   0.678s) [main thread     ]               main.cpp:95       0| Create main window
+2020-12-01 15:30:02.836 (   1.559s) [main thread     ]               main.cpp:115      0| Setup application icon
+2020-12-01 15:30:02.838 (   1.561s) [main thread     ]               main.cpp:47       0| Load OpenGL functions
+2020-12-01 15:30:02.839 (   1.562s) [main thread     ]               main.cpp:53       0| OpenGL 3.3.0 NVIDIA 450.80.02, GLSL 3.30 NVIDIA via Cg compiler
+2020-12-01 15:30:02.839 (   1.562s) [main thread     ]               main.cpp:55       0| Driver NVIDIA Corporation, Renderer GeForce GTX 1060/PCIe/SSE2
+2020-12-01 15:30:02.839 (   1.562s) [main thread     ]               main.cpp:66       0| Setup vertical sync to 60fps
+2020-12-01 15:30:02.839 (   1.562s) [main thread     ]               main.cpp:69       0| Start main draw loop
+2020-12-01 15:30:02.839 (   1.562s) [main thread     ]               main.cpp:126      0| Try load configuration file
+2020-12-01 15:30:03.085 (   1.808s) [main thread     ]               main.cpp:130      0| Create camera
+2020-12-01 15:30:03.085 (   1.809s) [main thread     ]               main.cpp:134      0| Create Resource manager
+2020-12-01 15:30:03.085 (   1.809s) [main thread     ]               main.cpp:138      0| Create Scene
+2020-12-01 15:30:03.086 (   1.809s) [main thread     ]           Renderer.cpp:65       0| Initialize needed attributes
+2020-12-01 15:30:03.086 (   1.809s) [main thread     ]           Renderer.cpp:71       0| Compile shaders
+2020-12-01 15:30:03.086 (   1.809s) [main thread     ]             Shader.cpp:111      0| Start compiling shader in directory 'resources/shaders/': vertex=color_pos.vert, fragment=color_pos.frag
+2020-12-01 15:30:03.086 (   1.809s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
+2020-12-01 15:30:03.192 (   1.915s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
+2020-12-01 15:30:03.192 (   1.915s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
+2020-12-01 15:30:03.360 (   2.083s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
+2020-12-01 15:30:03.360 (   2.083s) [main thread     ]             Shader.cpp:133      0| Link shader program
+2020-12-01 15:30:03.360 (   2.083s) [main thread     ]             Shader.cpp:108      0| Start compiling shader in directory 'resources/shaders/': vertex=circle.vert, fragment=circle.frag, geometry=circle.geom
+2020-12-01 15:30:03.360 (   2.083s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
+2020-12-01 15:30:03.534 (   2.257s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
+2020-12-01 15:30:03.534 (   2.257s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
+2020-12-01 15:30:03.686 (   2.409s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
+2020-12-01 15:30:03.688 (   2.411s) [main thread     ]             Shader.cpp:127      0| Load Geometry shader
+2020-12-01 15:30:03.864 (   2.587s) [main thread     ]             Shader.cpp:129      0| Compile Geometry shader
+2020-12-01 15:30:03.864 (   2.587s) [main thread     ]             Shader.cpp:133      0| Link shader program
+2020-12-01 15:30:03.865 (   2.588s) [main thread     ]             Shader.cpp:111      0| Start compiling shader in directory 'resources/shaders/': vertex=simple.vert, fragment=uniform_color.frag
+2020-12-01 15:30:03.865 (   2.588s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
+2020-12-01 15:30:03.909 (   2.632s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
+2020-12-01 15:30:03.909 (   2.632s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
+2020-12-01 15:30:03.912 (   2.635s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
+2020-12-01 15:30:03.912 (   2.635s) [main thread     ]             Shader.cpp:133      0| Link shader program
+2020-12-01 15:30:03.913 (   2.636s) [main thread     ]           Renderer.cpp:75       0| Create rectangle for future rendering
+2020-12-01 15:30:03.913 (   2.636s) [main thread     ]           Renderer.cpp:99       0| Create Uniform buffer
+2020-12-01 15:30:03.913 (   2.636s) [main thread     ]           Renderer.cpp:107      0| Bind Uniform buffer to shaders
+2020-12-01 15:30:03.913 (   2.636s) [main thread     ]               main.cpp:141      0| Create GUI controller
+2020-12-01 15:30:04.295 (   3.018s) [main thread     ]               main.cpp:149      0| Create network protocol handler: working with JSON protocol
+2020-12-01 15:30:04.295 (   3.018s) [main thread     ]               main.cpp:154      0| Start networking thread
+2020-12-01 15:30:04.295 (   3.018s) [main thread     ]               main.cpp:167      0| Start render loop
+2020-12-01 15:30:04.295 (   3.018s) [        357FF640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-01 15:41:42.971 ( 701.694s) [        357FF640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:45729
+2020-12-01 15:41:46.170 ( 704.893s) [        357FF640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-01 20:28:35.447 (17914.171s) [        357FF640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:40154
+2020-12-01 20:28:38.817 (17917.540s) [        357FF640]        NetListener.cpp:34       0| NetClient:: Start listening

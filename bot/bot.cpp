@@ -48,6 +48,8 @@ public:
   {
     // TODO: fix it
     this->max_bombs = bombs;
+    if (range == 0)
+      range = 2;
     this->range = range;
   }
 
@@ -179,7 +181,10 @@ public:
     {
       char type;
       int owner_id, x, y, param1, param2;
-      scanf("\n%c%d%d%d%d%d", &type, &owner_id, &x, &y, &param1, &param2);
+      scanf("\n%c", &type);
+      if (type == 'f')
+        scanf("%*c%*c");
+      scanf("%d%d%d%d%d", &owner_id, &x, &y, &param1, &param2);
       if (type == 'p')
       {
         players.pb(Player(x, y, owner_id, param1, param2));

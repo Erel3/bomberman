@@ -14,7 +14,7 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 def init():
-  field = Field(FieldConstructor(FieldType.NO_BLOCKS))
+  field = Field(FieldConstructor(FieldType.DEFAULT))
   helper = DrawHelper(field)
   players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
   bombs = []
@@ -35,28 +35,6 @@ def init():
     # DummyMonster(12, 10), 
     # DummyMonster(12, 10)
   ]
-  entities = players + bombs + monsters
-  helper.client.message(str(config.tick))
-  helper.redraw(field, entities)
-  return helper, field, players, bombs, monsters
-
-
-def init_from_file(file="../maps/level05.txt"):
-  field = Field(FieldConstructor(FieldType.DEFAULT))
-  players = [StrategyPlayer(1, 0, 0, Color.BLUE, "p1")]
-  bombs = []
-  monsters = []
-  with open(file, "r") as f:
-    line = f.readline()
-    w, h = map(int, line.split())
-    field.width, field.height = w, h
-    for id, line in enumerate(f.readlines()):
-      for i in range(w):
-        field.data[id][i] = line[i]
-        if field.data[id][i] == 'm':
-          field.data[id][i] = '.'
-          monsters.append(DummyMonster(i, id))
-  helper = DrawHelper(field)
   entities = players + bombs + monsters
   helper.client.message(str(config.tick))
   helper.redraw(field, entities)

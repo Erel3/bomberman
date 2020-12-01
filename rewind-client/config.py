@@ -18,7 +18,7 @@ config.monster_radius = 21
 config.width = 13
 config.height = 11
 config.bomb_timer = 6
-config.bomb_count = 1
+config.bomb_count = 3
 config.bomb_range = 2
 
 
