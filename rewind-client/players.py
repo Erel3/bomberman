@@ -100,13 +100,15 @@ class StrategyPlayer(Player):
       for i in range(field.height):
         self.proc.stdin.write("{}\n".format("".join(field.data[i])))    
       # entities cnt
-      self.proc.stdin.write("{}\n".format(len(players + bombs + monsters)))
+      self.proc.stdin.write("{}\n".format(len(players + bombs + monsters + features)))
       for player in players:
         self.proc.stdin.write("{} {} {} {} {} {}\n".format(player.type, player.owner, player.x, player.y, player.current_bomb_count, player.bomb_range))
       for bomb in bombs:
         self.proc.stdin.write("{} {} {} {} {} {}\n".format(bomb.type, bomb.owner, bomb.x, bomb.y, bomb.timer, bomb.range))
       for monster in monsters:
         self.proc.stdin.write("{} {} {} {} {} {}\n".format(monster.type, monster.owner, monster.x, monster.y, 0, 0))
+      for feature in features:
+        self.proc.stdin.write("{} {} {} {} {} {}\n".format(feature.type, feature.owner, feature.x, feature.y, 0, 0))
       self.proc.stdin.flush()
     except:
       print("error writing state to player {}".format(self.owner))
