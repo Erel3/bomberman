@@ -13,7 +13,6 @@ import os
 
 def init():
   field = Field(FieldConstructor(config.field))
-  helper = DrawHelper(field)
   players = [StrategyPlayer(id, int(player[1]), int(player[2]), player_colors[id], player[0], False if id == 0 else True) for id, player in enumerate(config.players)]
   for player in players:      
     for i in range(0, 3):      
@@ -25,6 +24,7 @@ def init():
         field.data[player.y + i][player.x] = '.'
       if player.y - i >= 0 and i < 2:
         field.data[player.y - i][player.x] = '.'
+  helper = DrawHelper(field)        
   bombs = []
   monsters = []
   features = []
