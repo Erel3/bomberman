@@ -53,6 +53,14 @@ def next_tick_bombs(field, players, bombs, monsters, features):
       id += 1
 
 
+def count_box_of_player(field, players, bombs, monsters, features):
+  for player in players:
+    for i in range(config.width):
+      for j in range(config.height):
+        if player.owner in field.box_of_player[j][i]:
+          player.score += 1
+
+
 def next_tick_field(field, players, bombs, monsters, features):
   id = 0
   while id < len(features):
@@ -147,10 +155,11 @@ def run():
 
     # bombs
     next_tick_bombs(field, players, bombs, monsters, features)
+    count_box_of_player(field, players, bombs, monsters, features)
     next_tick_field(field, players, bombs, monsters, features)
     next_tick_entities(field, players, bombs, monsters, features)
     field.draw_destroy_data(helper.client)
-    field.clean_destroy_data()
+    field.clean()
     if config.every_step_redraw:
       helper.current_step("bombs", field, players + bombs + monsters + features)
 
@@ -168,31 +177,32 @@ def run():
     helper.redraw(field, players + bombs + monsters + features)
 
 
-if __name__ == "__main__":
-  # helper, field, players, bombs, monsters = init_from_file()
-  helper, field, players, bombs, monsters, features = init()
+# if __name__ == "__main__":
+#   # helper, field, players, bombs, monsters = init_from_file()
+#   helper, field, players, bombs, monsters, features = init()
 
-  for config.tick in range(1, config.max_ticks + 1):
-    helper.client.message(str(config.tick))
+#   for config.tick in range(1, config.max_ticks + 1):
+#     helper.client.message(str(config.tick))
 
-    # bombs
-    next_tick_bombs(field, players, bombs, monsters, features)
-    next_tick_field(field, players, bombs, monsters, features)
-    next_tick_entities(field, players, bombs, monsters, features)
-    field.draw_destroy_data(helper.client)
-    field.clean_destroy_data()
-    if config.every_step_redraw:
-      helper.current_step("bombs", field, players + bombs + monsters + features)
+#     # bombs
+#     next_tick_bombs(field, players, bombs, monsters, features)
+#     count_box_of_player(field, players, bombs, monsters, features)
+#     next_tick_field(field, players, bombs, monsters, features)
+#     next_tick_entities(field, players, bombs, monsters, features)
+#     field.draw_destroy_data(helper.client)
+#     field.clean()
+#     if config.every_step_redraw:
+#       helper.current_step("bombs", field, players + bombs + monsters + features)
 
-    # monsters
-    next_tick_players(field, players, bombs, monsters, features)
-    next_tick_monsters(field, players, bombs, monsters, features)
-    next_tick_monsters_kill_players(field, players, bombs, monsters, features)
-    next_apply_players(field, players, bombs, monsters, features)
-    next_tick_monsters_kill_players(field, players, bombs, monsters, features)
-    next_apply_features(field, players, bombs, monsters, features)
-    if config.every_step_redraw:
-      helper.current_step("monsters", field, players + bombs + monsters + features)
-    if config.every_step_redraw:
-      helper.current_step("players", field, players + bombs + monsters + features)
-    helper.redraw(field, players + bombs + monsters + features)
+#     # monsters
+#     next_tick_players(field, players, bombs, monsters, features)
+#     next_tick_monsters(field, players, bombs, monsters, features)
+#     next_tick_monsters_kill_players(field, players, bombs, monsters, features)
+#     next_apply_players(field, players, bombs, monsters, features)
+#     next_tick_monsters_kill_players(field, players, bombs, monsters, features)
+#     next_apply_features(field, players, bombs, monsters, features)
+#     if config.every_step_redraw:
+#       helper.current_step("monsters", field, players + bombs + monsters + features)
+#     if config.every_step_redraw:
+#       helper.current_step("players", field, players + bombs + monsters + features)
+#     helper.redraw(field, players + bombs + monsters + features)

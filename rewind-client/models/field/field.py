@@ -61,6 +61,10 @@ class Field():
         [False for i in range(self.width)]
         for j in range(self.height)
     ]
+    self.box_of_player = [
+      [{} for i in range(self.width)]
+        for j in range(self.height)
+    ]
 
   def draw(self, client, layer=1, permanent=True):
     client.set_options(layer=layer, permanent=permanent)
@@ -136,7 +140,11 @@ class Field():
               Color.TRANSPARENT_RED.value, True
           )
 
-  def clean_destroy_data(self):
+  def clean(self):
     for i in range(self.height):
       for j in range(self.width):
         self.destroy_data[i][j] = False
+    self.box_of_player = [
+      [{} for i in range(self.width)]
+        for j in range(self.height)
+    ]
