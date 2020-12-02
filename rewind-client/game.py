@@ -12,10 +12,13 @@ import os
 
 
 def init():
+  score = {}
   field = Field(FieldConstructor(config.field))
-  players = [StrategyPlayer(id, int(player[1]), int(player[2]), player_colors[id], player[0], False if id == 0 else True) for id, player in enumerate(config.players)]
-  for player in players:      
-    for i in range(0, 3):      
+  players = [StrategyPlayer(id, int(player[1]), int(player[2]), player_colors[id],
+                            player[0], False if id == 0 else True) for id, player in enumerate(config.players)]
+  for player in players:
+    score[player.owner] = 0
+    for i in range(0, 3):
       if (player.x + i < field.width):
         field.data[player.y][player.x + i] = '.'
       if player.x - i >= 0:
@@ -24,14 +27,14 @@ def init():
         field.data[player.y + i][player.x] = '.'
       if player.y - i >= 0 and i < 2:
         field.data[player.y - i][player.x] = '.'
-  helper = DrawHelper(field)        
+  helper = DrawHelper(field)
   bombs = []
   monsters = []
   features = []
   entities = players + bombs + monsters + features
   helper.client.message(str(config.tick))
   helper.redraw(field, entities)
-  return helper, field, players, bombs, monsters, features
+  return helper, field, players, bombs, monsters, features, score
 
 
 def next_tick_bombs(field, players, bombs, monsters, features):
@@ -53,11 +56,12 @@ def next_tick_bombs(field, players, bombs, monsters, features):
       id += 1
 
 
-def count_box_of_player(field, players, bombs, monsters, features):
+def count_box_of_player(field, players, bombs, monsters, features, score):
   for player in players:
     for i in range(config.width):
       for j in range(config.height):
         if player.owner in field.box_of_player[j][i]:
+          score[player.owner] += 1
           player.score += 1
 
 
@@ -130,6 +134,7 @@ def next_apply_players(field, players, bombs, monsters, features):
   for player in players:
     player.apply(field, players, bombs, monsters, features)
 
+
 def next_apply_features(field, players, bombs, monsters, features):
   id = 0
   while id < len(features):
@@ -138,30 +143,32 @@ def next_apply_features(field, players, bombs, monsters, features):
       if player.x == features[id].x and player.y == features[id].y:
         used = True
         if features[id].type == "f_a":
-          player.bomb_count+=1
+          player.bomb_count += 1
         else:
-          player.bomb_range+=1
+          player.bomb_range += 1
     if used:
       features.pop(id)
     else:
       id += 1
 
+
 def run():
   # helper, field, players, bombs, monsters = init_from_file()
-  helper, field, players, bombs, monsters, features = init()
+  helper, field, players, bombs, monsters, features, score = init()
 
   for config.tick in range(1, config.max_ticks + 1):
     helper.client.message(str(config.tick))
 
     # bombs
     next_tick_bombs(field, players, bombs, monsters, features)
-    count_box_of_player(field, players, bombs, monsters, features)
+    count_box_of_player(field, players, bombs, monsters, features, score)
     next_tick_field(field, players, bombs, monsters, features)
     next_tick_entities(field, players, bombs, monsters, features)
     field.draw_destroy_data(helper.client)
     field.clean()
     if config.every_step_redraw:
-      helper.current_step("bombs", field, players + bombs + monsters + features)
+      helper.current_step("bombs", field, players +
+                          bombs + monsters + features)
 
     # monsters
     next_tick_players(field, players, bombs, monsters, features)
@@ -171,9 +178,12 @@ def run():
     next_tick_monsters_kill_players(field, players, bombs, monsters, features)
     next_apply_features(field, players, bombs, monsters, features)
     if config.every_step_redraw:
-      helper.current_step("monsters", field, players + bombs + monsters + features)
+      helper.current_step("monsters", field, players +
+                          bombs + monsters + features)
     if config.every_step_redraw:
-      helper.current_step("players", field, players + bombs + monsters + features)
+      helper.current_step("players", field, players +
+                          bombs + monsters + features)
+    helper.client.message(str(list(score.items())))
     helper.redraw(field, players + bombs + monsters + features)
 
 
