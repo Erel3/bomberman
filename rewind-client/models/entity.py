@@ -39,6 +39,8 @@ class Player(Entity):
     self.action = None
     self.color = color
 
+    self.score = 0
+
   def recalculate(self, field, players, bombs, monsters, features):
     self.current_bomb_count = self.bomb_count
     for bomb in bombs:
@@ -80,7 +82,7 @@ class Player(Entity):
     block_size = config.block_size
     player_radius = config.player_radius
     client.circle(block_size * self.x + block_size // 2, block_size * self.y + block_size // 2, player_radius, self.color.value, True)
-    client.circle_popup(block_size * self.x + block_size // 2, block_size * self.y + block_size // 2, player_radius, "mb: {}, b:{}, r:{}".format(self.bomb_count, self.current_bomb_count, self.bomb_range))
+    client.circle_popup(block_size * self.x + block_size // 2, block_size * self.y + block_size // 2, player_radius, "mb: {}, b:{}, r:{}, s:{}".format(self.bomb_count, self.current_bomb_count, self.bomb_range, self.score))
 
 
 class Bomb(Entity):
@@ -106,24 +108,32 @@ class Bomb(Entity):
           break
         field.destroy_data[self.y][self.x + 1 + i] = True
         if field.data[self.y][self.x + 1 + i] == ';':
+          if self.owner not in field.box_of_player[self.y][self.x + 1 + i]:
+            field.box_of_player[self.y][self.x + 1 + i][self.owner] = True
           break
     for i in range(self.range):
         if self.x - 1 - i < 0 or field.data[self.y][self.x - 1 - i] == '!':
           break
         field.destroy_data[self.y][self.x - 1 - i] = True
         if field.data[self.y][self.x - 1 - i] == ';':
+          if self.owner not in field.box_of_player[self.y][self.x - 1 - i]:
+            field.box_of_player[self.y][self.x - 1 - i][self.owner] = True
           break
     for i in range(self.range):
         if self.y + 1 + i >= field.height or field.data[self.y + 1 + i][self.x] == '!':
           break
         field.destroy_data[self.y + 1 + i][self.x] = True
         if field.data[self.y + 1 + i][self.x] == ';':
+          if self.owner not in field.box_of_player[self.y + 1 + i][self.x]:
+            field.box_of_player[self.y + 1 + i][self.x][self.owner] = True
           break
     for i in range(self.range):
         if self.y - 1 - i < 0 or field.data[self.y - 1 - i][self.x] == '!':
           break
         field.destroy_data[self.y - 1 - i][self.x] = True
         if field.data[self.y - 1 - i][self.x] == ';':
+          if self.owner not in field.box_of_player[self.y - 1 - i][self.x]:
+            field.box_of_player[self.y - 1 - i][self.x][self.owner] = True          
           break
 
   def draw(self, client, layer = 5, permanent = False):

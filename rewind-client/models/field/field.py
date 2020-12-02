@@ -61,6 +61,10 @@ class Field():
         [False for i in range(self.width)]
         for j in range(self.height)
     ]
+    self.box_of_player = [
+      [{} for i in range(self.width)]
+        for j in range(self.height)
+    ]
 
     # player1 space
     self.data[0][0] = '.'
@@ -147,7 +151,11 @@ class Field():
               Color.TRANSPARENT_RED.value, True
           )
 
-  def clean_destroy_data(self):
+  def clean(self):
     for i in range(self.height):
       for j in range(self.width):
         self.destroy_data[i][j] = False
+    self.box_of_player = [
+      [{} for i in range(self.width)]
+        for j in range(self.height)
+    ]
