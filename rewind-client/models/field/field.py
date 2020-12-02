@@ -62,17 +62,6 @@ class Field():
         for j in range(self.height)
     ]
 
-    # player1 space
-    self.data[0][0] = '.'
-    self.data[0][1] = '.'
-    self.data[0][2] = '.'
-    self.data[1][0] = '.'
-    # player2 space
-    self.data[-1][-1] = '.'
-    self.data[-1][-2] = '.'
-    self.data[-1][-3] = '.'
-    self.data[-2][-1] = '.'
-
   def draw(self, client, layer=1, permanent=True):
     client.set_options(layer=layer, permanent=permanent)
     block_size = config.block_size
