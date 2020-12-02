@@ -151,8 +151,6 @@ public:
   {
     int width, height, owner_id, tick;
     scanf("%d%d%d%d", &width, &height, &owner_id, &tick);
-    fprintf(stderr, "oid %d\n", owner_id);
-    fflush(stderr);
     if (width == -1 && height == -1)
     {
       fprintf(stderr, "max time: %.3lf ms\n", max_tick_time);

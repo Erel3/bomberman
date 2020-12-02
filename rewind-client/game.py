@@ -25,11 +25,11 @@ def init():
 
 
 def next_tick_bombs(field, players, bombs, monsters, features):
+  for bomb in bombs:
+    bomb.tick(field, players, bombs, monsters, features)
   scan = True
   while scan:
     scan = False
-    for bomb in bombs:
-      bomb.tick(field, players, bombs, monsters, features)
     for bomb in bombs:
       if bomb.timer != 0 and field.destroy_data[bomb.y][bomb.x]:
         bomb.timer = 1
