@@ -138,18 +138,20 @@ private:
 
 public:
   int tick;
+  int start_x, start_y;
   Game()
   {
     read_state(true);
+    this->start_x = this->me->x;
+    this->start_y = this->me->y;
+    cerr << this->start_x << " " << this->start_y << endl;
   }
 
   void read_state(bool create = false)
   {
-    fprintf(stderr, "reading\n");
-    fflush(stderr);
     int width, height, owner_id, tick;
     scanf("%d%d%d%d", &width, &height, &owner_id, &tick);
-    fprintf(stderr, "%d\n", width);
+    fprintf(stderr, "oid %d\n", owner_id);
     fflush(stderr);
     if (width == -1 && height == -1)
     {
@@ -205,6 +207,14 @@ public:
       if (type == 'm')
       {
         monsters.pb(Monster(x, y, owner_id));
+      }
+    }
+
+    for (Player &player : players)
+    {
+      if (player.owner_id == owner_id)
+      {
+        this->me = &player;
       }
     }
     this->tick = tick;
@@ -873,7 +883,7 @@ public:
       else
       {
         cerr << "shit" << endl;
-        gox = 0, goy = 0;
+        gox = this->start_x, goy = this->start_y;
         this->me->action = get_action_by_target(gox, goy);
       }
     }
@@ -884,7 +894,7 @@ public:
     }
     else
     {
-      this->me->action = get_action_by_target(0, 0);
+      this->me->action = get_action_by_target(this->start_x, this->start_y);
     }
   }
 
@@ -918,8 +928,6 @@ public:
 
 int main()
 {
-  fprintf(stderr, "started\n");
-  fflush(stderr);
   Game game;
   while (true)
   {

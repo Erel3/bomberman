@@ -2,74 +2,175 @@ arguments: ./rewindviewer
 Current dir: /home/mika/work/projects/bomberman/rewind-viewer
 File verbosity level: 0
 date       time         ( uptime  ) [ thread name/id ]                   file:line     v| 
-2020-12-02 01:08:01.631 (   0.000s) [main thread     ]             loguru.hpp:1971     0| Logging to 'rewindviewer.log', mode: 'w', verbosity: 0
-2020-12-02 01:08:01.631 (   0.000s) [main thread     ]               main.cpp:35       0| Init GLFW
-2020-12-02 01:08:02.568 (   0.937s) [main thread     ]               main.cpp:95       0| Create main window
-2020-12-02 01:08:03.667 (   2.036s) [main thread     ]               main.cpp:115      0| Setup application icon
-2020-12-02 01:08:03.669 (   2.038s) [main thread     ]               main.cpp:47       0| Load OpenGL functions
-2020-12-02 01:08:03.670 (   2.039s) [main thread     ]               main.cpp:53       0| OpenGL 3.3.0 NVIDIA 450.80.02, GLSL 3.30 NVIDIA via Cg compiler
-2020-12-02 01:08:03.670 (   2.039s) [main thread     ]               main.cpp:55       0| Driver NVIDIA Corporation, Renderer GeForce GTX 1060/PCIe/SSE2
-2020-12-02 01:08:03.670 (   2.039s) [main thread     ]               main.cpp:66       0| Setup vertical sync to 60fps
-2020-12-02 01:08:03.672 (   2.040s) [main thread     ]               main.cpp:69       0| Start main draw loop
-2020-12-02 01:08:03.672 (   2.040s) [main thread     ]               main.cpp:126      0| Try load configuration file
-2020-12-02 01:08:03.672 (   2.041s) [main thread     ]               main.cpp:130      0| Create camera
-2020-12-02 01:08:03.672 (   2.041s) [main thread     ]               main.cpp:134      0| Create Resource manager
-2020-12-02 01:08:03.672 (   2.041s) [main thread     ]               main.cpp:138      0| Create Scene
-2020-12-02 01:08:03.672 (   2.041s) [main thread     ]           Renderer.cpp:65       0| Initialize needed attributes
-2020-12-02 01:08:03.672 (   2.041s) [main thread     ]           Renderer.cpp:71       0| Compile shaders
-2020-12-02 01:08:03.672 (   2.041s) [main thread     ]             Shader.cpp:111      0| Start compiling shader in directory 'resources/shaders/': vertex=color_pos.vert, fragment=color_pos.frag
-2020-12-02 01:08:03.672 (   2.041s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
-2020-12-02 01:08:03.692 (   2.061s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
-2020-12-02 01:08:03.692 (   2.061s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
-2020-12-02 01:08:03.714 (   2.083s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
-2020-12-02 01:08:03.714 (   2.083s) [main thread     ]             Shader.cpp:133      0| Link shader program
-2020-12-02 01:08:03.714 (   2.083s) [main thread     ]             Shader.cpp:108      0| Start compiling shader in directory 'resources/shaders/': vertex=circle.vert, fragment=circle.frag, geometry=circle.geom
-2020-12-02 01:08:03.714 (   2.083s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
-2020-12-02 01:08:03.721 (   2.090s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
-2020-12-02 01:08:03.721 (   2.090s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
-2020-12-02 01:08:03.722 (   2.090s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
-2020-12-02 01:08:03.722 (   2.090s) [main thread     ]             Shader.cpp:127      0| Load Geometry shader
-2020-12-02 01:08:03.723 (   2.092s) [main thread     ]             Shader.cpp:129      0| Compile Geometry shader
-2020-12-02 01:08:03.723 (   2.092s) [main thread     ]             Shader.cpp:133      0| Link shader program
-2020-12-02 01:08:03.724 (   2.092s) [main thread     ]             Shader.cpp:111      0| Start compiling shader in directory 'resources/shaders/': vertex=simple.vert, fragment=uniform_color.frag
-2020-12-02 01:08:03.724 (   2.092s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
-2020-12-02 01:08:03.724 (   2.093s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
-2020-12-02 01:08:03.724 (   2.093s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
-2020-12-02 01:08:03.724 (   2.093s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
-2020-12-02 01:08:03.724 (   2.093s) [main thread     ]             Shader.cpp:133      0| Link shader program
-2020-12-02 01:08:03.724 (   2.093s) [main thread     ]           Renderer.cpp:75       0| Create rectangle for future rendering
-2020-12-02 01:08:03.725 (   2.093s) [main thread     ]           Renderer.cpp:99       0| Create Uniform buffer
-2020-12-02 01:08:03.725 (   2.093s) [main thread     ]           Renderer.cpp:107      0| Bind Uniform buffer to shaders
-2020-12-02 01:08:03.725 (   2.093s) [main thread     ]               main.cpp:141      0| Create GUI controller
-2020-12-02 01:08:03.776 (   2.145s) [main thread     ]               main.cpp:149      0| Create network protocol handler: working with JSON protocol
-2020-12-02 01:08:03.776 (   2.145s) [main thread     ]               main.cpp:154      0| Start networking thread
-2020-12-02 01:08:03.776 (   2.145s) [main thread     ]               main.cpp:167      0| Start render loop
-2020-12-02 01:08:03.776 (   2.145s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:08:23.496 (  21.865s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:35542
-2020-12-02 01:08:24.823 (  23.192s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:08:50.731 (  49.100s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:42710
-2020-12-02 01:08:50.740 (  49.109s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:13:53.166 ( 351.535s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:47831
-2020-12-02 01:14:05.840 ( 364.209s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:15:16.562 ( 434.931s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:5336
-2020-12-02 01:15:31.392 ( 449.761s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:15:46.457 ( 464.825s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:13528
-2020-12-02 01:15:53.919 ( 472.288s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:17:34.220 ( 572.589s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:41176
-2020-12-02 01:17:42.266 ( 580.635s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:18:55.494 ( 653.863s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:63704
-2020-12-02 01:18:58.036 ( 656.404s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:19:21.502 ( 679.871s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:6873
-2020-12-02 01:19:36.180 ( 694.549s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:31:09.691 (1388.060s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:41691
-2020-12-02 01:31:13.928 (1392.297s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:33:24.602 (1522.971s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:8412
-2020-12-02 01:33:25.044 (1523.413s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:33:39.582 (1537.951s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:13532
-2020-12-02 01:33:40.019 (1538.387s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:34:06.365 (1564.734s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:21212
-2020-12-02 01:34:06.857 (1565.226s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:34:42.515 (1600.884s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:29404
-2020-12-02 01:34:42.996 (1601.365s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
-2020-12-02 01:38:53.256 (1851.625s) [        C82AA640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:34013
-2020-12-02 01:38:53.653 (1852.022s) [        C82AA640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:01:28.534 (   0.001s) [main thread     ]             loguru.hpp:1971     0| Logging to 'rewindviewer.log', mode: 'w', verbosity: 0
+2020-12-02 17:01:28.534 (   0.001s) [main thread     ]               main.cpp:35       0| Init GLFW
+2020-12-02 17:01:29.448 (   0.915s) [main thread     ]               main.cpp:95       0| Create main window
+2020-12-02 17:01:30.341 (   1.807s) [main thread     ]               main.cpp:115      0| Setup application icon
+2020-12-02 17:01:30.343 (   1.809s) [main thread     ]               main.cpp:47       0| Load OpenGL functions
+2020-12-02 17:01:30.344 (   1.810s) [main thread     ]               main.cpp:53       0| OpenGL 3.3.0 NVIDIA 450.80.02, GLSL 3.30 NVIDIA via Cg compiler
+2020-12-02 17:01:30.344 (   1.810s) [main thread     ]               main.cpp:55       0| Driver NVIDIA Corporation, Renderer GeForce GTX 1060/PCIe/SSE2
+2020-12-02 17:01:30.344 (   1.810s) [main thread     ]               main.cpp:66       0| Setup vertical sync to 60fps
+2020-12-02 17:01:30.344 (   1.810s) [main thread     ]               main.cpp:69       0| Start main draw loop
+2020-12-02 17:01:30.344 (   1.810s) [main thread     ]               main.cpp:126      0| Try load configuration file
+2020-12-02 17:01:30.359 (   1.825s) [main thread     ]               main.cpp:130      0| Create camera
+2020-12-02 17:01:30.359 (   1.826s) [main thread     ]               main.cpp:134      0| Create Resource manager
+2020-12-02 17:01:30.359 (   1.826s) [main thread     ]               main.cpp:138      0| Create Scene
+2020-12-02 17:01:30.359 (   1.826s) [main thread     ]           Renderer.cpp:65       0| Initialize needed attributes
+2020-12-02 17:01:30.359 (   1.826s) [main thread     ]           Renderer.cpp:71       0| Compile shaders
+2020-12-02 17:01:30.359 (   1.826s) [main thread     ]             Shader.cpp:111      0| Start compiling shader in directory 'resources/shaders/': vertex=color_pos.vert, fragment=color_pos.frag
+2020-12-02 17:01:30.359 (   1.826s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
+2020-12-02 17:01:30.360 (   1.826s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
+2020-12-02 17:01:30.360 (   1.826s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
+2020-12-02 17:01:30.360 (   1.827s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
+2020-12-02 17:01:30.360 (   1.827s) [main thread     ]             Shader.cpp:133      0| Link shader program
+2020-12-02 17:01:30.360 (   1.827s) [main thread     ]             Shader.cpp:108      0| Start compiling shader in directory 'resources/shaders/': vertex=circle.vert, fragment=circle.frag, geometry=circle.geom
+2020-12-02 17:01:30.360 (   1.827s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
+2020-12-02 17:01:30.361 (   1.827s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
+2020-12-02 17:01:30.361 (   1.827s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
+2020-12-02 17:01:30.361 (   1.828s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
+2020-12-02 17:01:30.361 (   1.828s) [main thread     ]             Shader.cpp:127      0| Load Geometry shader
+2020-12-02 17:01:30.361 (   1.828s) [main thread     ]             Shader.cpp:129      0| Compile Geometry shader
+2020-12-02 17:01:30.361 (   1.828s) [main thread     ]             Shader.cpp:133      0| Link shader program
+2020-12-02 17:01:30.362 (   1.828s) [main thread     ]             Shader.cpp:111      0| Start compiling shader in directory 'resources/shaders/': vertex=simple.vert, fragment=uniform_color.frag
+2020-12-02 17:01:30.362 (   1.828s) [main thread     ]             Shader.cpp:115      0| Load Vertex shader
+2020-12-02 17:01:30.362 (   1.829s) [main thread     ]             Shader.cpp:117      0| Compile Vertex shader
+2020-12-02 17:01:30.362 (   1.829s) [main thread     ]             Shader.cpp:120      0| Load Fragment shader
+2020-12-02 17:01:30.362 (   1.829s) [main thread     ]             Shader.cpp:122      0| Compile Fragment shader
+2020-12-02 17:01:30.362 (   1.829s) [main thread     ]             Shader.cpp:133      0| Link shader program
+2020-12-02 17:01:30.363 (   1.829s) [main thread     ]           Renderer.cpp:75       0| Create rectangle for future rendering
+2020-12-02 17:01:30.363 (   1.829s) [main thread     ]           Renderer.cpp:99       0| Create Uniform buffer
+2020-12-02 17:01:30.363 (   1.829s) [main thread     ]           Renderer.cpp:107      0| Bind Uniform buffer to shaders
+2020-12-02 17:01:30.363 (   1.829s) [main thread     ]               main.cpp:141      0| Create GUI controller
+2020-12-02 17:01:30.423 (   1.889s) [main thread     ]               main.cpp:149      0| Create network protocol handler: working with JSON protocol
+2020-12-02 17:01:30.423 (   1.889s) [main thread     ]               main.cpp:154      0| Start networking thread
+2020-12-02 17:01:30.423 (   1.889s) [main thread     ]               main.cpp:167      0| Start render loop
+2020-12-02 17:01:30.423 (   1.889s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:01:54.035 (  25.501s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:12011
+2020-12-02 17:01:54.440 (  25.907s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:02:44.254 (  75.721s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:21227
+2020-12-02 17:02:44.640 (  76.107s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:03:10.500 ( 101.967s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:25323
+2020-12-02 17:03:10.949 ( 102.416s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:03:21.925 ( 113.392s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:27371
+2020-12-02 17:03:22.274 ( 113.741s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:03:31.049 ( 122.515s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:28395
+2020-12-02 17:03:31.401 ( 122.868s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:04:19.582 ( 171.048s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:37611
+2020-12-02 17:04:20.151 ( 171.617s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:04:36.331 ( 187.797s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:41195
+2020-12-02 17:04:36.765 ( 188.231s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:04:57.201 ( 208.668s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:44267
+2020-12-02 17:04:57.614 ( 209.081s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:05:33.352 ( 244.819s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:51435
+2020-12-02 17:05:33.748 ( 245.215s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:05:57.365 ( 268.832s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:55531
+2020-12-02 17:05:57.814 ( 269.280s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:08:45.980 ( 437.447s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:22764
+2020-12-02 17:08:45.988 ( 437.455s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:09:30.921 ( 482.387s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:32492
+2020-12-02 17:09:32.948 ( 484.415s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:10:00.439 ( 511.906s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:37100
+2020-12-02 17:10:00.443 ( 511.910s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:10:09.105 ( 520.572s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:39660
+2020-12-02 17:10:10.882 ( 522.349s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:11:13.441 ( 584.908s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:48876
+2020-12-02 17:11:13.978 ( 585.444s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:11:36.116 ( 607.583s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:52972
+2020-12-02 17:11:38.039 ( 609.506s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:12:40.736 ( 672.202s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:64236
+2020-12-02 17:12:41.264 ( 672.730s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:12:46.920 ( 678.386s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:237
+2020-12-02 17:12:47.453 ( 678.920s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:14:22.614 ( 774.080s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:19181
+2020-12-02 17:14:23.148 ( 774.615s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:14:30.673 ( 782.140s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:20717
+2020-12-02 17:14:30.826 ( 782.293s) [        5DB2E640]        JsonHandler.cpp:321   WARN| JsonClient::Exception: parse error - unexpected ','; expected end of input
+2020-12-02 17:14:31.255 ( 782.721s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:14:41.891 ( 793.357s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:23789
+2020-12-02 17:14:43.997 ( 795.463s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:15:14.947 ( 826.413s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:28909
+2020-12-02 17:15:16.949 ( 828.415s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:15:22.039 ( 833.506s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:30445
+2020-12-02 17:15:23.869 ( 835.336s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:16:08.117 ( 879.583s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:38125
+2020-12-02 17:16:08.459 ( 879.926s) [        5DB2E640]        JsonHandler.cpp:321   WARN| JsonClient::Exception: parse error - unexpected 'r'; expected end of input
+2020-12-02 17:16:10.053 ( 881.520s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:16:16.291 ( 887.758s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:40173
+2020-12-02 17:16:18.224 ( 889.691s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:17:47.479 ( 978.945s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:53485
+2020-12-02 17:17:47.927 ( 979.393s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:17:53.939 ( 985.406s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:55533
+2020-12-02 17:17:54.458 ( 985.925s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:18:04.135 ( 995.601s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:57069
+2020-12-02 17:18:04.582 ( 996.049s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:18:25.548 (1017.014s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:61165
+2020-12-02 17:18:25.961 (1017.428s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:18:55.897 (1047.363s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:64749
+2020-12-02 17:18:56.340 (1047.806s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:19:24.768 (1076.234s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:3310
+2020-12-02 17:19:25.352 (1076.818s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:20:11.611 (1123.077s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:10478
+2020-12-02 17:20:12.089 (1123.555s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:20:31.257 (1142.724s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:14574
+2020-12-02 17:20:31.713 (1143.180s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:21:09.910 (1181.376s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:1664
+2020-12-02 17:21:10.343 (1181.810s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:21:20.556 (1192.022s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:4224
+2020-12-02 17:21:20.975 (1192.441s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:21:29.094 (1200.560s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:6784
+2020-12-02 17:21:29.606 (1201.072s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:22:11.141 (1242.608s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:16512
+2020-12-02 17:22:11.538 (1243.005s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:23:12.128 (1303.594s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:27264
+2020-12-02 17:23:12.538 (1304.004s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:23:45.932 (1337.399s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:32384
+2020-12-02 17:23:46.489 (1337.956s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:23:57.869 (1349.336s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:34944
+2020-12-02 17:23:57.923 (1349.389s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:24:36.853 (1388.320s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:42112
+2020-12-02 17:24:36.898 (1388.364s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:24:48.838 (1400.305s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:43648
+2020-12-02 17:24:49.195 (1400.662s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:25:28.687 (1440.153s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:49280
+2020-12-02 17:25:28.692 (1440.158s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:26:11.841 (1483.308s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:56960
+2020-12-02 17:26:12.258 (1483.725s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:26:53.052 (1524.518s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:64640
+2020-12-02 17:26:53.724 (1525.190s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:27:19.576 (1551.042s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:2177
+2020-12-02 17:27:20.468 (1551.934s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:27:28.905 (1560.372s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:3713
+2020-12-02 17:27:29.595 (1561.062s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:28:44.742 (1636.209s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:14977
+2020-12-02 17:28:45.123 (1636.589s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:28:53.881 (1645.348s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:17537
+2020-12-02 17:28:54.499 (1645.966s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:29:24.001 (1675.468s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:21121
+2020-12-02 17:29:24.111 (1675.577s) [        5DB2E640]        JsonHandler.cpp:321   WARN| JsonClient::Exception: parse error - unexpected 'n'
+2020-12-02 17:29:24.308 (1675.775s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:30:07.398 (1718.864s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:29313
+2020-12-02 17:30:08.177 (1719.643s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:31:21.956 (1793.423s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:39553
+2020-12-02 17:31:22.658 (1794.124s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:33:40.968 (1932.434s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:61569
+2020-12-02 17:33:41.221 (1932.688s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:34:20.351 (1971.818s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:3714
+2020-12-02 17:34:20.637 (1972.103s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:34:38.656 (1990.123s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:6786
+2020-12-02 17:34:39.310 (1990.776s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:39:58.389 (2309.856s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:47746
+2020-12-02 17:39:58.872 (2310.339s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:53:21.036 (3112.502s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:20100
+2020-12-02 17:53:21.824 (3113.291s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:53:51.776 (3143.242s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:26244
+2020-12-02 17:53:52.440 (3143.906s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:54:01.044 (3152.511s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:27268
+2020-12-02 17:54:01.685 (3153.152s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:54:11.335 (3162.802s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:29316
+2020-12-02 17:54:12.054 (3163.521s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:54:20.317 (3171.783s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:30340
+2020-12-02 17:54:21.125 (3172.591s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:57:10.408 (3341.875s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:51332
+2020-12-02 17:57:11.066 (3342.533s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening
+2020-12-02 17:57:48.413 (3379.879s) [        5DB2E640]        NetListener.cpp:47       0| NetListener:: Got connection from 127.0.0.1:56452
+2020-12-02 17:57:49.063 (3380.530s) [        5DB2E640]        NetListener.cpp:34       0| NetClient:: Start listening

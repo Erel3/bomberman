@@ -1,8 +1,10 @@
-from models import Field, FieldType, FieldConstructor, Bomb, Monster, MonsterAction, Player, PlayerAction, FeatureAdd, FeatureRange
+from models.field.field import Field, FieldConstructor
+from models.field.field_type import FieldType
+from models.entity import Bomb, Monster, MonsterAction, Player, PlayerAction, FeatureAdd, FeatureRange
 from players import StrategyPlayer
 from monsters import DummyMonster
 from draw_helper import DrawHelper
-from colors import Color
+from colors import Color, player_colors
 from config import config
 
 import random
@@ -10,9 +12,9 @@ import os
 
 
 def init():
-  field = Field(FieldConstructor(FieldType.DEFAULT))
+  field = Field(FieldConstructor(config.field))
   helper = DrawHelper(field)
-  players = [StrategyPlayer(1, 0, 0, Color.BLUE, "../strategies/bot")]
+  players = [StrategyPlayer(id, int(player[1]), int(player[2]), player_colors[id], player[0], False if id == 0 else True) for id, player in enumerate(config.players)]
   bombs = []
   monsters = []
   features = []

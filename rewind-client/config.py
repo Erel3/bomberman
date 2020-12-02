@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 from argparse import ArgumentParser
+from models.field.field_type import FieldType
 import sys
 
 config = SimpleNamespace()
@@ -22,10 +23,16 @@ class ConfigParser(ArgumentParser):
                       default=config.every_step_redraw, dest='every_step_redraw', help='redraw field on every step inside one tick (bombs-clean-monsters-clean-players-clean)')
     self.add_argument('-t', '--ticks', action='store', type=int,
                       default=config.max_ticks, metavar=config.max_ticks, dest='max_ticks', help='number of ticks in game')
+    self.add_argument('-p', '--player-strategy', action='append', nargs=3,
+                      metavar=('strategy-file', 'x', 'y'), dest='players', help='player and it\'s position')
+    self.add_argument('-f', '--field', action='store', metavar=list(map(lambda f: f.value, FieldType)),
+                      default=FieldType.DEFAULT, type=FieldType, choices=list(FieldType), dest='field', help='field type generator')
     self.namespace = config
 
   def parse(self):
     self.parse_args(namespace=self.namespace)
+    if len(self.namespace.players) == 0:
+      self.namespace.players.append(["../strategies/bot", '0', '0'])
 
   def error(self, message):
     sys.stderr.write('error: %s\n' % message)
@@ -50,6 +57,7 @@ config.height = 11
 config.bomb_timer = 6
 config.bomb_count = 1
 config.bomb_range = 2
+config.players = []
 
 
 # run variables

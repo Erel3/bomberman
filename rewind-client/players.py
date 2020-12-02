@@ -1,7 +1,6 @@
 import subprocess
 
-from models import Player
-from models import PlayerAction
+from models.entity import Player, PlayerAction
 from config import config
 
 import os
@@ -97,6 +96,7 @@ class StrategyPlayer(Player):
     try:
       # game info
       self.proc.stdin.write("{} {} {} {}\n".format(field.width, field.height, self.owner, config.tick))
+      print(self.owner)
       # field
       for i in range(field.height):
         self.proc.stdin.write("{}\n".format("".join(field.data[i])))    

@@ -1,5 +1,4 @@
-from models import Monster
-from models import MonsterAction
+from models.entity import Monster, MonsterAction
 import random
 from config import config
 
