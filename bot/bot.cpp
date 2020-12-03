@@ -798,41 +798,9 @@ public:
     shortest_path();
     shortest_path_with_bomb();
 
-    // box/monster destroy
+    // choose and destroy boxes
     int gox = -1, goy, dd = 10000;
 
-    // 1 bomb - 400 ticks; 2, 3 bomb - 200 ticks; range 2; 50% boxes
-    // for (int iy = 0; iy < this->field.height; iy++)
-    // {
-    //   for (int ix = 0; ix < this->field.width; ix++)
-    //   {
-    //     if (this->field.cells[iy][ix].type == CELL_BOX && shortest_paths[last_layer][iy][ix] == -1)
-    //       for (int dir = 0; dir < 4; dir++)
-    //       {
-    //         for (int i = 1; i <= this->me->range; i++)
-    //         {
-    //           int to_x = ix + dx[dir] * i, to_y = iy + dy[dir] * i;
-    //           if (to_x < 0 || to_x >= this->field.width ||
-    //               to_y < 0 || to_y >= this->field.height || this->field.cells[to_y][to_x].type == CELL_BLOCK || this->field.cells[to_y][to_x].type == CELL_BOX)
-    //           {
-    //             break;
-    //           }
-
-    //           for (int l = 0; l < layers_to_check; l++)
-    //           {
-    //             if (shortest_paths[l][to_y][to_x] != -1 && dd > shortest_paths[l][to_y][to_x])
-    //             {
-    //               dd = shortest_paths[l][to_y][to_x];
-    //               gox = to_x;
-    //               goy = to_y;
-    //             }
-    //           }
-    //         }
-    //       }
-    //   }
-    // }
-
-    // 1 bomb - 200 ticks; 2, 3 bomb - 170 ticks; range 2; 50% boxes
     vector<vector<int>> box_destroy = vector<vector<int>>(this->field.height, vector<int>(this->field.width, 0));
     for (int iy = 0; iy < this->field.height; iy++)
     {
@@ -861,9 +829,9 @@ public:
         if (box_destroy[iy][ix] != 0)
           for (int l = 0; l < layers_to_check; l++)
           {
-            if (shortest_paths[l][iy][ix] != -1 && dd > shortest_paths[l][iy][ix] - 3 * (box_destroy[iy][ix] - 1) + 6 * max(0, this->me->bombs - 1))
+            if (shortest_paths[l][iy][ix] != -1 && dd > shortest_paths[l][iy][ix] - 5 * (box_destroy[iy][ix] - 1) + 6 * max(0, this->me->bombs - 1))
             {
-              dd = shortest_paths[l][iy][ix] - 3 * (box_destroy[iy][ix] - 1) + 6 * max(0, this->me->bombs - 1);
+              dd = shortest_paths[l][iy][ix] - 5 * (box_destroy[iy][ix] - 1) + 6 * max(0, this->me->bombs - 1);
               gox = ix;
               goy = iy;
             }
