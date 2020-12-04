@@ -58,7 +58,8 @@ config.bomb_timer = 6
 config.bomb_count = 1
 config.bomb_range = 2
 config.players = []
-
+config.with_viewer = True
+config.game_count = 1
 
 # run variables
 config.tick = 0
