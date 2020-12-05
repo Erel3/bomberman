@@ -333,7 +333,7 @@ public:
     int bombs_count = bombs.size();
     Bomb bombs[MAX_BOMB];
     for (int i = 0; i < bombs_count; i++)
-      bombs[i] = bombs[i];
+      bombs[i] = vec_bombs[i];
 
     bitset<W * H> destroy_boxes[2];
     bitset<W> accessibleness[H];
