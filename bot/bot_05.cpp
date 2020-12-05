@@ -387,14 +387,14 @@ public:
 
             if (bombs_count > 0)
             {
-              tie(is_safe, own_score_change, rival_score_change) = check_safe_and_get_score(tick, x, y, current_field, bombs, bombs_count);
+              tie(is_safe, own_score_change, rival_score_change) = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count);
             }
             else
             {
               if (!is_calced[y][x])
               {
                 is_calced[y][x] = 1;
-                calced_value[y][x] = check_safe_and_get_score(tick, x, y, current_field, bombs, bombs_count);
+                calced_value[y][x] = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count);
               }
               tie(is_safe, own_score_change, rival_score_change) = calced_value[y][x];
             }
