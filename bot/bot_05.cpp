@@ -30,6 +30,7 @@ int dx[] = {0, -1, 1, 0, 0}, dy[] = {-1, 0, 0, 1, 0};
 double max_tick_time = 0;
 
 const int bomb_timer = 6;
+const int W = 13, H = 11, K = W + H + 10;
 
 enum PlayerMove
 {
@@ -267,10 +268,10 @@ public:
 
   void prepare()
   {
-    x = get_action
-    set_action x.f
-    if(have_bomb)
-      prev_cnt = 
+    pair<PlayerMove, int> base_action = get_action(bombs, field, this->me->bombs > 0);
+    this -> me -> action = base_action.fs;
+    if(this->me->bombs > 0)
+      int prev_cnt = get_score(bombs, field);
       vec bombs = this -> boms
       cnt = 
       if prev_cnt < cnt
