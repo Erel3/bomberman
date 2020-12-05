@@ -46,7 +46,6 @@ class Player
 public:
   Player(int x, int y, int owner_id, int bombs, int range) : x(x), y(y), owner_id(owner_id), bombs(bombs), range(range)
   {
-    // TODO: fix it
     this->max_bombs = bombs;
     if (range == 0)
       range = 2;
@@ -213,6 +212,11 @@ public:
       if (player.owner_id == owner_id)
       {
         this->me = &player;
+      }
+      for (Bomb bomb: bombs) {
+        if (player.owner_id == bomb.owner_id) {
+          player.max_bombs++;
+        }
       }
     }
     this->tick = tick;
