@@ -219,157 +219,9 @@ public:
   }
 
   vector<vector<vector<int>>> shortest_paths;
-  vector<vector<vector<int>>> current_map;
-  vector<vector<vector<int>>> place_bomb;
   vector<vector<vector<int>>> action_id;
   int layers_to_check = 9;
   int last_layer = layers_to_check - 1;
-  int layers_to_check_inner = layers_to_check + 9;
-  int last_layer_inner = layers_to_check_inner - 1;
-
-  int check_place_bomb(int st_layer, int x, int y, set<int> alive_bombs, vector<Bomb> bombs, vector<vector<int>> c_map)
-  {
-    vector<vector<vector<int>>> destroy_map = vector<vector<vector<int>>>(layers_to_check_inner, vector<vector<int>>(this->field.height, vector<int>(this->field.width, 0)));
-    vector<vector<vector<int>>> current_map = vector<vector<vector<int>>>(layers_to_check_inner, vector<vector<int>>(this->field.height, vector<int>(this->field.width, 0)));
-
-    // setting up map at current time
-    for (int i = 0; i < this->field.height; i++)
-    {
-      for (int j = 0; j < this->field.width; j++)
-      {
-        if (this->field.cells[i][j].type == CELL_BLOCK || this->field.cells[i][j].type == CELL_BOX)
-        {
-          current_map[st_layer][i][j] = c_map[i][j];
-        }
-      }
-    }
-    { // calculate field map, dangerous cells for next points of time
-      for (int layer = st_layer + 1; layer < layers_to_check_inner; layer++)
-      {
-
-        // copy current_map
-        for (int i = 0; i < this->field.height; i++)
-        {
-          for (int j = 0; j < this->field.width; j++)
-          {
-            current_map[layer][i][j] = current_map[layer - 1][i][j];
-          }
-        }
-
-        // boom
-        vector<int> to_destroy;
-        for (int id : alive_bombs)
-        {
-          Bomb &bomb = bombs[id];
-          if (bomb.timer == layer)
-          {
-            to_destroy.pb(id);
-            destroy_map[layer][bomb.y][bomb.x] = 1;
-            current_map[layer][bomb.y][bomb.x] = 0;
-            for (int dir = 0; dir < 4; dir++)
-            {
-              for (int i = 1; i <= bomb.range; i++)
-              {
-                int to_x = bomb.x + dx[dir] * i, to_y = bomb.y + dy[dir] * i;
-                if (to_x < 0 || to_x >= this->field.width ||
-                    to_y < 0 || to_y >= this->field.height || this->field.cells[to_y][to_x].type == CELL_BLOCK)
-                {
-                  break;
-                }
-                destroy_map[layer][to_y][to_x] = 1;
-                current_map[layer][to_y][to_x] = 0;
-                if (this->field.cells[to_y][to_x].type == CELL_BOX && current_map[layer - 1][to_y][to_x] == 1)
-                {
-                  break;
-                }
-              }
-            }
-          }
-        }
-        for (int id : to_destroy)
-        {
-          alive_bombs.erase(id);
-        }
-        to_destroy.clear();
-        // check if bomb destroyed another bomb
-        bool check = true;
-        while (check)
-        {
-          check = false;
-          for (int id : alive_bombs)
-          {
-            Bomb &bomb = bombs[id];
-            if (destroy_map[layer][bomb.y][bomb.x] == 1)
-            {
-              check = true;
-              to_destroy.pb(id);
-              destroy_map[layer][bomb.y][bomb.x] = 1;
-              current_map[layer][bomb.y][bomb.x] = 0;
-              for (int dir = 0; dir < 4; dir++)
-              {
-                for (int i = 1; i <= bomb.range; i++)
-                {
-                  int to_x = bomb.x + dx[dir] * i, to_y = bomb.y + dy[dir] * i;
-                  if (to_x < 0 || to_x >= this->field.width ||
-                      to_y < 0 || to_y >= this->field.height || this->field.cells[to_y][to_x].type == CELL_BLOCK)
-                  {
-                    break;
-                  }
-                  destroy_map[layer][to_y][to_x] = 1;
-                  current_map[layer][to_y][to_x] = 0;
-                  if (this->field.cells[to_y][to_x].type == CELL_BOX && current_map[layer - 1][to_y][to_x] == 1)
-                  {
-                    break;
-                  }
-                }
-              }
-            }
-          }
-          for (int id : to_destroy)
-          {
-            alive_bombs.erase(id);
-          }
-          to_destroy.clear();
-        }
-      }
-    }
-
-    // for(int k = 0; k < 8; k++) {
-    //   cerr << k << " - \n";
-    //   for(int i = 0; i < 11; i++) {
-    //     for(int j = 0; j < 13; j++) {
-    //       cerr << destroy_map[k][i][j];
-    //     }
-    //     cerr << endl;
-    //   }
-    //   cerr << endl;
-    // }
-
-    // now we have destroy_map, current_map and we can find shortest path without dying. BUT!! maybe we can access some point at earliest time but die later
-    vector<vector<vector<int>>> shortest_paths = vector<vector<vector<int>>>(layers_to_check_inner, vector<vector<int>>(this->field.height, vector<int>(this->field.width, -1)));
-
-    vector<pair<pair<int, pair<int, int>>, int>> q;
-    shortest_paths[0][this->me->y][this->me->x] = 0;
-    q.pb(mp(mp(0, mp(this->me->y, this->me->x)), 0));
-    for (int i = 0; i < q.size(); i++)
-    {
-      int layer = q[i].fs.fs;
-      int y = q[i].fs.sc.fs;
-      int x = q[i].fs.sc.sc;
-      int len = q[i].sc;
-      for (int j = 0; j < 5; j++)
-      {
-        int nl = min(last_layer_inner, layer + 1), nx = x + dx[j], ny = y + dy[j];
-        if (nx >= 0 && nx < this->field.width && ny >= 0 && ny < this->field.height)
-          if (destroy_map[nl][ny][nx] == 0 && (current_map[nl][ny][nx] == 0 || j == 4) && shortest_paths[nl][ny][nx] == -1)
-          {
-            shortest_paths[nl][ny][nx] = len + 1;
-            q.pb(mp(mp(nl, mp(ny, nx)), len + 1));
-          }
-      }
-    }
-    return 0;
-  }
 
   void shortest_path()
   {
@@ -391,12 +243,11 @@ public:
     }
     for (Bomb bomb : bombs)
       current_map[0][bomb.y][bomb.x] = 1;
-    set<int> alive_bombs_layers[layers_to_check];
+
     { // calculate field map, dangerous cells for next points of time
       set<int> alive_bombs;
       for (int i = 0; i < bombs.size(); i++)
         alive_bombs.insert(i);
-      alive_bombs_layers[0] = alive_bombs;
       for (int layer = 1; layer < layers_to_check; layer++)
       {
 
@@ -484,7 +335,6 @@ public:
           }
           to_destroy.clear();
         }
-        alive_bombs_layers[layer] = alive_bombs;
       }
     }
 
@@ -501,7 +351,6 @@ public:
 
     // now we have destroy_map, current_map and we can find shortest path without dying. BUT!! maybe we can access some point at earliest time but die later
     shortest_paths = vector<vector<vector<int>>>(layers_to_check, vector<vector<int>>(this->field.height, vector<int>(this->field.width, -1)));
-    place_bomb = vector<vector<vector<int>>>(layers_to_check, vector<vector<int>>(this->field.height, vector<int>(this->field.width, -1)));
     action_id = vector<vector<vector<int>>>(layers_to_check, vector<vector<int>>(this->field.height, vector<int>(this->field.width, -1))); // to get previous action
 
     vector<pair<pair<int, pair<int, int>>, int>> q;
@@ -586,21 +435,6 @@ public:
           if (!is_safe[layer][i][j])
           {
             shortest_paths[layer][i][j] = -1;
-          }
-        }
-      }
-    }
-
-    ///////////////////
-    for (int layer = 0; layer < layers_to_check; layer++)
-    {
-      for (int i = 0; i < this->field.height; i++)
-      {
-        for (int j = 0; j < this->field.width; j++)
-        {
-          if (shortest_paths[layer][i][j] != -1)
-          {
-            place_bomb[layer][i][j] = check_place_bomb(layer, j, i, alive_bombs_layers[layer], bombs, current_map[layer]);
           }
         }
       }
@@ -817,6 +651,52 @@ public:
     }
   }
 
+  vector<vector<int>> shortest_paths_dummy;
+  vector<vector<int>> action_id_dummy;
+  void shortest_path_dummy()
+  {
+    shortest_paths_dummy = vector<vector<int>>(this->field.height, vector<int>(this->field.width, -1));
+    action_id_dummy = vector<vector<int>>(this->field.height, vector<int>(this->field.width, -1));
+    priority_queue<pair<pair<int, int>, pair<int, int>>> q;
+    q.push(mp(mp(0, -1), mp(this->me->y, this->me->x)));
+    while (!q.empty())
+    {
+      pair<pair<int, int>, pair<int, int>> e = q.top();
+      q.pop();
+      int y = e.sc.fs;
+      int x = e.sc.sc;
+      int len = -e.fs.fs;
+      int act = e.fs.sc;
+      if (shortest_paths_dummy[y][x] != -1)
+        continue;
+      shortest_paths_dummy[y][x] = len;
+      action_id_dummy[y][x] = act;
+      for (int j = 0; j < 5; j++)
+      {
+        int nx = x + dx[j], ny = y + dy[j];
+        if (nx >= 0 && nx < this->field.width && ny >= 0 && ny < this->field.height)
+          if (this->field.cells[ny][nx].type != CELL_BLOCK)
+          {
+            q.push(mp(mp(-(len + (field.cells[ny][nx].type == CELL_BOX ? 9 : 1)), j), mp(ny, nx)));
+          }
+      }
+    }
+  }
+
+  pair<int, int> get_box_by_target(int x, int y)
+  {
+    pair<int, int> box = mp(-1, -1);
+    while (shortest_paths_dummy[y][x] > 0)
+    {
+      if (this->field.cells[y][x].type == CELL_BOX)
+        box = mp(y, x);
+      int dir = action_id_dummy[y][x];
+      int nx = x - dx[dir], ny = y - dy[dir];
+      x = nx, y = ny;
+    }
+    return box;
+  }
+
   PlayerMove get_action_by_target(int x, int y)
   {
     for (int i = 1; i < layers_to_check; i++)
@@ -848,6 +728,68 @@ public:
       }
     }
     assert(0);
+  }
+
+  void destroy_cell(int ix, int iy)
+  {
+    int gox, goy, dd = 10000;
+
+    if (this->field.cells[iy][ix].type == CELL_BOX)
+      for (int dir = 0; dir < 4; dir++)
+      {
+        for (int i = 1; i <= this->me->range; i++)
+        {
+          int to_x = ix + dx[dir] * i, to_y = iy + dy[dir] * i;
+          if (to_x < 0 || to_x >= this->field.width ||
+              to_y < 0 || to_y >= this->field.height || this->field.cells[to_y][to_x].type == CELL_BLOCK || this->field.cells[to_y][to_x].type == CELL_BOX)
+          {
+            break;
+          }
+
+          for (int l = 0; l < layers_to_check; l++)
+          {
+            if (shortest_paths[l][to_y][to_x] != -1 && dd > shortest_paths[l][to_y][to_x])
+            {
+              dd = shortest_paths[l][to_y][to_x];
+              gox = to_x;
+              goy = to_y;
+            }
+          }
+        }
+      }
+    // cerr << gox << " " << goy << endl;
+    if (dd == 10000)
+      return;
+    if (gox == this->me->x && goy == this->me->y)
+    {
+      cerr << "t3" << endl;
+      if (this->me->bombs)
+      {
+        this->me->action = PLAYER_BOMB;
+      }
+      else
+      {
+        cerr << "shit" << endl;
+        gox = 0, goy = 0;
+        this->me->action = get_action_by_target(gox, goy);
+      }
+    }
+    else
+    {
+      cerr << "t4 " << (this->me->x) << " " << (this->me->y) << " - " << gox << " " << goy << endl;
+      this->me->action = get_action_by_target(gox, goy);
+    }
+  }
+
+  int get_way_length_to_target(int x, int y)
+  {
+    for (int i = 1; i < layers_to_check; i++)
+    {
+      if (shortest_paths[i][y][x] != -1)
+      {
+        return shortest_paths[i][y][x];
+      }
+    }
   }
 
   void prepare()
@@ -896,7 +838,6 @@ public:
           }
       }
     }
-    cerr << dd << endl;
 
     if (gox == this->me->x && goy == this->me->y)
     {
@@ -908,7 +849,7 @@ public:
       else
       {
         cerr << "shit" << endl;
-        gox = this->start_x, goy = this->start_y;
+        gox = this->me->x, goy = this->me->y;
         this->me->action = get_action_by_target(gox, goy);
       }
     }
@@ -919,7 +860,6 @@ public:
     }
     else
     {
-      cerr << "t5" << endl;
       this->me->action = get_action_by_target(this->start_x, this->start_y);
     }
   }
