@@ -229,7 +229,7 @@ public:
 
   int f(int dist, int own_score, int others_score)
   {
-    return (own_score - others_score) * 5 - dist;
+    return (own_score - others_score) * 5 - dist + 100000;  
   }
 
   void simulate_tick(int tick, bitset<W> (&accessibleness)[H], bitset<W> (&current_field)[H], bitset<W * H> (&destroy_boxes)[2], Bomb (&bombs)[MAX_BOMB], int &bombs_count)
@@ -255,9 +255,9 @@ public:
         destroy_field[bombs[i].y][bombs[i].x] = 1;
         for (int dir = 0; dir < 4; dir++)
         {
-          for (int i = 1; i <= bombs[i].range; i++)
+          for (int j = 1; j <= bombs[i].range; j++)
           {
-            int to_x = bombs[i].x + dx[dir] * i, to_y = bombs[i].y + dy[dir] * i;
+            int to_x = bombs[i].x + dx[dir] * j, to_y = bombs[i].y + dy[dir] * j;
             if (to_x < 0 || to_x >= field.width ||
                 to_y < 0 || to_y >= field.height || field.cells[to_y][to_x].type == CELL_BLOCK)
             {
@@ -308,7 +308,7 @@ public:
 
     accessibleness[own_y][own_x] = 1;
     // check realy tick + 6 or not
-    bombs[bombs_count++] = Bomb(own_x, own_y, this->me->owner_id, tick + 6, this->me->range);
+    bombs[bombs_count++] = Bomb(own_x, own_y, this->me->owner_id, tick + BOMB_TIMER, this->me->range);
     while (bombs_count > 0)
     {
       simulate_tick(tick, accessibleness, current_field, destroy_boxes, bombs, bombs_count);
@@ -324,14 +324,13 @@ public:
 
   tuple<int, int, int, int> get_action(vector<Bomb> vec_bombs, Field field, bool have_bomb)
   {
-
     int max_f = -1;
     int go_x, go_y, go_tick;
 
     int own_x = this->me->x;
     int own_y = this->me->y;
 
-    int bombs_count = bombs.size();
+    int bombs_count = vec_bombs.size();
     Bomb bombs[MAX_BOMB];
     for (int i = 0; i < bombs_count; i++)
       bombs[i] = vec_bombs[i];
@@ -359,6 +358,12 @@ public:
         }
       }
     }
+    // cerr << "STATE" << endl;
+    // for (int i = 0; i < H; i++)
+    //   cerr << current_field[i] << endl;
+    // for (int i = 0; i < bombs_count; i++)
+    //   cerr << bombs[i].x << " " << bombs[i].y << endl;
+    // cerr << endl;
 
     for (int tick = 1; tick < K; tick++)
     {
@@ -382,14 +387,14 @@ public:
 
             if (bombs_count > 0)
             {
-              tie(is_safe, own_score_change, rival_score_change) = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count);
+              tie(is_safe, own_score_change, rival_score_change) = check_safe_and_get_score(tick, x, y, current_field, bombs, bombs_count);
             }
             else
             {
               if (!is_calced[y][x])
               {
                 is_calced[y][x] = 1;
-                calced_value[y][x] = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count);
+                calced_value[y][x] = check_safe_and_get_score(tick, x, y, current_field, bombs, bombs_count);
               }
               tie(is_safe, own_score_change, rival_score_change) = calced_value[y][x];
             }
@@ -417,8 +422,10 @@ public:
 
   PlayerMove get_move(int s_tick, int s_x, int s_y)
   {
+    cerr << " DIR " << s_tick << " " << s_x << " " << s_y << endl;
     if (s_tick == 0)
       return PLAYER_BOMB;
+
     int own_x = this->me->x;
     int own_y = this->me->y;
 
@@ -434,7 +441,6 @@ public:
           dp[i][j][q] = -2;
     dp[0][own_y][own_x] = -1;
 
-    
     bitset<W * H> destroy_boxes[2];
     bitset<W> accessibleness[H];
 
@@ -486,7 +492,9 @@ public:
         }
       }
     }
-    int dir = dp[s_tick - 1][s_y][s_x];
+
+    int dir = dp[s_tick][s_y][s_x];
+    cerr << "DIR " << dir << endl;
     switch (dir)
     {
     case 0:
@@ -508,9 +516,12 @@ public:
   {
     bool our_bomb_destroyed = false;
     bool bomb_hits_our_position = false;
+    // cerr << "A" << bombs.size() << endl;
     next_tick(bombs, field, our_bomb_destroyed, bomb_hits_our_position);
+    // cerr << "B" << bombs.size() << endl;
     int next_tick_with_bomb = this->me->bombs - 1 + our_bomb_destroyed > 0 ? 0 : get_bomb_restore_ticks(bombs, field);
-    if (bomb_hits_our_position) return make_tuple(0, 0, 0, -2); // TODO: fix it
+    if (bomb_hits_our_position)
+      return make_tuple(0, 0, 0, -2); // TODO: fix it
     return get_action(bombs, field, next_tick_with_bomb);
   }
 
@@ -630,6 +641,7 @@ public:
   {
     int next_tick_with_bomb = this->me->bombs > 0 ? 0 : get_bomb_restore_ticks(this->bombs, this->field);
     auto [tick, go_x, go_y, max_f] = get_action(this->bombs, this->field, this->me->bombs > 0);
+    cerr << "GO TO " << tick << " " << go_x << " " << go_y << " " << max_f << endl;
     if (this->me->bombs > 0)
     {
       int prev_score = get_score(this->bombs, this->field);
@@ -640,9 +652,11 @@ public:
       if (prev_score < new_score)
       {
         int new_max_f = get<3>(get_action_with_bomb(bombs, this->field));
-        if (new_max_f >= max_f)
+        // cerr << "new max f " << new_max_f << endl;
+        if (new_max_f >= max_f){
           this->me->action = PLAYER_BOMB;
-        return;
+          return;
+        }
       }
     }
     this->me->action = get_move(tick, go_x, go_y);
