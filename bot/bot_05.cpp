@@ -413,23 +413,19 @@ public:
   tuple<int, int, int, int> get_action_with_bomb(vector<Bomb> bombs, Field field)
   {
     bool our_bomb_destroyed = false;
-    next_tick(bombs, field, our_bomb_destroyed);
+    bool bomb_hits_our_position = false;
+    next_tick(bombs, field, our_bomb_destroyed, bomb_hits_our_position);
     int next_tick_with_bomb = this->me->bombs - 1 + our_bomb_destroyed > 0 ? 0 : get_bomb_restore_ticks(bombs, field);
-    // check if we'll die
-    return make_tuple(0, 0, 0, 0);
+    if (bomb_hits_our_position) return make_tuple(0, 0, 0, -2); // TODO: fix it
+    return get_action(bombs, field, next_tick_with_bomb);
   }
 
-  // wtf ?
-  // bool check_bomb_will_destroy_box(vector<Bomb> bombs, Field field){
-  //   bombs.pb();
-  //   simulate()
-  // }
-
   // simulate one tick. updates state, returns score of tick
-  int next_tick(vector<Bomb> &bombs, Field &field, bool &our_bomb_destroyed)
+  int next_tick(vector<Bomb> &bombs, Field &field, bool &our_bomb_destroyed, bool &bomb_hits_our_position)
   {
     // ask Batyr set or array(check bits)
     our_bomb_destroyed = false;
+    bomb_hits_our_position = false;
     set<pair<int, int>> destroyed_me;
     set<pair<int, int>> destroyed_others;
     int score = 0;
@@ -482,14 +478,15 @@ public:
       field.cells[p.sc][p.fs].type = CELL_EMPTY;
     for (const pair<int, int> &p : destroyed_others)
       field.cells[p.sc][p.fs].type = CELL_EMPTY;
-
+    bomb_hits_our_position = destroyed_me.count(mp(this->me->x, this->me->y)) > 0 || destroyed_others.count(mp(this->me->x, this->me->y)) > 0;
     return score;
   }
 
   int next_tick(vector<Bomb> &bombs, Field &field)
   {
     bool our_bomb_destroyed = false;
-    return next_tick(bombs, field, our_bomb_destroyed);
+    bool bomb_hits_our_position = false;
+    return next_tick(bombs, field, our_bomb_destroyed, bomb_hits_our_position);
   }
 
   // number of destroyed boxes with our bombs minus number of destroyed boxes with other bombs
@@ -523,7 +520,8 @@ public:
     while (!bombs.empty())
     {
       bool our_bomb_destroyed = false;
-      next_tick(bombs, field, our_bomb_destroyed);
+      bool bomb_hits_our_position = false;
+      next_tick(bombs, field, our_bomb_destroyed, bomb_hits_our_position);
       tick++;
       if (our_bomb_destroyed)
       {
@@ -553,6 +551,7 @@ public:
         return;
       }
     }
+    this->me->action = get_move(tick, go_x, go_y);
   }
 
   void apply()
