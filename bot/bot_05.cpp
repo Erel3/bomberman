@@ -307,6 +307,7 @@ public:
     bitset<W * H> destroy_boxes[2];
 
     accessibleness[own_y][own_x] = 1;
+    // check realy tick + 6 or not
     bombs[bombs_count++] = Bomb(own_x, own_y, this->me->owner_id, tick + 6, this->me->range);
     while (bombs_count > 0)
     {
@@ -361,6 +362,11 @@ public:
 
     for (int tick = 1; tick < K; tick++)
     {
+      bitset<W> prev_accessibleness[H];
+      for (int i = 0; i < H; i++)
+        prev_accessibleness[i] = accessibleness[i];
+
+      simulate_tick(tick, accessibleness, current_field, destroy_boxes, bombs, bombs_count);
 
       int own_score = destroy_boxes[1].count();
       int rival_score = destroy_boxes[0].count();
@@ -369,21 +375,21 @@ public:
       {
         for (int x = 0; x < W; x++)
         {
-          if (accessibleness[y][x])
+          if (prev_accessibleness[y][x] && accessibleness[y][x])
           {
             bool is_safe;
             int own_score_change, rival_score_change;
 
             if (bombs_count > 0)
             {
-              tie(is_safe, own_score_change, rival_score_change) = check_safe_and_get_score(tick, x, y, current_field, bombs, bombs_count);
+              tie(is_safe, own_score_change, rival_score_change) = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count);
             }
             else
             {
               if (!is_calced[y][x])
               {
                 is_calced[y][x] = 1;
-                calced_value[y][x] = check_safe_and_get_score(tick, x, y, current_field, bombs, bombs_count);
+                calced_value[y][x] = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count);
               }
               tie(is_safe, own_score_change, rival_score_change) = calced_value[y][x];
             }
@@ -398,16 +404,100 @@ public:
                 max_f = cur_f;
                 go_x = x;
                 go_y = y;
-                go_tick = tick;
+                go_tick = tick - 1;
               }
             }
           }
         }
       }
-      simulate_tick(tick, accessibleness, current_field, destroy_boxes, bombs, bombs_count);
     }
     //maybe cerr max_f == -1?
     return make_tuple(go_tick, go_x, go_y, max_f);
+  }
+
+  PlayerMove get_move(int s_tick, int s_x, int s_y)
+  {
+    if (s_tick == 0)
+      return PLAYER_BOMB;
+    int own_x = this->me->x;
+    int own_y = this->me->y;
+
+    int bombs_count = this->bombs.size();
+    Bomb bombs[MAX_BOMB];
+    for (int i = 0; i < bombs_count; i++)
+      bombs[i] = this->bombs[i];
+
+    int dp[K][H][W], pr[K][H][W];
+    for (int i = 0; i < K; i++)
+      for (int j = 0; j < H; j++)
+        for (int q = 0; q < W; q++)
+          dp[i][j][q] = -2;
+    dp[0][own_y][own_x] = -1;
+
+    bitset<W> accessibleness[H];
+
+    accessibleness[own_y][own_x] = 1;
+
+    bitset<W> current_field[H];
+
+    for (int i = 0; i < H; i++)
+    {
+      for (int j = 0; j < W; j++)
+      {
+        if (field.cells[i][j].type == CELL_BLOCK || field.cells[i][j].type == CELL_BOX)
+        {
+          current_field[i][j] = 1;
+        }
+      }
+    }
+
+    for (int tick = 1; tick < K; tick++)
+    {
+      bitset<W> prev_accessibleness[H];
+      for (int i = 0; i < H; i++)
+        prev_accessibleness[i] = accessibleness[i];
+
+      simulate_tick(tick, accessibleness, current_field, destroy_boxes, bombs, bombs_count);
+      for (int y = 0; y < H; y++)
+      {
+        for (int x = 0; x < W; x++)
+        {
+          if (prev_accessibleness[y][x])
+          {
+            for (int i = 0; i < 5; i++)
+            {
+              int to_x = x + dx[dir], to_y = y + dy[dir];
+              if (to_x < 0 || to_x >= field.width ||
+                  to_y < 0 || to_y >= field.height)
+              {
+                continue;
+              }
+              if (accessibleness[i])
+              {
+                if (dp[tick - 1][y][x] == -1)
+                  dp[tick][to_y][to_x] = i;
+                else
+                  dp[tick][to_y][to_x] = dp[tick - 1][y][x];
+              }
+            }
+          }
+        }
+      }
+    }
+    int dir = dp[s_tick - 1][s_y][s_x];
+    switch (dir)
+    {
+    case 0:
+      return PLAYER_UP;
+    case 1:
+      return PLAYER_LEFT;
+    case 2:
+      return PLAYER_RIGHT;
+    case 3:
+      return PLAYER_DOWN;
+    case 4:
+      return PLAYER_STAY;
+    }
   }
 
   tuple<int, int, int, int> get_action_with_bomb(vector<Bomb> bombs, Field field)
