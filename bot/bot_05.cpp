@@ -434,6 +434,8 @@ public:
           dp[i][j][q] = -2;
     dp[0][own_y][own_x] = -1;
 
+    
+    bitset<W * H> destroy_boxes[2];
     bitset<W> accessibleness[H];
 
     accessibleness[own_y][own_x] = 1;
@@ -464,7 +466,7 @@ public:
         {
           if (prev_accessibleness[y][x])
           {
-            for (int i = 0; i < 5; i++)
+            for (int dir = 0; dir < 5; dir++)
             {
               int to_x = x + dx[dir], to_y = y + dy[dir];
               if (to_x < 0 || to_x >= field.width ||
@@ -472,10 +474,10 @@ public:
               {
                 continue;
               }
-              if (accessibleness[i])
+              if (accessibleness[to_y][to_x])
               {
                 if (dp[tick - 1][y][x] == -1)
-                  dp[tick][to_y][to_x] = i;
+                  dp[tick][to_y][to_x] = dir;
                 else
                   dp[tick][to_y][to_x] = dp[tick - 1][y][x];
               }
@@ -498,6 +500,8 @@ public:
     case 4:
       return PLAYER_STAY;
     }
+    cerr << "No move found" << endl;
+    return PLAYER_STAY;
   }
 
   tuple<int, int, int, int> get_action_with_bomb(vector<Bomb> bombs, Field field)
