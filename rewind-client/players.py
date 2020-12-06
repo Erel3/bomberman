@@ -89,7 +89,8 @@ class StrategyPlayer(Player):
       line = self.proc.stdout.readline()
       return line
     except:
-      print("player {} not responded".format(self.owner))
+      if config.with_viewer:
+        print("player {} not responded".format(self.owner))
       return ''
 
   def _write_state(self, field, players, bombs, monsters, features):
@@ -111,7 +112,8 @@ class StrategyPlayer(Player):
         self.proc.stdin.write("{} {} {} {} {} {}\n".format(feature.type, feature.owner, feature.x, feature.y, 0, 0))
       self.proc.stdin.flush()
     except:
-      print("error writing state to player {}".format(self.owner))
+      if config.with_viewer:
+        print("error writing state to player {}".format(self.owner))
       pass
 
   def tick(self, field, players, bombs, monsters, features):

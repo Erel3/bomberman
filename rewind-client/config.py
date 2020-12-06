@@ -27,12 +27,16 @@ class ConfigParser(ArgumentParser):
                       metavar=('strategy-file', 'x', 'y'), dest='players', help='player and it\'s position')
     self.add_argument('-f', '--field', action='store', metavar=list(map(lambda f: f.value, FieldType)),
                       default=FieldType.DEFAULT, type=FieldType, choices=list(FieldType), dest='field', help='field type generator')
+    self.add_argument('-a', '--auto-test', action='store', type=int,
+                      default=config.game_count, metavar=config.game_count, dest='game_count', help='auto test multiple games')
     self.namespace = config
 
-  def parse(self):
+  def parse(self):    
     self.parse_args(namespace=self.namespace)
     if len(self.namespace.players) == 0:
       self.namespace.players.append(["../strategies/bot", '0', '0'])
+    if self.namespace.game_count > 1:
+      self.namespace.with_viewer = False
 
   def error(self, message):
     sys.stderr.write('error: %s\n' % message)

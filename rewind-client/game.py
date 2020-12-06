@@ -15,7 +15,7 @@ def init():
   score = {}
   field = Field(FieldConstructor(config.field))
   players = [StrategyPlayer(id, int(player[1]), int(player[2]), player_colors[id],
-                            player[0], False if id == 0 else True) for id, player in enumerate(config.players)]
+                            player[0], False if id == 0 and config.with_viewer else True) for id, player in enumerate(config.players)]
   for player in players:
     score[player.owner] = 0
     for i in range(0, 3):
@@ -185,6 +185,7 @@ def run():
                           bombs + monsters + features)
     helper.client.message(str(list(score.items())))
     helper.redraw(field, players + bombs + monsters + features)
+  return score
 
 
 # if __name__ == "__main__":
