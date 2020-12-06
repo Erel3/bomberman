@@ -34,4 +34,4 @@ if __name__ == "__main__":
     win_avg_diff /= win_count
   if lose_count > 0:
     lose_avg_diff /= lose_count
-  print("win: {} {}\nlose: {} {}\ndraw: {}\n".format(win_count, win_avg_diff, lose_count, lose_avg_diff, draw_count))
+  print("win: {} {:.2f}\nlose: {} {:.2f}\ndraw: {}\n".format(win_count, win_avg_diff, lose_count, lose_avg_diff, draw_count))
