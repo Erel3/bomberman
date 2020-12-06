@@ -31,7 +31,7 @@ class ConfigParser(ArgumentParser):
                       default=config.game_count, metavar=config.game_count, dest='game_count', help='auto test multiple games')
     self.namespace = config
 
-  def parse(self):    
+  def parse(self):
     self.parse_args(namespace=self.namespace)
     if len(self.namespace.players) == 0:
       self.namespace.players.append(["../strategies/bot", '0', '0'])
