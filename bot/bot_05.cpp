@@ -229,7 +229,7 @@ public:
 
   int f(int dist, int own_score, int others_score)
   {
-    return (own_score - others_score) * 5 - dist + 100000;  
+    return (own_score - others_score - 1) * 5 - dist + 100000;
   }
 
   void simulate_tick(int tick, bitset<W> (&accessibleness)[H], bitset<W> (&current_field)[H], bitset<W * H> (&destroy_boxes)[2], Bomb (&bombs)[MAX_BOMB], int &bombs_count)
@@ -322,7 +322,7 @@ public:
     return make_tuple(is_safe, own_score, rival_score);
   }
 
-  tuple<int, int, int, int> get_action(vector<Bomb> vec_bombs, Field field, bool have_bomb)
+  tuple<int, int, int, int> get_action(vector<Bomb> vec_bombs, Field field, int next_tick_with_bomb)
   {
     int max_f = -1;
     int go_x, go_y, go_tick;
@@ -404,7 +404,7 @@ public:
               int own_next_score = own_score + own_score_change;
               int rival_next_score = rival_score + rival_score_change;
               int cur_f = f(tick, own_next_score, rival_next_score);
-              if (max_f < cur_f)
+              if (max_f < cur_f && tick >= next_tick_with_bomb)
               {
                 max_f = cur_f;
                 go_x = x;
@@ -479,6 +479,15 @@ public:
                   to_y < 0 || to_y >= field.height)
               {
                 continue;
+              }
+              if (dir < 4) {
+                // make it less dummy
+                bool bad = 0;
+                for (int i = 0; i < bombs_count; i++) {
+                  if (bombs[i].x == to_x && bombs[i].y == to_y)
+                  bad = 1;
+                }
+                if (bad) continue;
               }
               if (accessibleness[to_y][to_x])
               {
@@ -640,6 +649,7 @@ public:
   void prepare()
   {
     int next_tick_with_bomb = this->me->bombs > 0 ? 0 : get_bomb_restore_ticks(this->bombs, this->field);
+    cerr << "next_bomb" << next_tick_with_bomb << endl;
     auto [tick, go_x, go_y, max_f] = get_action(this->bombs, this->field, this->me->bombs > 0);
     cerr << "GO TO " << tick << " " << go_x << " " << go_y << " " << max_f << endl;
     if (this->me->bombs > 0)
@@ -651,9 +661,10 @@ public:
       cerr << "here " << prev_score << " " << new_score << endl;
       if (prev_score < new_score)
       {
-        int new_max_f = get<3>(get_action_with_bomb(bombs, this->field));
-        // cerr << "new max f " << new_max_f << endl;
-        if (new_max_f >= max_f){
+        auto [ntick, ngo_x, ngo_y, nmax_f] = get_action_with_bomb(bombs, this->field);
+        cerr << "new max f " << nmax_f << endl;
+        if (nmax_f > max_f && ngo_x == go_x && ngo_y == go_y && ntick == tick) {
+          cerr << "BOMB!" << endl;
           this->me->action = PLAYER_BOMB;
           return;
         }
