@@ -6,6 +6,8 @@ from monsters import DummyMonster
 from draw_helper import DrawHelper
 from colors import Color, player_colors
 from config import config
+from datetime import datetime
+import time
 
 import random
 import os
@@ -166,13 +168,41 @@ def finish(helper, field, players, bombs, monsters, features, score):
   del features
   del score
 
+def write_logs(log_output, field, players, bombs, monsters, features):
+  # game info
+  log_output.write("{} {} {}\n".format(field.width, field.height, config.tick))
+  # field
+  for i in range(field.height):
+    log_output.write("{}\n".format("".join(field.data[i])))    
+  # entities cnt
+  log_output.write("{}\n".format(len(players + bombs + monsters + features)))
+  for player in players:
+    log_output.write("{} {} {} {} {} {}\n".format(player.type, player.owner, player.x, player.y, player.current_bomb_count, player.bomb_range))
+  for bomb in bombs:
+    log_output.write("{} {} {} {} {} {}\n".format(bomb.type, bomb.owner, bomb.x, bomb.y, bomb.timer, bomb.range))
+  for monster in monsters:
+    log_output.write("{} {} {} {} {} {}\n".format(monster.type, monster.owner, monster.x, monster.y, 0, 0))
+  for feature in features:
+    log_output.write("{} {} {} {} {} {}\n".format(feature.type, feature.owner, feature.x, feature.y, 0, 0))
+
+def finish_log(log_output):
+  log_output.write("{} {} {}\n".format(-1,-1, -1))
+  log_output.close()
 
 def run():
+  # open file to log
+  now = datetime.now()
+  dt_string = now.strftime("%d_%m_%Y_") + str(int(round(time.time() * 1000)))
+  log_output = open("../games/{}.gamelog".format(dt_string), "w")
+
   # helper, field, players, bombs, monsters = init_from_file()
   helper, field, players, bombs, monsters, features, score = init()
 
   for config.tick in range(1, config.max_ticks + 1):
     helper.client.message(str(config.tick))
+
+    # write logs
+    write_logs(log_output, field, players, bombs, monsters, features)
 
     # bombs
     next_tick_bombs(field, players, bombs, monsters, features)
@@ -201,6 +231,8 @@ def run():
     helper.client.message(str(list(score.items())))
     helper.redraw(field, players + bombs + monsters + features)
   finish(helper, field, players, bombs, monsters, features, score)
+  
+  finish_log(log_output)
   return score
 
 
