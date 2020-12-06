@@ -29,10 +29,15 @@ class ConfigParser(ArgumentParser):
                       default=FieldType.DEFAULT, type=FieldType, choices=list(FieldType), dest='field', help='field type generator')
     self.add_argument('-a', '--auto-test', action='store', type=int,
                       default=config.game_count, metavar=config.game_count, dest='game_count', help='auto test multiple games')
+    self.add_argument('--replay', action='store', type=str,
+                      default=config.replay_file, metavar="../games/file.gamelog", dest='replay_file', help='replay game from game log')
     self.namespace = config
 
   def parse(self):
     self.parse_args(namespace=self.namespace)
+    if len(self.namespace.replay_file) > 0:
+      self.namespace.is_replay = True
+      return
     if len(self.namespace.players) == 0:
       self.namespace.players.append(["../strategies/bot", '0', '0'])
     if self.namespace.game_count > 1:
@@ -71,3 +76,7 @@ config.max_ticks = 400
 
 # feature config
 config.feature_percent = 30
+
+# replay
+config.is_replay = False
+config.replay_file = ""

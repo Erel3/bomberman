@@ -39,6 +39,50 @@ def init():
   return helper, field, players, bombs, monsters, features, score
 
 
+def replay_update(replay):
+  config.width, config.height, config.tick = map(int, replay.readline().split())
+  if config.tick == -1:
+    return None, None, None, None, None, True
+
+  field = Field(FieldConstructor(config.field))
+  players = []
+  bombs = []
+  monsters = []
+  features = []
+
+  for i in range(config.height):
+    field.data[i] = list(replay.readline().strip())
+  entities_count = int(replay.readline())
+  for i in range(entities_count):
+    entity_type, owner, x, y, param1, param2 = replay.readline().split()
+    owner, x, y, param1, param2 = int(owner), int(x), int(y), int(param1), int(param2)
+    if entity_type == 'p':
+      players.append(Player(owner, x, y, player_colors[len(players)], param1, param2))
+    elif entity_type == 'm':
+      monsters.append(Monster(x, y))
+    elif entity_type == 'b':
+      bombs.append(Bomb(owner, x, y, param1, param2))
+    elif entity_type == "f_a":
+      features.append(FeatureAdd(x, y))
+    elif entity_type == "f_r":
+      features.append(FeatureRange(x, y))
+  
+  return field, players, bombs, monsters, features, False
+
+def replay_init():
+  replay = open(config.replay_file, "r")
+  score = {}
+  field, players, bombs, monsters, features, is_finish = replay_update(replay)
+  helper = DrawHelper(field)
+  entities = players + bombs + monsters + features
+  helper.client.message(str(config.tick))
+  helper.redraw(field, entities)
+
+  for player in players:
+    score[player.owner] = 0  
+
+  return replay, helper, field, players, bombs, monsters, features, score
+
 def next_tick_bombs(field, players, bombs, monsters, features):
   for bomb in bombs:
     bomb.tick(field, players, bombs, monsters, features)
@@ -235,6 +279,42 @@ def run():
   finish_log(log_output)
   return score
 
+def replay():
+  # helper, field, players, bombs, monsters = init_from_file()
+  replay, helper, field, players, bombs, monsters, features, score = replay_init()
+
+  strategy_players = [StrategyPlayer(id, int(player[1]), int(player[2]), player_colors[id],
+                            player[0], False if id == 0 and config.with_viewer else True) for id, player in enumerate(config.players)]
+
+  config.tick = 0
+  while True:
+    config.tick += 1    
+    helper.client.message(str(config.tick))
+
+    # bombs
+    next_tick_bombs(field, players, bombs, monsters, features)
+    count_box_of_player(field, players, bombs, monsters, features, score)
+    next_tick_field(field, players, bombs, monsters, features)
+    next_tick_entities(field, players, bombs, monsters, features)
+    field.draw_destroy_data(helper.client)
+    field.clean()
+    
+    for sp in strategy_players:
+      for p in players:
+        if sp.owner == p.owner:
+          sp.copy_from(p)
+
+    next_tick_players(field, strategy_players, bombs, monsters, features)
+    helper.client.message(str(list(score.items())))
+    helper.redraw(field, players + bombs + monsters + features)
+    
+    field, players, bombs, monsters, features, is_finish = replay_update(replay)
+
+    if is_finish:
+      break
+
+  replay.close()
+  
 
 # if __name__ == "__main__":
 #   # helper, field, players, bombs, monsters = init_from_file()

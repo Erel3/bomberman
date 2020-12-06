@@ -27,18 +27,17 @@ class PlayerAction(Enum):
 
 class Player(Entity):
 
-  def __init__(self, owner_id, x, y, color):
+  def __init__(self, owner_id, x, y, color, bomb_count, bomb_range):
     Entity.__init__(self)
     self.type = 'p'
     self.owner = owner_id
     self.x = x
     self.y = y
-    self.bomb_count = config.bomb_count
-    self.current_bomb_count = config.bomb_count
-    self.bomb_range = config.bomb_range
+    self.bomb_count = bomb_count
+    self.current_bomb_count = bomb_count
+    self.bomb_range = bomb_range
     self.action = None
     self.color = color
-
     self.score = 0
 
   def recalculate(self, field, players, bombs, monsters, features):
@@ -56,7 +55,7 @@ class Player(Entity):
     if self.action == PlayerAction.STAY:
       return
     if self.action == PlayerAction.BOMB:
-      bombs.append(Bomb(self))
+      bombs.append(Bomb(self.owner, self.x, self.y, config.bomb_timer, self.bomb_range))
       self.current_bomb_count -= 1
       return
     if self.action == PlayerAction.LEFT:
@@ -88,14 +87,14 @@ class Player(Entity):
 
 class Bomb(Entity):
 
-  def __init__(self, player):
+  def __init__(self, owner, x, y, timer, range):
     Entity.__init__(self)
     self.type = 'b'
-    self.owner = player.owner
-    self.x = player.x
-    self.y = player.y
-    self.timer = config.bomb_timer # bomb timer
-    self.range = player.bomb_range # bomb radius
+    self.owner = owner
+    self.x = x
+    self.y = y
+    self.timer = timer # bomb timer
+    self.range = range # bomb radius
 
   def tick(self, field, players, bombs, monsters, features):
     if self.timer == 0:

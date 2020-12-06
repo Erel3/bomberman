@@ -80,9 +80,17 @@ import os
 class StrategyPlayer(Player):
 
   def __init__(self, owner_id, x, y, color, file, hide_stderr=True):
-    Player.__init__(self, owner_id, x, y, color)
+    Player.__init__(self, owner_id, x, y, color, config.bomb_count, config.bomb_range)
     self.proc = subprocess.Popen(file, stdin=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True, stderr=subprocess.DEVNULL if hide_stderr else None)
 
+
+  def copy_from(self, player):
+    self.owner = player.owner
+    self.x = player.x
+    self.y = player.y
+    self.color = player.color
+    self.bomb_count = player.bomb_count
+    self.bomb_range = player.bomb_range
 
   def _read_line(self):
     try:
