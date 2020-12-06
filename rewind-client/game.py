@@ -155,6 +155,17 @@ def next_apply_features(field, players, bombs, monsters, features):
     else:
       id += 1
 
+def finish(helper, field, players, bombs, monsters, features, score):
+  del helper
+  del field
+  for player in players:
+    del player
+  del players
+  del bombs
+  del monsters
+  del features
+  del score
+
 
 def run():
   # helper, field, players, bombs, monsters = init_from_file()
@@ -189,6 +200,7 @@ def run():
                           bombs + monsters + features)
     helper.client.message(str(list(score.items())))
     helper.redraw(field, players + bombs + monsters + features)
+  finish(helper, field, players, bombs, monsters, features, score)
   return score
 
 

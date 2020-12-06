@@ -128,6 +128,9 @@ class StrategyPlayer(Player):
   def __del__(self):
     try:
       self.proc.stdin.write("-1 -1 -1 -1")
+      self.proc.stdout.close()
+      self.proc.stdin.close()
       self.proc.terminate
+      del self.proc
     except:
       pass

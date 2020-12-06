@@ -15,11 +15,10 @@ class DrawHelper():
     self.redraw(field, entities)
 
   def redraw(self, field, entities):
-    if (config.with_viewer):
-      field.draw_breakable_blocks(self.client)
-      for entity in entities:
-        entity.draw(self.client)
-      self.end_frame()
+    field.draw_breakable_blocks(self.client)
+    for entity in entities:
+      entity.draw(self.client)
+    self.end_frame()
 
   def end_frame(self):
     self.client.end_frame()

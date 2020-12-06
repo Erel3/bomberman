@@ -1,18 +1,22 @@
 import _socket
 import json
 from colors import Color
+from config import config
 from itertools import chain
 
 
 class RewindClient():
 
   def __init__(self, host=None, port=None):
-    self._socket = _socket.socket()
-    self._socket.setsockopt(_socket.IPPROTO_TCP, _socket.TCP_NODELAY, True)
-    if host is None:
-      host = "127.0.0.1"
-      port = 9111
-    self._socket.connect((host, port))
+    if (config.with_viewer):
+      self._socket = _socket.socket()
+      self._socket.setsockopt(_socket.IPPROTO_TCP, _socket.TCP_NODELAY, True)
+      if host is None:
+        host = "127.0.0.1"
+        port = 9111
+      self._socket.connect((host, port))
+    else:
+      self._socket = None
 
   @staticmethod
   def _to_geojson(points):
