@@ -242,7 +242,8 @@ def run():
   # open file to log
   now = datetime.now()
   dt_string = now.strftime("%d_%m_%Y_") + str(int(round(time.time() * 1000)))
-  log_output = open("../games/{}.gamelog".format(dt_string), "w")
+  log_filename = "../games/{}.gamelog".format(dt_string)
+  log_output = open(log_filename, "w")
 
   # helper, field, players, bombs, monsters = init_from_file()
   helper, field, players, bombs, monsters, features, score = init()
@@ -282,7 +283,7 @@ def run():
   finish(helper, field, players, bombs, monsters, features, score)
   
   finish_log(log_output)
-  return score
+  return score, log_filename
 
 def replay():
   # helper, field, players, bombs, monsters = init_from_file()

@@ -18,7 +18,7 @@ if __name__ == "__main__":
     lose_count, lose_avg_diff = 0, 0
     draw_count = 0
     for game_id in range(0, config.game_count):    
-      score = game.run()
+      score, log_filename = game.run()
       win = score[0] > score[1]
       lose = score[0] < score[1]
       draw = score[0] == score[1]
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         lose_avg_diff += score[1] - score[0]
       else:
         draw_count += 1
-      print("game id: {}\nresult: {}".format(game_id, str(list(score.items())))) 
+      print("game {:03}: result: {} file: {}".format(game_id, str(list(score.items())), log_filename)) 
     if win_count > 0:
       win_avg_diff /= win_count
     if lose_count > 0:
