@@ -66,6 +66,11 @@ def replay_update(replay):
       features.append(FeatureAdd(x, y))
     elif entity_type == "f_r":
       features.append(FeatureRange(x, y))
+
+  for bomb in bombs:
+    for player in players:
+      if bomb.owner == player.owner:
+        player.bomb_count += 1
   
   return field, players, bombs, monsters, features, False
 

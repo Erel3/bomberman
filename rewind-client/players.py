@@ -90,6 +90,7 @@ class StrategyPlayer(Player):
     self.y = player.y
     self.color = player.color
     self.bomb_count = player.bomb_count
+    self.current_bomb_count = player.current_bomb_count
     self.bomb_range = player.bomb_range
 
   def _read_line(self):
