@@ -34,4 +34,7 @@ if __name__ == "__main__":
     win_avg_diff /= win_count
   if lose_count > 0:
     lose_avg_diff /= lose_count
-  print("win: {} {:.2f}\nlose: {} {:.2f}\ndraw: {}\n".format(win_count, win_avg_diff, lose_count, lose_avg_diff, draw_count))
+  win_percent = win_count * 100 / config.game_count
+  lose_percent = lose_count * 100 / config.game_count
+  draw_percent = draw_count * 100 / config.game_count
+  print("total game count: {}\nwin: {} {:.2f} {:.2f}%\nlose: {} {:.2f} {:.2f}%\ndraw: {} {:.2f}%\n".format(config.game_count, win_count, win_avg_diff, win_percent, lose_count, lose_avg_diff, lose_percent, draw_count, draw_percent))
