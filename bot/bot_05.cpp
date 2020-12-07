@@ -31,7 +31,7 @@ double max_tick_time = 0;
 
 const int BOMB_TIMER = 6;
 const int W = 13, H = 11, K = W + H + 10;
-const int MAX_BOMB = 6;
+const int MAX_BOMB = 12;
 
 enum PlayerMove
 {
@@ -305,7 +305,6 @@ public:
       current_field[i] = previous_field[i];
     bitset<W> accessibleness[H];
     bitset<W * H> destroy_boxes[2];
-
     accessibleness[own_y][own_x] = 1;
     // check realy tick + 6 or not
     bombs[bombs_count++] = Bomb(own_x, own_y, this->me->owner_id, tick + BOMB_TIMER, this->me->range);
@@ -370,7 +369,6 @@ public:
       bitset<W> prev_accessibleness[H];
       for (int i = 0; i < H; i++)
         prev_accessibleness[i] = accessibleness[i];
-
       simulate_tick(tick, accessibleness, current_field, destroy_boxes, bombs, bombs_count);
 
       int own_score = destroy_boxes[1].count();
@@ -384,7 +382,6 @@ public:
           {
             bool is_safe;
             int own_score_change, rival_score_change;
-
             if (bombs_count > 0)
             {
               tie(is_safe, own_score_change, rival_score_change) = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count);
@@ -650,7 +647,7 @@ public:
   {
     int next_tick_with_bomb = this->me->bombs > 0 ? 0 : get_bomb_restore_ticks(this->bombs, this->field);
     cerr << "next_bomb" << next_tick_with_bomb << endl;
-    auto [tick, go_x, go_y, max_f] = get_action(this->bombs, this->field, this->me->bombs > 0);
+    auto [tick, go_x, go_y, max_f] = get_action(this->bombs, this->field, next_tick_with_bomb);
     cerr << "GO TO " << tick << " " << go_x << " " << go_y << " " << max_f << endl;
     if (this->me->bombs > 0)
     {

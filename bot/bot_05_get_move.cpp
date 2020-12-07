@@ -774,7 +774,7 @@ public:
   {
     int next_tick_with_bomb = this->me->bombs > 0 ? 0 : get_bomb_restore_ticks(this->bombs, this->field);
     cerr << "next_bomb" << next_tick_with_bomb << endl;
-    auto [tick, go_x, go_y, max_f] = get_action(this->bombs, this->field, this->me->bombs > 0);
+    auto [tick, go_x, go_y, max_f] = get_action(this->bombs, this->field, next_tick_with_bomb);
     cerr << "GO TO " << tick << " " << go_x << " " << go_y << " " << max_f << endl;
     if (this->me->bombs > 0)
     {

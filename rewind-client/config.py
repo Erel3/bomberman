@@ -29,6 +29,8 @@ class ConfigParser(ArgumentParser):
                       default=FieldType.DEFAULT, type=FieldType, choices=list(FieldType), dest='field', help='field type generator')
     self.add_argument('-a', '--auto-test', action='store', type=int,
                       default=config.game_count, metavar=config.game_count, dest='game_count', help='auto test multiple games')
+    self.add_argument('--proc', action='store', type=int,
+                      default=config.proc, metavar=config.proc, dest='proc', help='number of processes for autotest')
     self.add_argument('--replay', action='store', type=str,
                       default=config.replay_file, metavar="../games/file.gamelog", dest='replay_file', help='replay game from game log')
     self.namespace = config
@@ -67,15 +69,18 @@ config.bomb_timer = 6
 config.bomb_count = 1
 config.bomb_range = 2
 config.players = []
+
+# auto test
 config.with_viewer = True
 config.game_count = 1
+config.proc = 4
 
 # run variables
 config.tick = 0
 config.max_ticks = 400
 
 # feature config
-config.feature_percent = 30
+config.feature_percent = 10
 
 # replay
 config.is_replay = False
