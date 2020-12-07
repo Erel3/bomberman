@@ -322,7 +322,7 @@ public:
       accessibleness[i] = next_accessibleness[i];
   }
 
-  tuple<bool, int, int> check_safe_and_get_score(int tick, int own_x, int own_y, bitset<W> (&previous_field)[H], Bomb (&previous_bombs)[MAX_BOMB], int bombs_count)
+  tuple<bool, int, int> check_safe_and_get_score(int tick, int own_x, int own_y, bitset<W> (&previous_field)[H], Bomb (&previous_bombs)[MAX_BOMB], int bombs_count, bool set_bomb)
   {
     Bomb bombs[MAX_BOMB];
     for (int i = 0; i < bombs_count; i++)
@@ -335,7 +335,8 @@ public:
 
     accessibleness[own_y][own_x] = 1;
     // check realy tick + 6 or not
-    bombs[bombs_count++] = Bomb(own_x, own_y, this->me->owner_id, tick + BOMB_TIMER, this->me->range);
+    if (set_bomb)
+      bombs[bombs_count++] = Bomb(own_x, own_y, this->me->owner_id, tick + BOMB_TIMER, this->me->range);
     while (bombs_count > 0)
     {
       simulate_tick(tick, accessibleness, current_field, destroy_boxes, bombs, bombs_count);
@@ -389,6 +390,9 @@ public:
     //   cerr << bombs[i].x << " " << bombs[i].y << endl;
     // cerr << endl;
     // cerr << "START SIMULATING IN GET ACTION" << endl;
+    bool blank;
+    int own_afk_score, rival_next_score;
+    tie(blank, own_afk_score, rival_next_score) = check_safe_and_get_score(1, own_x, own_y, current_field, bombs, bombs_count, false);
     for (int tick = 1; tick < K; tick++)
     {
       bitset<W> prev_accessibleness[H];
@@ -411,14 +415,14 @@ public:
 
             if (bombs_count > 0)
             {
-              tie(is_safe, own_score_change, rival_score_change) = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count);
+              tie(is_safe, own_score_change, rival_score_change) = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count, true);
             }
             else
             {
               if (!is_calced[y][x])
               {
                 is_calced[y][x] = 1;
-                calced_value[y][x] = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count);
+                calced_value[y][x] = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count, true);
               }
               tie(is_safe, own_score_change, rival_score_change) = calced_value[y][x];
             }
@@ -428,7 +432,8 @@ public:
               int own_next_score = own_score + own_score_change;
               int rival_next_score = rival_score + rival_score_change;
               int cur_f = f(tick, own_next_score, rival_next_score);
-              if (max_f < cur_f && tick >= next_tick_with_bomb + 1)
+              if (own_next_score - rival_next_score > own_afk_score - rival_next_score &&
+                  max_f < cur_f && tick >= next_tick_with_bomb + 1)
               {
                 max_f = cur_f;
                 go_x = x;
