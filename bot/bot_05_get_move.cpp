@@ -431,7 +431,7 @@ public:
               int own_next_score = own_score + own_score_change;
               int rival_next_score = rival_score + rival_score_change;
               int cur_f = f(tick, own_next_score, rival_next_score);
-              if (max_f < cur_f && tick >= next_tick_with_bomb)
+              if (max_f < cur_f && tick >= next_tick_with_bomb + 1)
               {
                 max_f = cur_f;
                 go_x = x;
@@ -653,6 +653,7 @@ public:
     next_tick(bombs, field, our_bomb_destroyed, bomb_hits_our_position);
     // cerr << "B" << bombs.size() << endl;
     int next_tick_with_bomb = this->me->bombs - 1 + our_bomb_destroyed > 0 ? 0 : get_bomb_restore_ticks(bombs, field);
+    cerr << "next_bomb" << next_tick_with_bomb << endl;
     if (bomb_hits_our_position)
       return make_tuple(0, 0, 0, -2); // TODO: fix it
     return get_action(bombs, field, next_tick_with_bomb);
