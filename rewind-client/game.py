@@ -57,7 +57,7 @@ def replay_update(replay):
     entity_type, owner, x, y, param1, param2 = replay.readline().split()
     owner, x, y, param1, param2 = int(owner), int(x), int(y), int(param1), int(param2)
     if entity_type == 'p':
-      players.append(Player(owner, x, y, player_colors[len(players)], param1, param2))
+      players.append(Player(owner, x, y, player_colors[owner], param1, param2))
     elif entity_type == 'm':
       monsters.append(Monster(x, y))
     elif entity_type == 'b':
