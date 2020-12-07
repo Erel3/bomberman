@@ -437,7 +437,7 @@ public:
                 go_x = x;
                 go_y = y;
                 go_tick = tick - 1;
-              }  
+              }
             }
           }
         }
@@ -473,7 +473,7 @@ public:
         for (int q = 0; q < W; q++)
           dp[i][j][q] = -1;
     pr[0][own_y][own_x] = -1;
-    dp[0][own_y][own_x] = 0;
+    dp[0][own_y][own_x] = this->me->max_bombs * 1000;
 
     bitset<W * H> destroy_boxes[2];
     bitset<W> accessibleness[H];
@@ -499,7 +499,77 @@ public:
       for (int i = 0; i < H; i++)
         prev_accessibleness[i] = accessibleness[i];
 
-      simulate_tick(tick, accessibleness, current_field, destroy_boxes, bombs, bombs_count);
+      {
+        bitset<W> next_accessibleness[H];
+        bitset<W> destroy_field[H];
+
+        for (int i = 0; i < H; i++)
+        {
+          next_accessibleness[i] = accessibleness[i];
+          if (i + 1 < H)
+            next_accessibleness[i] |= accessibleness[i + 1];
+          if (i - 1 >= 0)
+            next_accessibleness[i] |= accessibleness[i - 1];
+          next_accessibleness[i] |= (accessibleness[i] << 1);
+          next_accessibleness[i] |= (accessibleness[i] >> 1);
+        }
+
+        for (int i = 0; i < bombs_count; i++)
+        {
+          if (bombs[i].timer == tick || destroy_field[bombs[i].y][bombs[i].x])
+          {
+            destroy_field[bombs[i].y][bombs[i].x] = 1;
+            for (int dir = 0; dir < 4; dir++)
+            {
+              for (int j = 1; j <= bombs[i].range; j++)
+              {
+                int to_x = bombs[i].x + dx[dir] * j, to_y = bombs[i].y + dy[dir] * j;
+                if (to_x < 0 || to_x >= field.width ||
+                    to_y < 0 || to_y >= field.height || field.cells[to_y][to_x].type == CELL_BLOCK)
+                {
+                  break;
+                }
+                destroy_field[to_y][to_x] = 1;
+                if (field.cells[to_y][to_x].type == CELL_BOX && current_field[to_y][to_x] == 1)
+                {
+                  destroy_boxes[bombs[i].owner_id == this->me->owner_id][to_y * W + to_x] = 1;
+                  break;
+                }
+              }
+            }
+            swap(bombs[i], bombs[bombs_count - 1]);
+            bombs_count--;
+            i = -1;
+          }
+        }
+
+        for (int i = 0; i < features_count; i++)
+        {
+          if (destroy_field[features[i].y][features[i].x])
+          {
+            swap(features[i], features[features_count - 1]);
+            features_count--;
+            i--;
+          }
+        }
+
+        for (int i = 0; i < bombs_count; i++)
+        {
+          int x = bombs[i].x;
+          int y = bombs[i].y;
+          next_accessibleness[y][x] = next_accessibleness[y][x] & accessibleness[y][x];
+        }
+
+        for (int i = 0; i < H; i++)
+        {
+          next_accessibleness[i] &= (next_accessibleness[i] ^ current_field[i]);
+          next_accessibleness[i] &= (next_accessibleness[i] ^ destroy_field[i]);
+          current_field[i] ^= (current_field[i] & destroy_field[i]);
+        }
+
+        for (int i = 0; i < H; i++)
+          accessibleness[i] = next_accessibleness[i];
+      }
       for (int y = 0; y < H; y++)
       {
         for (int x = 0; x < W; x++)
@@ -535,12 +605,14 @@ public:
                 {
                   if (features[i].type == FEATURE_RANGE)
                   {
-                    dp_val++;
+                    dp_val += 10;
                   }
                   if (features[i].type == FEATURE_AMOUNT)
                   {
-                    if(dp_val < 1000)
+                    if (dp_val < 2000)
                       dp_val += 1000;
+                    else
+                      dp_val += 1;
                   }
                 }
               }
