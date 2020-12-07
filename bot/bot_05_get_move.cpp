@@ -349,13 +349,10 @@ public:
     return make_tuple(is_safe, own_score, rival_score);
   }
 
-  tuple<int, int, int, int> get_action(vector<Bomb> vec_bombs, Field field, int next_tick_with_bomb)
+  tuple<int, int, int, int> get_action(vector<Bomb> vec_bombs, Field field, int own_x, int own_y, int next_tick_with_bomb)
   {
     int max_f = -1;
     int go_x, go_y, go_tick;
-
-    int own_x = this->me->x;
-    int own_y = this->me->y;
 
     int bombs_count = vec_bombs.size();
     Bomb bombs[MAX_BOMB];
@@ -603,16 +600,19 @@ public:
               {
                 for (int i = 0; i < features_count; i++)
                 {
-                  if (features[i].type == FEATURE_RANGE)
+                  if (to_x == features[i].x && to_y == features[i].y)
                   {
-                    dp_val += 10;
-                  }
-                  if (features[i].type == FEATURE_AMOUNT)
-                  {
-                    if (dp_val < 2000)
-                      dp_val += 1000;
-                    else
-                      dp_val += 1;
+                    if (features[i].type == FEATURE_RANGE)
+                    {
+                      dp_val += 10;
+                    }
+                    if (features[i].type == FEATURE_AMOUNT)
+                    {
+                      if (dp_val < 2000)
+                        dp_val += 1000;
+                      else
+                        dp_val += 1;
+                    }
                   }
                 }
               }
@@ -656,7 +656,7 @@ public:
     cerr << "next_bomb" << next_tick_with_bomb << endl;
     if (bomb_hits_our_position)
       return make_tuple(0, 0, 0, -2); // TODO: fix it
-    return get_action(bombs, field, next_tick_with_bomb);
+    return get_action(bombs, field, this->me->x, this->me->y, next_tick_with_bomb);
   }
 
   // simulate one tick. updates state, returns score of tick
@@ -775,7 +775,7 @@ public:
   {
     int next_tick_with_bomb = this->me->bombs > 0 ? 0 : get_bomb_restore_ticks(this->bombs, this->field);
     cerr << "next_bomb" << next_tick_with_bomb << endl;
-    auto [tick, go_x, go_y, max_f] = get_action(this->bombs, this->field, next_tick_with_bomb);
+    auto [tick, go_x, go_y, max_f] = get_action(this->bombs, this->field, this->me->x, this->me->y, next_tick_with_bomb);
     cerr << "GO TO " << tick << " " << go_x << " " << go_y << " " << max_f << endl;
     if (this->me->bombs > 0)
     {

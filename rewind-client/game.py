@@ -183,10 +183,10 @@ def next_tick_players(field, players, bombs, monsters, features):
 
 def next_apply_players(field, players, bombs, monsters, features):
   for player in players:
-    if player.action == PlayerAction.BOMB:
+    if player.action != PlayerAction.BOMB:
       player.apply(field, players, bombs, monsters, features)
   for player in players:
-    if player.action != PlayerAction.BOMB:
+    if player.action == PlayerAction.BOMB:
       player.apply(field, players, bombs, monsters, features)
 
 

@@ -80,7 +80,7 @@ config.tick = 0
 config.max_ticks = 400
 
 # feature config
-config.feature_percent = 10
+config.feature_percent = 30
 
 # replay
 config.is_replay = False
