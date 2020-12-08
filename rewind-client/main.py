@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from config import config, ConfigParser
+import concurrent.futures
 import game
 
 import os
@@ -9,6 +10,8 @@ abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
+def run():
+  return game.run()
 if __name__ == "__main__":
   parser = ConfigParser(config=config, prog="main.py", description="rewind client for bomberman")
   parser.parse()
@@ -17,8 +20,13 @@ if __name__ == "__main__":
     win_count, win_avg_diff = 0, 0
     lose_count, lose_avg_diff = 0, 0
     draw_count = 0
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=config.proc)
+
+    tasks = []
+    for game_id in range(0, config.game_count):
+      tasks.append(executor.submit(run))
     for game_id in range(0, config.game_count):    
-      score, log_filename = game.run()
+      score, log_filename = tasks[game_id].result()
       win = score[0] > score[1]
       lose = score[0] < score[1]
       draw = score[0] == score[1]

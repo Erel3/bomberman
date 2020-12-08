@@ -4,6 +4,7 @@ from models.entity import Player, PlayerAction
 from config import config
 
 import os
+import select
 
 ##### USED NAMED PIPES
 # class StrategyPlayer(Player):
@@ -81,6 +82,7 @@ class StrategyPlayer(Player):
 
   def __init__(self, owner_id, x, y, color, file, hide_stderr=True):
     Player.__init__(self, owner_id, x, y, color, config.bomb_count, config.bomb_range)
+    self.broken = False
     self.proc = subprocess.Popen(file, stdin=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True, stderr=subprocess.DEVNULL if hide_stderr else None)
 
 
@@ -98,6 +100,7 @@ class StrategyPlayer(Player):
       line = self.proc.stdout.readline()
       return line
     except:
+      self.broken = True
       if config.with_viewer:
         print("player {} not responded".format(self.owner))
       return ''
@@ -121,13 +124,15 @@ class StrategyPlayer(Player):
         self.proc.stdin.write("{} {} {} {} {} {}\n".format(feature.type, feature.owner, feature.x, feature.y, 0, 0))
       self.proc.stdin.flush()
     except:
+      self.broken = True
       if config.with_viewer:
         print("error writing state to player {}".format(self.owner))
       pass
 
   def tick(self, field, players, bombs, monsters, features):
-    self._write_state(field, players, bombs, monsters, features)
-    action = self._read_line().strip()
+    if not self.broken:
+      self._write_state(field, players, bombs, monsters, features)
+    action = self._read_line().strip() if not self.broken else ''
     if action == '':
       action = 'stay'
     self.action = PlayerAction(action)
