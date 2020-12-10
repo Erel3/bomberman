@@ -888,28 +888,29 @@ public:
     return 10001;
   }
 
-  int ff(int dist, int own_score, int ene_score, bool is_own_safe, bool ene_safe_afk, bool is_ene_safe, bool ignore_afk, bool better_then_afk)
+  int ff(int dist, int own_score, int ene_score, bool is_own_safe, bool ene_safe_afk, bool is_ene_safe, bool better_then_afk)
   {
-    if (ene_safe_afk && !is_ene_safe) {
-      if (is_own_safe) {
+    if (ene_safe_afk && !is_ene_safe)
+    {
+      if (is_own_safe)
+      {
         return 1000000 - dist;
-      } 
-      if (current_global_score + (own_score - ene_score) > 0) {
-        return 900000 - dist + (own_score - ene_score);
+      }
+      if (current_global_score + (own_score - ene_score) >= 1)
+      {
+        return 900000 - dist * 30 + (own_score - ene_score);
       }
     }
-    if (!is_own_safe) {
+    if (!is_own_safe)
+    {
       return own_score - ene_score;
     }
-    if (ignore_afk) {
-      return (own_score - ene_score) * 5 - dist + 100000;
-    }
-    if (better_then_afk) {
+    if (better_then_afk)
+    {
       return (own_score - ene_score) * 5 - dist + 100000;
     }
     return -1;
   }
-
 
   void simulate_tick_akim(int tick, bitset<W> (&accessibleness_own)[H], bitset<W> (&accessibleness_ene)[H], bitset<W> (&current_field)[H], bitset<W * H> (&destroy_boxes)[2], Bomb (&bombs)[MAX_BOMB], int &bombs_count)
   {
@@ -1027,7 +1028,7 @@ public:
     return make_tuple(is_own_safe, is_ene_safe, own_score, ene_score);
   }
 
-  tuple<int, int, int, int> get_action_akim(vector<Bomb> vec_bombs, Field field, int own_x, int own_y, int ene_x, int ene_y, int next_tick_with_bomb, bool ignore_afk = false)
+  tuple<int, int, int, int> get_action_akim(vector<Bomb> vec_bombs, Field field, int own_x, int own_y, int ene_x, int ene_y, int next_tick_with_bomb)
   {
     int max_f = -1;
     int go_x = own_x, go_y = own_y, go_tick = 0;
@@ -1043,12 +1044,12 @@ public:
 
     accessibleness_own[own_y][own_x] = 1;
     if (ene_x != -1 && ene_y != -1)
-    accessibleness_ene[ene_y][ene_x] = 1;
+      accessibleness_ene[ene_y][ene_x] = 1;
 
     bitset<W> current_field[H];
 
     bool is_calced[H][W];
-    tuple<bool, int, int> calced_value[H][W];
+    tuple<bool, bool, int, int> calced_value[H][W];
     for (int i = 0; i < H; i++)
       for (int j = 0; j < W; j++)
         is_calced[i][j] = 0;
@@ -1099,12 +1100,26 @@ public:
               bool is_own_safe, is_ene_safe;
               int own_score_change, ene_score_change;
 
+
+            if (bombs_count > 0)
+            {
               tie(is_own_safe, is_ene_safe, own_score_change, ene_score_change) = check_safe_and_get_score_akim(tick + 1, x, y, accessibleness_ene, current_field, bombs, bombs_count, true);
+            }
+            else
+            {
+              if (!is_calced[y][x])
+              {
+                is_calced[y][x] = 1;
+                calced_value[y][x] = check_safe_and_get_score_akim(tick + 1, x, y, accessibleness_ene, current_field, bombs, bombs_count, true);
+              }
+              tie(is_own_safe, is_ene_safe, own_score_change, ene_score_change) = calced_value[y][x];
+            }
+
 
               {
                 int own_next_score = own_score + own_score_change;
                 int ene_next_score = ene_score + ene_score_change;
-                int cur_f = ff(tick - 1, own_next_score, ene_next_score, is_own_safe, ene_safe_afk, is_ene_safe, ignore_afk, own_next_score - ene_next_score > own_afk_score - ene_next_score);
+                int cur_f = ff(tick - 1, own_next_score, ene_next_score, is_own_safe, ene_safe_afk, is_ene_safe, own_next_score - ene_next_score > own_afk_score - ene_afk_score);
                 if (max_f < cur_f)
                 {
                   max_f = cur_f;
@@ -1123,28 +1138,65 @@ public:
     return make_tuple(go_tick, go_x, go_y, max_f);
   }
 
+
+  tuple<int, int, int, int> get_action_with_move_akim(vector<Bomb> bombs, Field field, Player player, PlayerMove move)
+  {
+    if (!apply_move(bombs, field, player, move))
+    {
+      return make_tuple(0, player.x, player.y, -2);
+    }
+    bool our_bomb_destroyed = false;
+    bool bomb_hits_our_position = false;
+    next_tick(bombs, field, player, our_bomb_destroyed, bomb_hits_our_position);
+    int next_tick_with_bomb = get_bomb_restore_ticks(bombs, field, player);
+    if (bomb_hits_our_position)
+      return make_tuple(0, player.x, player.y, -2);
+    return get_action_akim(bombs, field, player.x, player.y, -1, -1, next_tick_with_bomb);
+  }
+
   void prepare()
   {
     {
       int next_tick_with_bomb = get_bomb_restore_ticks(this->bombs, this->field, *this->me);
       cerr << "next_bomb: " << next_tick_with_bomb << endl;
       int ene_x = -1, ene_y = -1;
-      if(this->enemy != nullptr)
+      if (this->enemy != nullptr)
         ene_x = this->enemy->x, ene_y = this->enemy->y;
       auto [tick, go_x, go_y, max_f] = get_action_akim(this->bombs, this->field, this->me->x, this->me->y, ene_x, ene_y, next_tick_with_bomb);
       cerr << "GO TO: " << tick << " " << go_x << " " << go_y << " " << max_f << endl;
-      if (max_f >= 200000) {
-        cerr << "------------------------------------------------------------------------------------DIE!" << " " << max_f <<  endl;
+
+      if (next_tick_with_bomb == 0 && max_f < 200000)
+      {
+        int prev_score = get_score(this->bombs, this->field, *this->me);
+        int new_score = get_score_with_bomb(bombs, this->field, *this->me);
+        cerr << "old and new score: " << prev_score << " " << new_score << endl;
+        if (prev_score < new_score)
+        {
+          auto [ntick, ngo_x, ngo_y, nmax_f] = get_action_with_move_akim(this->bombs, this->field, *this->me, PLAYER_BOMB);
+          cerr << "max f after placing bomb: " << nmax_f << endl;
+          if (nmax_f > max_f && ngo_x == go_x && ngo_y == go_y && ntick == tick)
+          {
+            cerr << "BOMB!" << endl;
+            this->me->action = PLAYER_BOMB;
+            return;
+          }
+        }
       }
-      if (max_f < 500) {
-        cerr << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~PANIC!" << " " << max_f << endl;
+
+      if (max_f >= 200000)
+      {
+        cerr << "------------------------------------------------------------------------------------DIE!"
+             << " " << max_f << endl;
       }
-      if (max_f >= 200000) {
-        this->me->action = get_move(tick, go_x, go_y);
-        current_global_score += get_tick_score(this->bombs, this->field, *this->me);
-        cerr << "SCORE: " << current_global_score << endl;
-        return;
+      if (max_f < 500)
+      {
+        cerr << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~PANIC!"
+             << " " << max_f << endl;
       }
+      this->me->action = get_move(tick, go_x, go_y);
+      current_global_score += get_tick_score(this->bombs, this->field, *this->me);
+      cerr << "SCORE: " << current_global_score << endl;
+      return;
     }
 
     int next_tick_with_bomb = get_bomb_restore_ticks(this->bombs, this->field, *this->me);
