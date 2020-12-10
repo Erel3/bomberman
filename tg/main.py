@@ -171,7 +171,7 @@ def start():
   while True:
     try:
       current_milis = int(round(time.time() * 1000))
-      if latest_leaderboard_update_milis + latest_leaderboard_update_delay_milis > current_milis:
+      if latest_leaderboard_update_milis + latest_leaderboard_update_delay_milis < current_milis:
         print('update start')
         leaderboard_data = get_leaderboard()
         top_changed = update_leaderboard(leaderboard_data)
