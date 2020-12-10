@@ -180,13 +180,23 @@ def next_tick_players(field, players, bombs, monsters, features):
   for player in players:
     player.tick(field, players, bombs, monsters, features)
 
+def next_tick_players_for_replay(field, players, bombs, monsters, features, strategy_players):
+  for player in players:
+    player.recalculate(field, players, bombs, monsters, features)
+  for sp in strategy_players:
+    for p in players:
+      if sp.owner == p.owner:
+        sp.copy_from(p)
+  for player in strategy_players:
+    player.tick(field, players, bombs, monsters, features)
+
 
 def next_apply_players(field, players, bombs, monsters, features):
   for player in players:
-    if player.action != PlayerAction.BOMB:
+    if player.action == PlayerAction.BOMB:
       player.apply(field, players, bombs, monsters, features)
   for player in players:
-    if player.action == PlayerAction.BOMB:
+    if player.action != PlayerAction.BOMB:
       player.apply(field, players, bombs, monsters, features)
 
 
@@ -305,12 +315,7 @@ def replay():
     field.draw_destroy_data(helper.client)
     field.clean()
     
-    for sp in strategy_players:
-      for p in players:
-        if sp.owner == p.owner:
-          sp.copy_from(p)
-
-    next_tick_players(field, strategy_players, bombs, monsters, features)
+    next_tick_players_for_replay(field, players, bombs, monsters, features, strategy_players)
     helper.client.message(str(list(score.items())))
     helper.redraw(field, players + bombs + monsters + features)
     
