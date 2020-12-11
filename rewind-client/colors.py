@@ -15,7 +15,8 @@ class Color(Enum):
   DARK_BLUE = 0x000077
   TRANSPARENT = 0x7f000000
   INVISIBLE = 0x01000000
-
+  ORANGE = 0xff7f50
+  GOLD = 0xffd700
 
 player_colors = [
   Color.BLUE,

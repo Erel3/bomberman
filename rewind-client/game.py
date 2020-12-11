@@ -1,6 +1,6 @@
 from models.field.field import Field, FieldConstructor
 from models.field.field_type import FieldType
-from models.entity import Bomb, Monster, MonsterAction, Player, PlayerAction, FeatureAdd, FeatureRange
+from models.entity import Bomb, Monster, MonsterAction, Player, PlayerAction, FeatureAdd, FeatureRange, FeatureTeleport, FeatureJump
 from players import StrategyPlayer
 from monsters import DummyMonster
 from draw_helper import DrawHelper
@@ -66,6 +66,15 @@ def replay_update(replay):
       features.append(FeatureAdd(x, y))
     elif entity_type == "f_r":
       features.append(FeatureRange(x, y))
+  features_count = int(replay.readline())
+  for i in range(features_count):
+    owner, param = map(int, replay.readline().split())
+    for player in players:
+      if player.owner == owner:
+        if param == 0:
+          player.teleport = True
+        else:
+          player.jump = True
 
   for bomb in bombs:
     for player in players:
@@ -130,17 +139,22 @@ def next_tick_field(field, players, bombs, monsters, features):
         if field.data[i][j] == ';':
           rand = random.randint(0, 100)
           if rand <= config.feature_percent:
-            if random.randint(0, 1):
+            type_feature_rand = random.randint(0, 4)
+            if type_feature_rand == 0:
               features.append(FeatureAdd(j, i))
-            else:
+            elif type_feature_rand == 1:
               features.append(FeatureRange(j, i))
+            elif type_feature_rand == 2:
+              features.append(FeatureTeleport(j, i))
+            elif type_feature_rand == 3:
+              features.append(FeatureJump(j, i))
         field.data[i][j] = '.'
 
 
 def next_tick_entities(field, players, bombs, monsters, features):
   id = 0
   while id < len(players):
-    if field.destroy_data[players[id].y][players[id].x]:
+    if field.destroy_data[players[id].y][players[id].x] and players[id].action != PlayerAction.JUMP:
       players.pop(id)
     else:
       id += 1
@@ -209,8 +223,12 @@ def next_apply_features(field, players, bombs, monsters, features):
         used = True
         if features[id].type == "f_a":
           player.bomb_count += 1
-        else:
+        elif features[id].type == "f_r":
           player.bomb_range += 1
+        elif features[id].type == "f_t":
+          player.teleport = True
+        elif features[id].type == "f_j":
+          player.jump = True
     if used:
       features.pop(id)
     else:
@@ -243,6 +261,16 @@ def write_logs(log_output, field, players, bombs, monsters, features):
     log_output.write("{} {} {} {} {} {}\n".format(monster.type, monster.owner, monster.x, monster.y, 0, 0))
   for feature in features:
     log_output.write("{} {} {} {} {} {}\n".format(feature.type, feature.owner, feature.x, feature.y, 0, 0))
+
+  player_features = []
+  for player in players:
+    if player.teleport:
+      player_features.append((player.owner, 0))
+    if player.jump:
+      player_features.append((player.owner, 1))
+  log_output.write("{}\n".format(len(player_features)))
+  for feature in player_features:
+    log_output.write("{} {}\n".format(feature[0], feature[1]))
 
 def finish_log(log_output):
   log_output.write("{} {} {}\n".format(-1,-1, -1))

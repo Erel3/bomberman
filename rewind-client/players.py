@@ -94,6 +94,8 @@ class StrategyPlayer(Player):
     self.bomb_count = player.bomb_count
     self.current_bomb_count = player.current_bomb_count
     self.bomb_range = player.bomb_range
+    self.teleport = player.teleport
+    self.jump = player.jump
 
   def _read_line(self):
     try:
@@ -122,6 +124,15 @@ class StrategyPlayer(Player):
         self.proc.stdin.write("{} {} {} {} {} {}\n".format(monster.type, monster.owner, monster.x, monster.y, 0, 0))
       for feature in features:
         self.proc.stdin.write("{} {} {} {} {} {}\n".format(feature.type, feature.owner, feature.x, feature.y, 0, 0))
+      player_features = []
+      for player in players:
+        if player.teleport:
+          player_features.append((player.owner, 0))
+        if player.jump:
+          player_features.append((player.owner, 1))
+      self.proc.stdin.write("{}\n".format(len(player_features)))
+      for feature in player_features:
+        self.proc.stdin.write("{} {}\n".format(feature[0], feature[1]))
       self.proc.stdin.flush()
     except:
       self.broken = True
@@ -132,11 +143,18 @@ class StrategyPlayer(Player):
   def tick(self, field, players, bombs, monsters, features):
     if not self.broken:
       self._write_state(field, players, bombs, monsters, features)
-    action = self._read_line().strip() if not self.broken else ''
+    action_elements = self._read_line().strip().split() if not self.broken else ['']
+    action = action_elements[0]
+    if len(action_elements) > 1:
+      self.action_x, self.action_y = int(action_elements[1]), int(action_elements[2])
     if action == '':
       action = 'stay'
     self.action = PlayerAction(action)
     if self.action == PlayerAction.BOMB and self.current_bomb_count == 0:
+      self.action = PlayerAction.STAY
+    if self.action == PlayerAction.JUMP and self.jump == False:
+      self.action = PlayerAction.STAY
+    if self.action == PlayerAction.TELEPORT and self.teleport == False:
       self.action = PlayerAction.STAY
 
   def __del__(self):
