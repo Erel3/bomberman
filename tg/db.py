@@ -17,6 +17,7 @@ class Leaderboard(Base):
   mu = Column(Float)
   sigma = Column(Float)
   last_game = Column(String)
+  delta = Column(Float)
 
   def __init__(self, place, captain_id, captain_name, score, mu, sigma, last_game):
     self.place = place
@@ -26,6 +27,7 @@ class Leaderboard(Base):
     self.mu = self.mu
     self.sigma = sigma
     self.last_game = last_game
+    self.delta = 0
 
 
 class Chats(Base):

@@ -34,7 +34,8 @@ def check_secret(message):
   if len(message.text.split(' ', 1)) > 1:
     if(message.text.split(' ', 1)[1] == secret):
       session = Session()
-      chat = session.query(Chats).filter(Chats.chat_id == message.chat.id).first()
+      chat = session.query(Chats).filter(
+          Chats.chat_id == message.chat.id).first()
       if chat == None:
         chat = Chats(message.chat.id)
         session.add(chat)
@@ -66,7 +67,7 @@ def activate_chat(message):
   if chat != None:
     chat.is_active = True
     session.add(chat)
-    bot.reply_to(message, "activated")    
+    bot.reply_to(message, "activated")
   session.commit()
   session.close()
 
@@ -75,9 +76,10 @@ def activate_chat(message):
 def leaderboard_top(message):
   session = Session()
   chat = session.query(Chats).filter(Chats.chat_id == message.chat.id).first()
-  if chat == None or chat.is_active == False:
+  if chat == None:
     return
-  leaderboard = session.query(Leaderboard).order_by(Leaderboard.place).all()[:10]
+  leaderboard = session.query(Leaderboard).order_by(
+      Leaderboard.place).all()[:10]
   msg_text = tabulate([[leader.place, leader.captain_name, leader.score] for leader in leaderboard], headers=['', 'PLAYER', 'SCORE'])
   session.commit()
   session.close()
@@ -88,7 +90,7 @@ def leaderboard_top(message):
 def leaderboard_all(message):
   session = Session()
   chat = session.query(Chats).filter(Chats.chat_id == message.chat.id).first()
-  if chat == None or chat.is_active == False:
+  if chat == None:
     return
   leaderboard = session.query(Leaderboard).order_by(Leaderboard.place).all()
   msg_text = tabulate([[leader.place, leader.captain_name, leader.score] for leader in leaderboard], headers=['', 'PLAYER', 'SCORE'])
@@ -99,7 +101,8 @@ def leaderboard_all(message):
 
 def notify_update_leaderboard():
   session = Session()
-  leaderboard = session.query(Leaderboard).order_by(Leaderboard.place).all()[:10]
+  leaderboard = session.query(Leaderboard).order_by(
+      Leaderboard.place).all()[:10]
   msg_text = tabulate([[leader.place, leader.captain_name, leader.score] for leader in leaderboard], headers=['', 'PLAYER', 'SCORE'])
   chats = session.query(Chats).filter(Chats.is_active == True)
   for chat in chats:
@@ -107,8 +110,9 @@ def notify_update_leaderboard():
   session.commit()
   session.close()
 
+
 def get_leaderboard():
-  link = "https://cup.alem.school/api/leaderboard"
+  link = "https://cup.alem.school/api/leaderboard/2"
   data = requests.get(link).json()
   return data
 
@@ -135,8 +139,10 @@ def update_leaderboard(leaderboard_data):
           place, captain_id, captain_name, score, mu, sigma, last_game)
     else:
       leaderboard_participant.place = place
-      if place <= 10 and leaderboard_participant.score != score:
-        top_updated = True
+      if leaderboard_participant.score != score:
+        leaderboard_participant.delta = score - leaderboard_participant.score
+        if place <= 10:
+          top_updated = True
       leaderboard_participant.score = score
       leaderboard_participant.mu = mu
       leaderboard_participant.sigma = sigma
