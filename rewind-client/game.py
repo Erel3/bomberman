@@ -139,14 +139,14 @@ def next_tick_field(field, players, bombs, monsters, features):
         if field.data[i][j] == ';':
           rand = random.randint(0, 100)
           if rand <= config.feature_percent:
-            type_feature_rand = random.randint(0, 4)
-            if type_feature_rand == 0:
+            type_feature_rand = random.randint(0, 99)
+            if type_feature_rand < 35:
               features.append(FeatureAdd(j, i))
-            elif type_feature_rand == 1:
+            elif type_feature_rand < 70:
               features.append(FeatureRange(j, i))
-            elif type_feature_rand == 2:
+            elif type_feature_rand < 85:
               features.append(FeatureTeleport(j, i))
-            elif type_feature_rand == 3:
+            elif type_feature_rand < 100:
               features.append(FeatureJump(j, i))
         field.data[i][j] = '.'
 
