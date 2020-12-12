@@ -276,6 +276,18 @@ def finish_log(log_output):
   log_output.write("{} {} {}\n".format(-1,-1, -1))
   log_output.close()
 
+def is_finished_game(field, players):
+  has_box = False
+  for i in range(field.height):
+    for j in range(field.width):
+      if field.data[i][j] == ';':
+        has_box = True
+  if has_box == False and len(players) <= 1:
+    return True
+  if len(players) == 0:
+    return True
+  return False
+
 def run():
   # open file to log
   now = datetime.now()
@@ -318,6 +330,9 @@ def run():
                           bombs + monsters + features)
     helper.client.message(str(list(score.items())))
     helper.redraw(field, players + bombs + monsters + features)
+    if is_finished_game(field, players):
+      break
+
   finish(helper, field, players, bombs, monsters, features, score)
   
   finish_log(log_output)
