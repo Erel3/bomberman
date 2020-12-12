@@ -34,9 +34,8 @@ def _default_gen(self, width, height):
       for j in range(height)
   ]
 def _file_gen(self, width, height):
-    fileName = random.randint(0, 10)
+    fileName = random.randint(0, 9)
     fileName = "../maps/1/" + str(fileName)
-    print(fileName)
     with open(fileName, "r") as f:
       return [list(f.readline().strip()) for i in range(height)]    
 
@@ -44,7 +43,6 @@ def _file_gen(self, width, height):
 class FieldConstructor():
 
   def __init__(self, ftype):
-    print(ftype)
     if (ftype == FieldType.SNAKE):
       self.construct = _snake_gen
     elif (ftype == FieldType.NO_BLOCKS):

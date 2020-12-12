@@ -144,7 +144,7 @@ class StrategyPlayer(Player):
     if not self.broken:
       self._write_state(field, players, bombs, monsters, features)
     action_elements = self._read_line().strip().split() if not self.broken else ['']
-    action = action_elements[0]
+    action = '' if len(action_elements) == 0 else action_elements[0]
     if len(action_elements) > 1:
       self.action_x, self.action_y = int(action_elements[1]), int(action_elements[2])
     if action == '':
