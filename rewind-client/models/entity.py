@@ -84,7 +84,7 @@ class Player(Entity):
         self.teleport = False
         return
     if self.action == PlayerAction.JUMP:
-      self.teleport = False
+      self.jump = False
       return
     for bomb in bombs:
       if nx == bomb.x and ny == bomb.y:
