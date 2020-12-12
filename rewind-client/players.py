@@ -127,9 +127,9 @@ class StrategyPlayer(Player):
       player_features = []
       for player in players:
         if player.teleport:
-          player_features.append((player.owner, 0))
-        if player.jump:
           player_features.append((player.owner, 1))
+        if player.jump:
+          player_features.append((player.owner, 0))
       self.proc.stdin.write("{}\n".format(len(player_features)))
       for feature in player_features:
         self.proc.stdin.write("{} {}\n".format(feature[0], feature[1]))

@@ -6,3 +6,4 @@ class FieldType(Enum):
   SNAKE = 'snake'
   NO_BLOCKS = 'no-blocks'
   FULL = 'full'
+  FILE = 'file'
