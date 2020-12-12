@@ -90,9 +90,9 @@ public:
 enum FeatureType
 {
   FEATURE_RANGE = 'r',
-  FEATURE_AMOUNT = 'a'
+  FEATURE_AMOUNT = 'a',
   FEATURE_TELEPORT = 't',
-  FEATURE_JUMP = 'j',
+  FEATURE_JUMP = 'j'
 };
 
 class Feature
