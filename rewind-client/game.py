@@ -276,16 +276,28 @@ def finish_log(log_output):
   log_output.write("{} {} {}\n".format(-1,-1, -1))
   log_output.close()
 
-def is_finished_game(field, players):
+def enemy_owner(me_owner):
+  return me_owner ^ 1
+
+def is_finished_game(field, players, score):
   has_box = False
+  box_counts = 0
   for i in range(field.height):
     for j in range(field.width):
       if field.data[i][j] == ';':
+        box_counts += 1
         has_box = True
   if has_box == False and len(players) <= 1:
     return True
   if len(players) == 0:
     return True
+  
+  for player in players:
+    if score[player.owner] + box_counts + (0 if len(players) == 1 else 7) < score[enemy_owner(player.owner)]:
+      return True
+    if score[enemy_owner(player.owner)] + box_counts < score[player.owner] and len(players) == 1:
+      return True
+
   return False
 
 def run():
@@ -330,7 +342,7 @@ def run():
                           bombs + monsters + features)
     helper.client.message(str(list(score.items())))
     helper.redraw(field, players + bombs + monsters + features)
-    if is_finished_game(field, players):
+    if is_finished_game(field, players, score):
       break
 
   finish(helper, field, players, bombs, monsters, features, score)
