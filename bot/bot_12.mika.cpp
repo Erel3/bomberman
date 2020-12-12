@@ -1056,7 +1056,7 @@ public:
   tuple<int, int, int, int> get_action_akim(vector<Bomb> vec_bombs, Field field, int own_x, int own_y, int ene_x, int ene_y, int next_tick_with_bomb)
   {
     int max_f = -1;
-    int go_x = own_x, go_y = own_y, go_tick = 0;
+    int go_x = own_x, go_y = own_y, go_tick = 20;
 
     int bombs_count = vec_bombs.size();
     Bomb bombs[MAX_BOMB];
