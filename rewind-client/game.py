@@ -1,7 +1,7 @@
 from models.field.field import Field, FieldConstructor
 from models.field.field_type import FieldType
 from models.entity import Bomb, Monster, MonsterAction, Player, PlayerAction, FeatureAdd, FeatureRange, FeatureTeleport, FeatureJump
-from players import StrategyPlayer
+from players import StrategyPlayer, KeyboardPlayer
 from monsters import DummyMonster
 from draw_helper import DrawHelper
 from colors import Color, player_colors
@@ -17,7 +17,9 @@ def init():
   score = {}
   field = Field(FieldConstructor(config.field))
   players = [StrategyPlayer(id, int(player[1]), int(player[2]), player_colors[id],
-                            player[0], False if id == 0 and config.with_viewer else True) for id, player in enumerate(config.players)]
+                            player[0], False if id == 0 and config.with_viewer and not config.with_keyboard_player else True) for id, player in enumerate(config.players)]
+  players.append(KeyboardPlayer(len(players), 0, 0, player_colors[len(players)]))
+  
   for player in players:
     score[player.owner] = 0
     for i in range(0, 3):

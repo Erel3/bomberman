@@ -33,6 +33,8 @@ class ConfigParser(ArgumentParser):
                       default=config.proc, metavar=config.proc, dest='proc', help='number of processes for autotest')
     self.add_argument('--replay', action='store', type=str,
                       default=config.replay_file, metavar="../games/file.gamelog", dest='replay_file', help='replay game from game log')
+    self.add_argument('-kp', '--keyboard-player', action='store_true',
+                      default=config.with_keyboard_player, dest='with_keyboard_player', help='enable keyboard player')
     self.namespace = config
 
   def parse(self):
@@ -85,3 +87,6 @@ config.feature_percent = 28
 # replay
 config.is_replay = False
 config.replay_file = ""
+
+# with keyboard player
+config.with_keyboard_player = False
