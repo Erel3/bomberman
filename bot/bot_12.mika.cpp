@@ -1263,8 +1263,8 @@ int main()
     game.apply();
     double tick_endtime = 1000. * clock() / CLOCKS_PER_SEC;
     game.read_state(); // here we also wait for server response do we need to count it?
-    fprintf(stderr, "tick %d time: %.3lf ms\n", game.tick, max_tick_time);
     max_tick_time = max(max_tick_time, tick_endtime - tick_starttime);
+    fprintf(stderr, "tick %d time: %.3lf ms\n", game.tick, max_tick_time);
   }
 
   return 0;

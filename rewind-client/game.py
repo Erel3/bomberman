@@ -18,7 +18,8 @@ def init():
   field = Field(FieldConstructor(config.field))
   players = [StrategyPlayer(id, int(player[1]), int(player[2]), player_colors[id],
                             player[0], False if id == 0 and config.with_viewer and not config.with_keyboard_player else True) for id, player in enumerate(config.players)]
-  players.append(KeyboardPlayer(len(players), 0, 0, player_colors[len(players)]))
+  if config.with_keyboard_player:
+    players.append(KeyboardPlayer(len(players), 0, 0, player_colors[len(players)]))
   
   for player in players:
     score[player.owner] = 0

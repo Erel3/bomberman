@@ -265,7 +265,7 @@ class FeatureTeleport(Entity):
 class FeatureJump(Entity):
   def __init__(self, x, y):
     Entity.__init__(self)
-    self.type = "f_r"
+    self.type = "f_j"
     self.owner = -1
     self.x = x
     self.y = y
