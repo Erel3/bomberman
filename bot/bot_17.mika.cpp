@@ -308,8 +308,8 @@ public:
     if (!(rhs.me_score + rhs.me_next_score > rhs.me_default_score || rhs.enemy_score + rhs.enemy_next_score < rhs.enemy_default_score))
       rhspen = 10000;
 
-    int cost1 = (me_score + me_next_score - enemy_score - enemy_next_score) * 2 - (dist + me_dist_penalty) - pen;
-    int cost2 = (rhs.me_score + rhs.me_next_score - rhs.enemy_score - rhs.enemy_next_score) * 2 - (rhs.dist + rhs.me_dist_penalty) - rhspen;
+    int cost1 = (me_score + me_next_score - enemy_score - enemy_next_score) * 4 - (dist + me_dist_penalty) - pen;
+    int cost2 = (rhs.me_score + rhs.me_next_score - rhs.enemy_score - rhs.enemy_next_score) * 4 - (rhs.dist + rhs.me_dist_penalty) - rhspen;
     if (cost1 == cost2)
       return dist + me_dist_penalty < rhs.dist + rhs.me_dist_penalty;
     return cost1 > cost2;
@@ -1311,7 +1311,7 @@ public:
 
   void prepare()
   {
-    if (me == nullptr || this->tick >= 76)
+    if (me == nullptr)
       exit(1);
 
     for (Bomb &bomb : bombs)
