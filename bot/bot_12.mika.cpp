@@ -48,6 +48,7 @@ enum PlayerMove
 class Player
 {
 public:
+  Player() {}
   Player(int x, int y, int owner_id, int bombs, int range) : x(x), y(y), owner_id(owner_id), bombs(bombs), range(range)
   {
     this->max_bombs = bombs;
@@ -57,11 +58,45 @@ public:
     this->teleport = false;
     this->jump = false;
   }
+  Player(const Player &p)
+  {
+    this->x = p.x;
+    this->y = p.y;
+    this->owner_id = p.owner_id;
+    this->max_bombs = p.max_bombs;
+    this->bombs = p.bombs;
+    this->range = p.range;
+    this->teleport = p.teleport;
+    this->jump = p.jump;
+    this->action = p.action;
+    this->action_x = p.action_x;
+    this->action_y = p.action_y;
+  }
+  Player(const Player *p)
+  {
+    if (p == nullptr)
+    {
+      this->dead = true;
+      return;
+    }
+    this->x = p->x;
+    this->y = p->y;
+    this->owner_id = p->owner_id;
+    this->max_bombs = p->max_bombs;
+    this->bombs = p->bombs;
+    this->range = p->range;
+    this->teleport = p->teleport;
+    this->jump = p->jump;
+    this->action = p->action;
+    this->action_x = p->action_x;
+    this->action_y = p->action_y;
+  }
 
   int x, y;
   int owner_id;
   int max_bombs, bombs, range;
   bool teleport, jump;
+  bool dead = false;
 
   PlayerMove action = PLAYER_STAY;
   int action_x, action_y;
@@ -76,15 +111,6 @@ public:
   int x, y;
   int owner_id;
   int timer, range;
-};
-
-class Monster
-{
-public:
-  Monster(int x, int y, int owner_id) : x(x), y(y), owner_id(owner_id) {}
-
-  int x, y;
-  int owner_id;
 };
 
 enum FeatureType
@@ -152,6 +178,155 @@ public:
   vector<vector<Cell>> cells;
 };
 
+class Target
+{
+public:
+  Target() {}
+
+  int x, y;
+  int tick;
+  int type = -1; // 0 - bomb; 1 - feature; -1 - undefined
+};
+
+int fd(int dist)
+{
+  return 0;
+  if (dist < -5)
+  {
+    return -1;
+  }
+  if (dist > 20)
+  {
+    return 100;
+  }
+  if (dist > 15)
+  {
+    return 4;
+  }
+  if (dist > 10)
+  {
+    return 2;
+  }
+  if (dist > 5)
+  {
+    return 1;
+  }
+  return 0;
+}
+
+class StateQuality
+{
+public:
+  StateQuality() {}
+
+  StateQuality(int me_score, int enemy_score) : me_score(me_score), enemy_score(enemy_score) {}
+
+  int dist = 0;
+  int me_score = 0;
+  int enemy_score = 0;
+  int me_next_score = 0;
+  int enemy_next_score = 0;
+  int me_default_score = 0;
+  int enemy_default_score = 0;
+  int me_dist_penalty = 0;
+  int enemy_dist = 0;
+  bool me_alive = true;
+  bool enemy_alive = true;
+  bool me_will_alive = true;
+  bool enemy_will_alive = true;
+
+  // int ff()
+  // {
+  //   if (enemy_alive && !enemy_will_alive)
+  //   {
+  //     if (me_will_alive)
+  //     {
+  //       return 1000000 - dist;
+  //     }
+  //     if (me_score + me_next_score - enemy_score - enemy_next_score >= 1)
+  //     {
+  //       return 900000 - dist * 30 + (me_score + me_next_score - enemy_score - enemy_next_score);
+  //     }
+  //   }
+  //   if (!me_will_alive)
+  //   {
+  //     return me_score + me_next_score - enemy_score - enemy_next_score;
+  //   }
+  //   if (me_score + me_next_score > me_default_score || enemy_score + enemy_next_score < enemy_default_score)
+  //     return (me_score + me_next_score - enemy_score - enemy_next_score) * 5 - dist + 100000;
+  //   return -1;
+  // }
+
+  bool operator<(StateQuality &rhs) // a < b: if a better then b true else false; if b better then a false else true
+  {
+    // return this->ff() > rhs.ff();
+
+    if (enemy_alive)
+    {
+      if (!enemy_will_alive && !rhs.enemy_will_alive)
+      {
+        if (me_will_alive && rhs.me_will_alive)
+        {
+          return dist < rhs.dist;
+        }
+        else if (me_will_alive)
+        {
+          return true;
+        }
+        else if (rhs.me_will_alive)
+        {
+          return false;
+        }
+        // ! do not do suicide because it's hard to compute which bomb will kill you; also unbroken bombs won't add any point
+      }
+      else if (!enemy_will_alive && me_will_alive)
+      {
+        return true;
+      }
+      else if (!rhs.enemy_will_alive && rhs.me_will_alive)
+      {
+        return false;
+      }
+    }
+    if (!me_will_alive && !rhs.me_will_alive)
+    {
+      return me_score + me_next_score - enemy_score - enemy_next_score > rhs.me_score + rhs.me_next_score - rhs.enemy_score - rhs.enemy_next_score;
+    }
+    else if (!me_will_alive)
+    {
+      return false;
+    }
+    else if (!rhs.me_will_alive)
+    {
+      return true;
+    }
+
+    int pen = 0;
+    if (!(me_score + me_next_score > me_default_score || enemy_score + enemy_next_score < enemy_default_score))
+      pen = 10000;
+    int rhspen = 0;
+    if (!(rhs.me_score + rhs.me_next_score > rhs.me_default_score || rhs.enemy_score + rhs.enemy_next_score < rhs.enemy_default_score))
+      rhspen = 10000;
+
+    int cost1 = (me_score + me_next_score - enemy_score - enemy_next_score) * 2 - (dist + me_dist_penalty) - pen;
+    int cost2 = (rhs.me_score + rhs.me_next_score - rhs.enemy_score - rhs.enemy_next_score) * 2 - (rhs.dist + rhs.me_dist_penalty) - rhspen;
+    if (cost1 == cost2)
+      return dist + me_dist_penalty < rhs.dist + rhs.me_dist_penalty;
+    return cost1 > cost2;
+  }
+};
+
+class TupleComp
+{
+public:
+  bool operator()(const tuple<vector<Bomb>, vector<bitset<W>>, Player, Player, vector<bitset<W>>, vector<Feature>, StateQuality, Target> a, const tuple<vector<Bomb>, vector<bitset<W>>, Player, Player, vector<bitset<W>>, vector<Feature>, StateQuality, Target> b)
+  {
+    StateQuality a_state = get<6>(a);
+    StateQuality b_state = get<6>(b);
+    return a_state < b_state;
+  }
+};
+
 class Game
 {
 private:
@@ -160,9 +335,11 @@ private:
   Field field;
   vector<Player> players;
   vector<Bomb> bombs;
-  vector<Monster> monsters;
   vector<Feature> features;
-  int current_global_score = 0;
+  vector<bitset<W>> bit_field = vector<bitset<W>>(H, bitset<W>());
+  bitset<W> bit_full;
+  int me_global_score = 0;
+  int enemy_global_score = 0;
 
   void _log(string s)
   {
@@ -172,13 +349,13 @@ private:
 
 public:
   int tick;
-  int start_x, start_y;
   Game()
   {
     read_state(true);
-    this->start_x = this->me->x;
-    this->start_y = this->me->y;
-    cerr << this->start_x << " " << this->start_y << endl;
+    for (int i = 0; i < W; i++)
+    {
+      bit_full[i] = 1;
+    }
   }
 
   void read_state(bool create = false)
@@ -210,7 +387,6 @@ public:
     // clear
     players.clear();
     bombs.clear();
-    monsters.clear();
     features.clear();
 
     int entities;
@@ -234,10 +410,6 @@ public:
           assert(0);
         bombs.pb(Bomb(x, y, owner_id, param1, param2));
       }
-      if (type == 'm')
-      {
-        monsters.pb(Monster(x, y, owner_id));
-      }
       if (type == 'f')
       {
         features.pb(Feature(x, y, feature_type));
@@ -249,11 +421,16 @@ public:
     {
       int owner_id, fid;
       scanf("%d%d", &owner_id, &fid);
-      for (Player &player: players) {
-        if (owner_id == player.owner_id) {
-          if (fid == 0) {
+      for (Player &player : players)
+      {
+        if (owner_id == player.owner_id)
+        {
+          if (fid == 0)
+          {
             player.jump = true;
-          } else {
+          }
+          else
+          {
             player.teleport = true;
           }
         }
@@ -279,33 +456,38 @@ public:
         }
       }
     }
-    this->tick = tick;
-  }
-
-  int f(int dist, int own_score, int others_score)
-  {
-    return (own_score - others_score - 1) * 5 - dist + 100000;
-  }
-
-  void simulate_tick(int tick, bitset<W> (&accessibleness)[H], bitset<W> (&current_field)[H], bitset<W * H> (&destroy_boxes)[2], Bomb (&bombs)[MAX_BOMB], int &bombs_count)
-  {
-    bitset<W> next_accessibleness[H];
-    bitset<W> destroy_field[H];
 
     for (int i = 0; i < H; i++)
     {
-      next_accessibleness[i] = accessibleness[i];
-      if (i + 1 < H)
-        next_accessibleness[i] |= accessibleness[i + 1];
-      if (i - 1 >= 0)
-        next_accessibleness[i] |= accessibleness[i - 1];
-      next_accessibleness[i] |= (accessibleness[i] << 1);
-      next_accessibleness[i] |= (accessibleness[i] >> 1);
+      for (int j = 0; j < W; j++)
+      {
+        if (this->field.cells[i][j].type == CELL_BLOCK || this->field.cells[i][j].type == CELL_BOX)
+        {
+          this->bit_field[i][j] = 1;
+        }
+        else
+        {
+          this->bit_field[i][j] = 0;
+        }
+      }
     }
 
-    for (int i = 0; i < bombs_count; i++)
+    this->tick = tick;
+  }
+
+  tuple<int, int> simulate_bombs(Player &me, Player &enemy, vector<bitset<W>> &me_possible_pos, vector<bitset<W>> &enemy_possible_pos, vector<bitset<W>> &bit_field, vector<Bomb> &bombs, vector<Feature> &features, int &me_dist_penalty, bool can_escape = true)
+  {
+
+    me_dist_penalty = 0;
+    for (Bomb &bomb : bombs)
+      bomb.timer--;
+
+    vector<bitset<W>> destroy_field = vector<bitset<W>>(H, bitset<W>());
+    bitset<W * H> destroy_boxes[2];
+
+    for (int i = 0; i < bombs.size(); i++)
     {
-      if (bombs[i].timer == tick || destroy_field[bombs[i].y][bombs[i].x])
+      if (bombs[i].timer == 0 || destroy_field[bombs[i].y][bombs[i].x])
       {
         destroy_field[bombs[i].y][bombs[i].x] = 1;
         for (int dir = 0; dir < 4; dir++)
@@ -319,167 +501,597 @@ public:
               break;
             }
             destroy_field[to_y][to_x] = 1;
-            if (field.cells[to_y][to_x].type == CELL_BOX && current_field[to_y][to_x] == 1)
+            if (field.cells[to_y][to_x].type == CELL_BOX && bit_field[to_y][to_x] == 1)
             {
-              destroy_boxes[bombs[i].owner_id == this->me->owner_id][to_y * W + to_x] = 1;
+              destroy_boxes[bombs[i].owner_id == me.owner_id][to_y * W + to_x] = 1;
               break;
             }
           }
         }
-        swap(bombs[i], bombs[bombs_count - 1]);
-        bombs_count--;
+
+        if (bombs[i].owner_id == me.owner_id)
+          me.bombs++;
+        if (bombs[i].owner_id == enemy.owner_id)
+          enemy.bombs++;
+
+        swap(bombs[i], bombs.back());
+        bombs.ppb();
         i = -1;
       }
     }
 
-    for (int i = 0; i < bombs_count; i++)
+    for (int i = 0; i < features.size(); i++)
+    {
+      if (destroy_field[features[i].y][features[i].x])
+      {
+        swap(features[i], features.back());
+        features.ppb();
+        i--;
+      }
+    }
+    vector<bitset<W>> me_possible_pos_cache = me_possible_pos;
+    bool me_alive = false;
+    for (int i = 0; i < H; i++)
+    {
+      me_possible_pos[i] &= (me_possible_pos[i] ^ destroy_field[i]);
+      me_alive |= me_possible_pos[i].count();
+      enemy_possible_pos[i] &= (enemy_possible_pos[i] ^ destroy_field[i]);
+      bit_field[i] ^= (bit_field[i] & destroy_field[i]);
+    }
+
+    if (can_escape && !me_alive && me.jump)
+    {
+      me_dist_penalty = 6;
+      me_possible_pos = me_possible_pos_cache;
+      me.jump = false;
+    }
+    else if (can_escape && !me_alive && me.teleport)
+    {
+      me_dist_penalty = 10;
+      for (int i = 0; i < H; i++)
+        me_possible_pos[i] = bit_full ^ destroy_field[i];
+      me.teleport = false;
+    }
+
+    return make_tuple(destroy_boxes[1].count(), destroy_boxes[0].count());
+  }
+  void simulate_moves(Player &me, Player &enemy, vector<bitset<W>> &me_possible_pos, vector<bitset<W>> &enemy_possible_pos, vector<bitset<W>> &bit_field, vector<Bomb> &bombs, PlayerMove action = PLAYER_STAY)
+  {
+    vector<bitset<W>> me_possible_pos_next = me_possible_pos;
+    if (action == PLAYER_BOMB)
+    {
+      bombs.pb(Bomb(me.x, me.y, me.owner_id, BOMB_TIMER, me.range));
+    }
+    else if (action == PLAYER_TELEPORT)
+    {
+      me.teleport = false;
+      for (int i = 0; i < H; i++)
+        me_possible_pos_next[i] = bit_full;
+    }
+    else
+    {
+      for (int i = 0; i < H; i++)
+      {
+        if (i + 1 < H)
+          me_possible_pos_next[i] |= me_possible_pos[i + 1];
+        if (i - 1 >= 0)
+          me_possible_pos_next[i] |= me_possible_pos[i - 1];
+        me_possible_pos_next[i] |= (me_possible_pos[i] << 1);
+        me_possible_pos_next[i] |= (me_possible_pos[i] >> 1);
+      }
+    }
+    vector<bitset<W>> enemy_possible_pos_next = enemy_possible_pos;
+    for (int i = 0; i < H; i++)
+    {
+      if (i + 1 < H)
+        enemy_possible_pos_next[i] |= enemy_possible_pos[i + 1];
+      if (i - 1 >= 0)
+        enemy_possible_pos_next[i] |= enemy_possible_pos[i - 1];
+      enemy_possible_pos_next[i] |= (enemy_possible_pos[i] << 1);
+      enemy_possible_pos_next[i] |= (enemy_possible_pos[i] >> 1);
+    }
+    for (int i = 0; i < bombs.size(); i++)
     {
       int x = bombs[i].x;
       int y = bombs[i].y;
-      next_accessibleness[y][x] = next_accessibleness[y][x] & accessibleness[y][x];
+      me_possible_pos_next[y][x] = me_possible_pos_next[y][x] & me_possible_pos[y][x];
+      enemy_possible_pos_next[y][x] = enemy_possible_pos_next[y][x] & enemy_possible_pos[y][x];
     }
-
     for (int i = 0; i < H; i++)
     {
-      next_accessibleness[i] &= (next_accessibleness[i] ^ current_field[i]);
-      next_accessibleness[i] &= (next_accessibleness[i] ^ destroy_field[i]);
-      current_field[i] ^= (current_field[i] & destroy_field[i]);
+      me_possible_pos_next[i] &= (me_possible_pos_next[i] ^ bit_field[i]);
+      enemy_possible_pos_next[i] &= (enemy_possible_pos_next[i] ^ bit_field[i]);
     }
-
-    for (int i = 0; i < H; i++)
-      accessibleness[i] = next_accessibleness[i];
+    me_possible_pos = me_possible_pos_next;
+    enemy_possible_pos = enemy_possible_pos_next;
   }
 
-  tuple<bool, int, int> check_safe_and_get_score(int tick, int own_x, int own_y, bitset<W> (&previous_field)[H], Bomb (&previous_bombs)[MAX_BOMB], int bombs_count, bool set_bomb)
+  tuple<bool, bool, int, int, int> check_safe_and_get_score(Player me, Player enemy, vector<bitset<W>> enemy_possible_pos, vector<bitset<W>> bit_field, vector<Bomb> bombs, vector<Feature> features)
   {
-    Bomb bombs[MAX_BOMB];
-    for (int i = 0; i < bombs_count; i++)
-      bombs[i] = previous_bombs[i];
-    bitset<W> current_field[H];
-    for (int i = 0; i < H; i++)
-      current_field[i] = previous_field[i];
-    bitset<W> accessibleness[H];
-    bitset<W * H> destroy_boxes[2];
+    vector<bitset<W>> me_possible_pos = vector<bitset<W>>(H, bitset<W>());
+    if (!me.dead)
+      me_possible_pos[me.y][me.x] = 1;
 
-    accessibleness[own_y][own_x] = 1;
-    // check really tick + 6 or not
-    if (set_bomb)
-      bombs[bombs_count++] = Bomb(own_x, own_y, this->me->owner_id, tick + BOMB_TIMER, this->me->range);
-    while (bombs_count > 0)
+    int me_score = 0, enemy_score = 0;
+    bool first = true;
+    bool me_alive = false;
+    bool enemy_alive = false;
+    int me_dist_penalty = 0;
+    bool can_escape = false;
+    while (!bombs.empty())
     {
-      simulate_tick(tick, accessibleness, current_field, destroy_boxes, bombs, bombs_count);
-      tick++;
+      int me_score_change = 0, enemy_score_change = 0, me_dist_penalty_add;
+      tie(me_score_change, enemy_score_change) = simulate_bombs(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs, features, me_dist_penalty_add, can_escape);
+      me_score += me_score_change;
+      enemy_score += enemy_score_change;
+      me_dist_penalty += me_dist_penalty_add;
+      simulate_moves(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs);
+      can_escape = true;
     }
-    bool is_safe = false;
+
     for (int i = 0; i < H; i++)
-      is_safe |= (accessibleness[i].count() > 0);
-    int own_score = destroy_boxes[1].count();
-    int rival_score = destroy_boxes[0].count();
-    return make_tuple(is_safe, own_score, rival_score);
+      me_alive |= (me_possible_pos[i].count() > 0);
+
+    for (int i = 0; i < H; i++)
+      enemy_alive |= (enemy_possible_pos[i].count() > 0);
+    enemy_alive |= enemy.teleport || enemy.jump;
+    return make_tuple(me_alive, enemy_alive, me_score, enemy_score, me_dist_penalty);
   }
 
-  tuple<int, int, int, int> get_action(vector<Bomb> vec_bombs, Field field, int own_x, int own_y, int next_tick_with_bomb, bool ignore_afk = false)
+  vector<tuple<vector<Bomb>, vector<bitset<W>>, Player, Player, vector<bitset<W>>, vector<Feature>, StateQuality, Target>> get_action(vector<tuple<vector<Bomb>, vector<bitset<W>>, Player, Player, vector<bitset<W>>, vector<Feature>, StateQuality, Target>> states, int top_bombs, int top_features)
   {
-    int max_f = -1;
-    int go_x = own_x, go_y = own_y, go_tick = 0;
-
-    int bombs_count = vec_bombs.size();
-    Bomb bombs[MAX_BOMB];
-    for (int i = 0; i < bombs_count; i++)
-      bombs[i] = vec_bombs[i];
-
-    bitset<W * H> destroy_boxes[2];
-    bitset<W> accessibleness[H];
-
-    accessibleness[own_y][own_x] = 1;
-
-    bitset<W> current_field[H];
-
-    bool is_calced[H][W];
-    tuple<bool, int, int> calced_value[H][W];
-    for (int i = 0; i < H; i++)
-      for (int j = 0; j < W; j++)
-        is_calced[i][j] = 0;
-
-    for (int i = 0; i < H; i++)
+    priority_queue<tuple<vector<Bomb>, vector<bitset<W>>, Player, Player, vector<bitset<W>>, vector<Feature>, StateQuality, Target>,
+                   vector<tuple<vector<Bomb>, vector<bitset<W>>, Player, Player, vector<bitset<W>>, vector<Feature>, StateQuality, Target>>,
+                   TupleComp>
+        result_bombs, result_features;
+    for (int state_id = 0; state_id < states.size(); state_id++)
     {
-      for (int j = 0; j < W; j++)
-      {
-        if (field.cells[i][j].type == CELL_BLOCK || field.cells[i][j].type == CELL_BOX)
+      bool is_calced[H][W];
+      tuple<bool, bool, int, int, int> calced_value[H][W];
+      for (int i = 0; i < H; i++)
+        for (int j = 0; j < W; j++)
+          is_calced[i][j] = 0;
+
+      bool is_calced_f[H][W];
+      tuple<bool, bool, int, int, int> calced_value_f[H][W];
+      for (int i = 0; i < H; i++)
+        for (int j = 0; j < W; j++)
+          is_calced_f[i][j] = 0;
+
+      { // * just place bomb at x y
+        vector<Bomb> bombs;
+        vector<bitset<W>> bit_field;
+        Player me;
+        Player enemy;
+        vector<bitset<W>> enemy_possible_pos;
+        vector<Feature> features;
+        StateQuality state_quality;
+        Target target;
+        tie(bombs, bit_field, me, enemy, enemy_possible_pos, features, state_quality, target) = states[state_id];
+
+        if (target.type != -1)
         {
-          current_field[i][j] = 1;
+          result_bombs.push(states[state_id]);
+          if (result_bombs.size() > top_bombs)
+            result_bombs.pop();
+        }
+
+        if (me.dead)
+        {
+          continue;
+        }
+
+        int me_score = state_quality.me_score, enemy_score = state_quality.enemy_score;
+
+        vector<bitset<W>> me_possible_pos = vector<bitset<W>>(H, bitset<W>());
+        me_possible_pos[me.y][me.x] = 1;
+        int me_dist_penalty = 0;
+        bool me_alive, enemy_alive;
+        int me_default_score, enemy_default_score;
+        int me_add_dist_penalty;
+        tie(me_alive, enemy_alive, me_default_score, enemy_default_score, me_add_dist_penalty) = check_safe_and_get_score(me, enemy, enemy_possible_pos, bit_field, bombs, features);
+        me_default_score += state_quality.me_score, enemy_default_score += state_quality.enemy_score;
+        for (int tick = 0; tick < K; tick++)
+        {
+          int me_dist_penalty_add;
+          int me_score_change, enemy_score_change;
+          tie(me_score_change, enemy_score_change) = simulate_bombs(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs, features, me_dist_penalty_add);
+          me_score += me_score_change;
+          enemy_score += enemy_score_change;
+          me_dist_penalty += me_dist_penalty_add;
+
+          if (me.bombs > 0)
+            for (int y = 0; y < H; y++)
+            {
+              for (int x = 0; x < W; x++)
+              {
+                if (!me_possible_pos[y][x])
+                  continue;
+                Player me_bomb = me;
+                Player enemy_bomb = enemy;
+                vector<bitset<W>> me_possible_pos_bomb = me_possible_pos;
+                vector<bitset<W>> enemy_possible_pos_bomb = enemy_possible_pos;
+                vector<Bomb> bombs_bomb = bombs;
+                me_bomb.bombs--;
+                me_bomb.x = x;
+                me_bomb.y = y;
+
+                simulate_moves(me_bomb, enemy_bomb, me_possible_pos_bomb, enemy_possible_pos_bomb, bit_field, bombs_bomb, PLAYER_BOMB);
+
+                bool me_will_alive, enemy_will_alive;
+                int me_will_score, enemy_will_score;
+                int me_add_dist_penalty;
+                if (bombs_bomb.size() > 1)
+                {
+                  tie(me_will_alive, enemy_will_alive, me_will_score, enemy_will_score, me_add_dist_penalty) = check_safe_and_get_score(me_bomb, enemy_bomb, enemy_possible_pos_bomb, bit_field, bombs_bomb, features);
+                }
+                else
+                {
+                  if (!is_calced[y][x])
+                  {
+                    is_calced[y][x] = 1;
+                    calced_value[y][x] = check_safe_and_get_score(me_bomb, enemy_bomb, enemy_possible_pos_bomb, bit_field, bombs_bomb, features);
+                  }
+                  tie(me_will_alive, enemy_will_alive, me_will_score, enemy_will_score, me_add_dist_penalty) = calced_value[y][x];
+                }
+
+                {
+                  StateQuality cur_state_quality;
+                  cur_state_quality.dist = state_quality.dist + tick + 1;
+                  cur_state_quality.me_score = me_score;
+                  cur_state_quality.enemy_score = state_quality.enemy_score + enemy_score;
+                  cur_state_quality.me_next_score = me_will_score;
+                  cur_state_quality.enemy_next_score = enemy_will_score;
+                  cur_state_quality.me_default_score = me_default_score;
+                  cur_state_quality.enemy_default_score = enemy_default_score;
+                  cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_add_dist_penalty;
+                  cur_state_quality.enemy_dist = 100; // TODO
+                  cur_state_quality.me_alive = me_alive;
+                  cur_state_quality.enemy_alive = enemy_alive;
+                  cur_state_quality.me_will_alive = me_will_alive;
+                  cur_state_quality.enemy_will_alive = enemy_will_alive;
+
+                  Target cur_target = target;
+                  if (target.type == -1)
+                  {
+                    cur_target.x = x;
+                    cur_target.y = y;
+                    cur_target.tick = tick;
+                    cur_target.type = 0;
+                  }
+                  bool ok = result_bombs.size() < top_bombs;
+                  if (!ok)
+                  {
+                    StateQuality sq;
+                    tie(ignore, ignore, ignore, ignore, ignore, ignore, sq, ignore) = result_bombs.top();
+                    ok = cur_state_quality < sq;
+                  }
+                  if (ok)
+                  {
+                    result_bombs.push(
+                        make_tuple(
+                            bombs_bomb, bit_field, me_bomb, enemy_bomb, enemy_possible_pos_bomb, features, cur_state_quality, cur_target));
+                    if (result_bombs.size() > top_bombs)
+                      result_bombs.pop();
+                  }
+                }
+              }
+            }
+          simulate_moves(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs);
         }
       }
-    }
-    // cerr << "STATE" << endl;
-    // for (int i = 0; i < H; i++)
-    //   cerr << current_field[i] << endl;
-    // for (int i = 0; i < bombs_count; i++)
-    //   cerr << bombs[i].x << " " << bombs[i].y << endl;
-    // cerr << endl;
-    // cerr << "START SIMULATING IN GET ACTION" << endl;
-    bool blank;
-    int own_afk_score, rival_next_score;
-    tie(blank, own_afk_score, rival_next_score) = check_safe_and_get_score(1, own_x, own_y, current_field, bombs, bombs_count, false);
-    for (int tick = 1; tick < K; tick++)
-    {
-      bitset<W> prev_accessibleness[H];
-      for (int i = 0; i < H; i++)
-        prev_accessibleness[i] = accessibleness[i];
+      ///////////////////////////////////////////////////////////////////
+      { // * tp and place bomb at x y
+        vector<Bomb> bombs;
+        vector<bitset<W>> bit_field;
+        Player me;
+        Player enemy;
+        vector<bitset<W>> enemy_possible_pos;
+        vector<Feature> features;
+        StateQuality state_quality;
+        Target target;
+        tie(bombs, bit_field, me, enemy, enemy_possible_pos, features, state_quality, target) = states[state_id];
 
-      simulate_tick(tick, accessibleness, current_field, destroy_boxes, bombs, bombs_count);
-
-      int own_score = destroy_boxes[1].count();
-      int rival_score = destroy_boxes[0].count();
-      // cerr << "START CALCING" << endl;
-      for (int y = 0; y < H; y++)
-      {
-        for (int x = 0; x < W; x++)
+        if (me.dead)
         {
-          if (prev_accessibleness[y][x] && accessibleness[y][x])
+          continue;
+        }
+
+        int me_score = state_quality.me_score, enemy_score = state_quality.enemy_score;
+
+        vector<bitset<W>> me_possible_pos = vector<bitset<W>>(H, bitset<W>());
+        me_possible_pos[me.y][me.x] = 1;
+        int me_dist_penalty = 8;
+        bool me_alive, enemy_alive;
+        int me_default_score, enemy_default_score;
+        int me_add_dist_penalty;
+        tie(me_alive, enemy_alive, me_default_score, enemy_default_score, me_add_dist_penalty) = check_safe_and_get_score(me, enemy, enemy_possible_pos, bit_field, bombs, features);
+        me_default_score += state_quality.me_score, enemy_default_score += state_quality.enemy_score;
+        if (me.teleport)
+        {
+          for (int tick = 0; tick < K; tick++)
           {
-            bool is_safe;
-            int own_score_change, rival_score_change;
+            int me_dist_penalty_add;
+            int me_score_change, enemy_score_change;
+            tie(me_score_change, enemy_score_change) = simulate_bombs(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs, features, me_dist_penalty_add);
+            me_score += me_score_change;
+            enemy_score += enemy_score_change;
 
-            if (bombs_count > 0)
-            {
-              tie(is_safe, own_score_change, rival_score_change) = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count, true);
-            }
-            else
-            {
-              if (!is_calced[y][x])
+            if (me.bombs > 0 && tick > 0)
+              for (int y = 0; y < H; y++)
               {
-                is_calced[y][x] = 1;
-                calced_value[y][x] = check_safe_and_get_score(tick + 1, x, y, current_field, bombs, bombs_count, true);
-              }
-              tie(is_safe, own_score_change, rival_score_change) = calced_value[y][x];
-            }
+                for (int x = 0; x < W; x++)
+                {
+                  if (!me_possible_pos[y][x])
+                    continue;
+                  Player me_bomb = me;
+                  Player enemy_bomb = enemy;
+                  vector<bitset<W>> me_possible_pos_bomb = me_possible_pos;
+                  vector<bitset<W>> enemy_possible_pos_bomb = enemy_possible_pos;
+                  vector<Bomb> bombs_bomb = bombs;
+                  me_bomb.bombs--;
+                  me_bomb.x = x;
+                  me_bomb.y = y;
 
-            if (is_safe)
-            {
-              int own_next_score = own_score + own_score_change;
-              int rival_next_score = rival_score + rival_score_change;
-              int cur_f = f(tick, own_next_score, rival_next_score);
-              if ((ignore_afk || own_next_score - rival_next_score > own_afk_score - rival_next_score) &&
-                  max_f < cur_f && tick >= next_tick_with_bomb + 1)
-              {
-                max_f = cur_f;
-                go_x = x;
-                go_y = y;
-                go_tick = tick - 1;
+                  simulate_moves(me_bomb, enemy_bomb, me_possible_pos_bomb, enemy_possible_pos_bomb, bit_field, bombs_bomb, PLAYER_BOMB);
+
+                  bool me_will_alive, enemy_will_alive;
+                  int me_will_score, enemy_will_score;
+                  if (bombs_bomb.size() > 1)
+                  {
+                    tie(me_will_alive, enemy_will_alive, me_will_score, enemy_will_score, me_add_dist_penalty) = check_safe_and_get_score(me_bomb, enemy_bomb, enemy_possible_pos_bomb, bit_field, bombs_bomb, features);
+                  }
+                  else
+                  {
+                    if (!is_calced[y][x])
+                    {
+                      is_calced[y][x] = 1;
+                      calced_value[y][x] = check_safe_and_get_score(me_bomb, enemy_bomb, enemy_possible_pos_bomb, bit_field, bombs_bomb, features);
+                    }
+                    tie(me_will_alive, enemy_will_alive, me_will_score, enemy_will_score, me_add_dist_penalty) = calced_value[y][x];
+                  }
+
+                  {
+                    StateQuality cur_state_quality;
+                    cur_state_quality.dist = state_quality.dist + tick + 1;
+                    cur_state_quality.me_score = me_score;
+                    cur_state_quality.enemy_score = state_quality.enemy_score + enemy_score;
+                    cur_state_quality.me_next_score = me_will_score;
+                    cur_state_quality.enemy_next_score = enemy_will_score;
+                    cur_state_quality.me_default_score = me_default_score;
+                    cur_state_quality.enemy_default_score = enemy_default_score;
+                    cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_add_dist_penalty;
+                    cur_state_quality.enemy_dist = 100; // TODO
+                    cur_state_quality.me_alive = me_alive;
+                    cur_state_quality.enemy_alive = enemy_alive;
+                    cur_state_quality.me_will_alive = me_will_alive;
+                    cur_state_quality.enemy_will_alive = enemy_will_alive;
+
+                    Target cur_target = target;
+                    if (target.type == -1)
+                    {
+                      cur_target.x = x;
+                      cur_target.y = y;
+                      cur_target.tick = tick;
+                      cur_target.type = 1; // TODO: find tp target
+                    }
+                    bool ok = result_bombs.size() < top_bombs;
+                    if (!ok)
+                    {
+                      StateQuality sq;
+                      tie(ignore, ignore, ignore, ignore, ignore, ignore, sq, ignore) = result_bombs.top();
+                      ok = cur_state_quality < sq;
+                    }
+                    if (ok)
+                    {
+                      result_bombs.push(
+                          make_tuple(
+                              bombs_bomb, bit_field, me_bomb, enemy_bomb, enemy_possible_pos_bomb, features, cur_state_quality, cur_target));
+                      if (result_bombs.size() > top_bombs)
+                        result_bombs.pop();
+                    }
+                  }
+                }
               }
-            }
+            simulate_moves(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs, tick == 0 ? PLAYER_TELEPORT : PLAYER_STAY);
           }
         }
       }
+      ///////////////////////////////////////////////////////////////////
+      if (top_features > 0)
+      { // * get features
+        vector<Bomb> bombs;
+        vector<bitset<W>> bit_field;
+        Player me;
+        Player enemy;
+        vector<bitset<W>> enemy_possible_pos;
+        vector<Feature> features;
+        StateQuality state_quality;
+        Target target;
+        tie(bombs, bit_field, me, enemy, enemy_possible_pos, features, state_quality, target) = states[state_id];
+
+        if (me.dead)
+        {
+          continue;
+        }
+
+        int me_score = state_quality.me_score, enemy_score = state_quality.enemy_score;
+
+        vector<bitset<W>> me_possible_pos = vector<bitset<W>>(H, bitset<W>());
+        int me_dist_penalty = 0;
+        me_possible_pos[me.y][me.x] = 1;
+        bool me_alive, enemy_alive;
+        int me_default_score, enemy_default_score;
+        int me_add_dist_penalty;
+        tie(me_alive, enemy_alive, me_default_score, enemy_default_score, me_add_dist_penalty) = check_safe_and_get_score(me, enemy, enemy_possible_pos, bit_field, bombs, features);
+        me_default_score += state_quality.me_score, enemy_default_score += state_quality.enemy_score;
+        for (int tick = 0; tick < K; tick++)
+        {
+          int me_dist_penalty_add;
+          int me_score_change, enemy_score_change;
+          tie(me_score_change, enemy_score_change) = simulate_bombs(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs, features, me_dist_penalty_add);
+          me_score += me_score_change;
+          enemy_score += enemy_score_change;
+          me_dist_penalty += me_dist_penalty_add;
+
+          for (int id = 0; id < features.size(); id++)
+          {
+            Feature &feature = features[id];
+            int x = feature.x;
+            int y = feature.y;
+            if (!me_possible_pos[y][x])
+              continue;
+
+            Player me_bomb = me;
+            Player enemy_bomb = enemy;
+            vector<bitset<W>> me_possible_pos_bomb = me_possible_pos;
+            vector<bitset<W>> enemy_possible_pos_bomb = enemy_possible_pos;
+            vector<Bomb> bombs_bomb = bombs;
+            me_bomb.x = x;
+            me_bomb.y = y;
+
+            vector<Feature> feature_bomb = features;
+            int me_took_dist_penalty = 0;
+            if (feature.type == FEATURE_AMOUNT) {
+              if (me_bomb.max_bombs == 1) {
+                me_took_dist_penalty = -3;
+              } else if (me_bomb.max_bombs == 2) {
+                me_took_dist_penalty = -1;
+              } else {
+                me_took_dist_penalty = 0;
+              }
+              me_bomb.bombs++;
+              me_bomb.max_bombs++;
+            } else if (feature.type == FEATURE_RANGE) {
+              if (me_bomb.range < 5) {
+                me_took_dist_penalty = -4;
+              } else {
+                me_took_dist_penalty = -1;
+              }
+              me_bomb.range++;
+            } else if (feature.type == FEATURE_JUMP) {
+              if (me_bomb.jump) {
+                me_took_dist_penalty = 0;
+              } else {
+                me_took_dist_penalty = -5;
+              }
+              me_bomb.jump = true;
+            } else if (feature.type == FEATURE_TELEPORT) {
+              if (me_bomb.teleport) {
+                me_took_dist_penalty = -1;
+              } else {
+                if (this->tick < 50)
+                  me_took_dist_penalty = -1000;
+                else
+                  me_took_dist_penalty = -10;
+              }
+              me_bomb.teleport = true;
+            }
+            swap(feature_bomb[id], feature_bomb.back());
+            feature_bomb.ppb();
+
+            bool me_will_alive, enemy_will_alive;
+            int me_will_score, enemy_will_score;
+            bool took_calced = 0;
+            if (bombs_bomb.size() > 0)
+            {
+              tie(me_will_alive, enemy_will_alive, me_will_score, enemy_will_score, me_add_dist_penalty) = check_safe_and_get_score(me_bomb, enemy_bomb, enemy_possible_pos_bomb, bit_field, bombs_bomb, features);
+            }
+            else
+            {
+              if (!is_calced_f[y][x])
+              {
+                is_calced_f[y][x] = 1;
+                calced_value_f[y][x] = check_safe_and_get_score(me_bomb, enemy_bomb, enemy_possible_pos_bomb, bit_field, bombs_bomb, features);
+              }
+              else
+              {
+                took_calced = 1;
+              }
+              tie(me_will_alive, enemy_will_alive, me_will_score, enemy_will_score, me_add_dist_penalty) = calced_value_f[y][x];
+            }
+
+            if (!took_calced)
+            {
+              StateQuality cur_state_quality;
+              cur_state_quality.dist = state_quality.dist + tick;
+              cur_state_quality.me_score = me_score;
+              cur_state_quality.enemy_score = state_quality.enemy_score + enemy_score;
+              cur_state_quality.me_next_score = me_will_score;
+              cur_state_quality.enemy_next_score = enemy_will_score;
+              cur_state_quality.me_default_score = me_default_score;
+              cur_state_quality.enemy_default_score = enemy_default_score;
+              cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_add_dist_penalty + me_took_dist_penalty;
+              cur_state_quality.enemy_dist = 100; // TODO
+              cur_state_quality.me_alive = me_alive;
+              cur_state_quality.enemy_alive = enemy_alive;
+              cur_state_quality.me_will_alive = me_will_alive;
+              cur_state_quality.enemy_will_alive = enemy_will_alive;
+
+              Target cur_target = target;
+              if (target.type == -1)
+              {
+                cur_target.x = x;
+                cur_target.y = y;
+                cur_target.tick = tick;
+                cur_target.type = 2;
+              }
+              bool ok = result_features.size() < top_features;
+              if (!ok)
+              {
+                StateQuality sq;
+                tie(ignore, ignore, ignore, ignore, ignore, ignore, sq, ignore) = result_features.top();
+                ok = cur_state_quality < sq;
+              }
+              if (ok)
+              {
+                result_features.push(
+                    make_tuple(
+                        bombs_bomb, bit_field, me_bomb, enemy_bomb, enemy_possible_pos_bomb, features, cur_state_quality, cur_target));
+                if (result_features.size() > top_features)
+                  result_features.pop();
+              }
+            }
+          }
+          simulate_moves(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs);
+        }
+      }
     }
-    // cerr << "END GET ACTION" << endl;
-    //maybe cerr max_f == -1?
-    return make_tuple(go_tick, go_x, go_y, max_f);
+    vector<tuple<vector<Bomb>, vector<bitset<W>>, Player, Player, vector<bitset<W>>, vector<Feature>, StateQuality, Target>> result;
+    while (!result_bombs.empty())
+    {
+      result.pb(result_bombs.top());
+      result_bombs.pop();
+    }
+    while (!result_features.empty())
+    {
+      result.pb(result_features.top());
+      result_features.pop();
+    }
+    cerr << "finished calc " << result.size() << endl;
+    sort(result.begin(), result.end(), TupleComp());
+    for (int i = 0; i < result.size(); i++)
+    {
+      Target target;
+      StateQuality sq;
+      tie(ignore, ignore, ignore, ignore, ignore, ignore, sq, target) = result[i];
+      cerr << target.x << " " << target.y << " " << target.tick << " " << sq.me_alive << " " << sq.me_dist_penalty << " " << target.type << endl;
+    }
+    return result;
   }
 
-  PlayerMove get_move(int s_tick, int s_x, int s_y)
+  tuple<int, int>
+  get_tick_score(Player me, Player enemy, vector<bitset<W>> bit_field, vector<Bomb> bombs, vector<Feature> features)
   {
+    vector<bitset<W>> me_possible_pos = vector<bitset<W>>(H, bitset<W>());
+    vector<bitset<W>> enemy_possible_pos = vector<bitset<W>>(H, bitset<W>());
+    int me_dist_penalty = 0;
+    return simulate_bombs(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs, features, me_dist_penalty);
+  }
+
+  PlayerMove get_move(Target target)
+  {
+    int s_x = target.x, s_y = target.y, s_tick = target.tick;
     cerr << " DIR " << s_tick << " " << s_x << " " << s_y << endl;
     if (s_tick == 0)
       return PLAYER_BOMB;
@@ -529,6 +1141,7 @@ public:
       for (int i = 0; i < H; i++)
         prev_accessibleness[i] = accessibleness[i];
 
+      bool jump = false;
       {
         bitset<W> next_accessibleness[H];
         bitset<W> destroy_field[H];
@@ -597,8 +1210,17 @@ public:
           current_field[i] ^= (current_field[i] & destroy_field[i]);
         }
 
+        bool is_alive = false;
         for (int i = 0; i < H; i++)
-          accessibleness[i] = next_accessibleness[i];
+          is_alive |= next_accessibleness[i].count();
+
+        if (!is_alive)
+        {
+          jump = true;
+        }
+        else
+          for (int i = 0; i < H; i++)
+            accessibleness[i] = next_accessibleness[i];
       }
       for (int y = 0; y < H; y++)
       {
@@ -606,7 +1228,7 @@ public:
         {
           if (prev_accessibleness[y][x])
           {
-            for (int dir = 0; dir < 5; dir++)
+            for (int dir = jump ? 4 : 0; dir < 5; dir++)
             {
               int to_x = x + dx[dir], to_y = y + dy[dir];
               if (to_x < 0 || to_x >= field.width ||
@@ -617,7 +1239,7 @@ public:
               }
               if (dir < 4)
               {
-                // make it less dummy
+                // TODO: make it less dummy
                 bool bad = 0;
                 for (int i = 0; i < bombs_count; i++)
                 {
@@ -641,17 +1263,25 @@ public:
                     }
                     if (features[i].type == FEATURE_AMOUNT)
                     {
-                      if (this->me->max_bombs == 1)
-                        // if (dp_val < 2000)
+                      // if (this->me->max_bombs == 1)
+                      if (dp_val < 2000)
                         dp_val += 1000;
                       else
                         dp_val += 1;
+                    }
+                    if (features[i].type == FEATURE_JUMP && !this->me->jump)
+                    {
+                      dp_val += 10;
+                    }
+                    if (features[i].type == FEATURE_TELEPORT && !this->me->teleport)
+                    {
+                      dp_val += 100;
                     }
                   }
                 }
               }
               if (pr_val == -1)
-                pr_val = dir;
+                pr_val = jump ? 5 : dir;
               if (dp[tick][to_y][to_x] < dp_val)
                 dp[tick][to_y][to_x] = dp_val, pr[tick][to_y][to_x] = pr_val;
             }
@@ -674,549 +1304,69 @@ public:
       return PLAYER_DOWN;
     case 4:
       return PLAYER_STAY;
+    case 5:
+      return PLAYER_JUMP;
     }
     cerr << "No move found" << endl;
     return PLAYER_STAY;
   }
 
-  bool check_not_intersect(vector<Bomb> bombs, Field field, int x, int y)
+  void prepare()
   {
-    if (x < 0 || x >= W || y < 0 || y >= H)
-      return false;
-    if (field.cells[y][x].type == CELL_BLOCK || field.cells[y][x].type == CELL_BOX)
-    {
-      return false;
-    }
-    for (Bomb bomb : bombs)
-    {
-      if (bomb.x == x && bomb.y == y)
-        return false;
-    }
-    return true;
-  }
+    if (me == nullptr)
+      exit(1);
 
-  bool apply_move(vector<Bomb> &bombs, Field field, Player &player, PlayerMove move)
-  {
-    switch (move)
-    {
-    case PLAYER_LEFT:
-      if (check_not_intersect(bombs, field, player.x - 1, player.y))
-      {
-        player.x--;
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    case PLAYER_RIGHT:
-      if (check_not_intersect(bombs, field, player.x + 1, player.y))
-      {
-        player.x++;
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    case PLAYER_DOWN:
-      if (check_not_intersect(bombs, field, player.x, player.y + 1))
-      {
-        player.y++;
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    case PLAYER_UP:
-      if (check_not_intersect(bombs, field, player.x, player.y - 1))
-      {
-        player.y--;
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    case PLAYER_STAY:
-      return true;
-    case PLAYER_BOMB:
-      if (player.bombs > 0)
-      {
-        bombs.pb(Bomb(player.x, player.y, player.owner_id, BOMB_TIMER, player.range));
-        player.bombs--;
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    }
-    return false;
-  }
+    for (Bomb &bomb : bombs)
+      bomb.timer++;
 
-  tuple<int, int, int, int> get_action_with_move(vector<Bomb> bombs, Field field, Player player, PlayerMove move)
-  {
-    if (!apply_move(bombs, field, player, move))
-    {
-      return make_tuple(0, player.x, player.y, -2);
-    }
-    bool our_bomb_destroyed = false;
-    bool bomb_hits_our_position = false;
-    next_tick(bombs, field, player, our_bomb_destroyed, bomb_hits_our_position);
-    int next_tick_with_bomb = get_bomb_restore_ticks(bombs, field, player);
-    if (bomb_hits_our_position)
-      return make_tuple(0, player.x, player.y, -2);
-    return get_action(bombs, field, player.x, player.y, next_tick_with_bomb);
-  }
+    //           bombs         field               me       enemy     enemy_pos          features         state         target(first)
+    vector<tuple<vector<Bomb>, vector<bitset<W>>, Player, Player, vector<bitset<W>>, vector<Feature>, StateQuality, Target>> initial_states, first_states, second_states, final_states;
 
-  // do not call this function inside main(prepare) function!!!
-  // simulate one tick. updates state, returns score of tick
-  int next_tick(vector<Bomb> &bombs, Field &field, Player &player, bool &our_bomb_destroyed, bool &bomb_hits_our_position)
-  {
-    // ask Batyr set or array(check bits)
-    our_bomb_destroyed = false;
-    bomb_hits_our_position = false;
-    set<pair<int, int>> destroyed_me;
-    set<pair<int, int>> destroyed_others;
-    int score = 0;
-    vector<Bomb> new_bombs;
+    vector<bitset<W>> enemy_possible_pos = vector<bitset<W>>(H, bitset<W>());
+
+    Player me = Player(this->me);
+    Player enemy = Player(this->enemy);
+
+    if (!enemy.dead)
+      enemy_possible_pos[enemy.y][enemy.x] = 1;
+
+    initial_states.pb(make_tuple(bombs, bit_field, me, enemy, enemy_possible_pos, features, StateQuality(me_global_score, enemy_global_score), Target()));
+
+    first_states = get_action(initial_states, 3, 2);
+    second_states = get_action(first_states, 3, 2);
+    final_states = get_action(second_states, 1, 0);
+    Target target;
+    StateQuality sq;
+    tie(ignore, ignore, ignore, ignore, ignore, ignore, sq, target) = final_states.back();
+
+    cerr << target.x << " " << target.y << " " << target.tick << " " << target.type << " " << sq.me_score << " " << sq.me_dist_penalty << endl;
 
     for (Bomb &bomb : bombs)
       bomb.timer--;
-    bool recheck = true;
-    while (recheck)
+
+    if (target.type == 0 || target.type == 2)
     {
-      recheck = false;
-      for (Bomb &bomb : bombs)
+      this->me->action = get_move(target);
+      if (this->me->action == PLAYER_JUMP)
       {
-        if (bomb.timer == 0 || destroyed_me.count(mp(bomb.x, bomb.y)) || destroyed_others.count(mp(bomb.x, bomb.y)))
-        {
-          recheck = true;
-          for (int dir = 0; dir < 5; dir++)
-          {
-            for (int i = 0; i <= bomb.range; i++)
-            {
-              int nx = bomb.x + dx[dir] * i, ny = bomb.y + dy[dir] * i;
-              if (nx < 0 || nx >= W || ny < 0 || ny >= H || field.cells[ny][nx].type == CELL_BLOCK)
-                break;
-              if (bomb.owner_id == player.owner_id)
-              {
-                our_bomb_destroyed = true;
-                score += field.cells[ny][nx].type == CELL_BOX && destroyed_me.count(mp(nx, ny)) == 0;
-                destroyed_me.insert(mp(nx, ny));
-              }
-              else
-              {
-                score -= field.cells[ny][nx].type == CELL_BOX && destroyed_others.count(mp(nx, ny)) == 0;
-                destroyed_others.insert(mp(nx, ny));
-              }
-              if (field.cells[ny][nx].type == CELL_BOX)
-                break;
-            }
-          }
-          if (bomb.owner_id == player.owner_id)
-            player.bombs++;
-        }
-        else
-        {
-          new_bombs.pb(bomb);
-        }
+        cerr << "----------------------------- JUMP!" << endl;
       }
-      bombs.swap(new_bombs);
-      new_bombs.clear();
-    }
-
-    for (const pair<int, int> &p : destroyed_me)
-      field.cells[p.sc][p.fs].type = CELL_EMPTY;
-    for (const pair<int, int> &p : destroyed_others)
-      field.cells[p.sc][p.fs].type = CELL_EMPTY;
-    bomb_hits_our_position = destroyed_me.count(mp(player.x, player.y)) > 0 || destroyed_others.count(mp(player.x, player.y)) > 0;
-    return score;
-  }
-
-  // do not call this function inside main(prepare) function!!!
-  int next_tick(vector<Bomb> &bombs, Field &field, Player &player)
-  {
-    bool our_bomb_destroyed = false;
-    bool bomb_hits_our_position = false;
-    return next_tick(bombs, field, player, our_bomb_destroyed, bomb_hits_our_position);
-  }
-
-  // number of destroyed boxes with our bombs minus number of destroyed boxes with other bombs
-  int get_score(vector<Bomb> bombs, Field field, Player player)
-  {
-    int score = 0;
-    while (!bombs.empty())
-    {
-      score += next_tick(bombs, field, player);
-    }
-    return score;
-  }
-
-  int get_tick_score(vector<Bomb> bombs, Field field, Player player)
-  {
-    int score = 0;
-    if (!bombs.empty())
-    {
-      score += next_tick(bombs, field, player);
-    }
-    return score;
-  }
-
-  int get_score_with_bomb(vector<Bomb> bombs, Field field, Player player)
-  {
-    bombs.pb(Bomb(player.x, player.y, player.owner_id, BOMB_TIMER, this->me->range));
-    int score = 0;
-    while (!bombs.empty())
-    {
-      score += next_tick(bombs, field, player);
-    }
-    return score;
-  }
-
-  // first tick when our bomb boom
-  int get_bomb_restore_ticks(vector<Bomb> bombs, Field field, Player player)
-  {
-    if (player.bombs > 0)
-      return 0;
-    bool we_have_bomb_on_field = false;
-    for (Bomb &bomb : bombs)
-    {
-      if (bomb.owner_id == player.owner_id)
-      {
-        we_have_bomb_on_field = true;
-        break;
+      if (target.type == 2) {
+        cerr << "----------------------------- FEATURE!" << endl;
       }
     }
-    if (!we_have_bomb_on_field)
+    else
     {
-      assert(0);
-      return 10000;
+      this->me->action = PLAYER_TELEPORT;
+      this->me->action_x = target.x;
+      this->me->action_y = target.y;
+      cerr << "------------------------------ TP " << target.x << " " << target.y << endl;
     }
-
-    int tick = 0;
-    while (!bombs.empty())
-    {
-      bool our_bomb_destroyed = false;
-      bool bomb_hits_our_position = false;
-      next_tick(bombs, field, player, our_bomb_destroyed, bomb_hits_our_position);
-      tick++;
-      if (our_bomb_destroyed)
-      {
-        return tick;
-      }
-    }
-    // must be impossible
-    assert(0);
-    return 10001;
-  }
-
-  int ff(int dist, int own_score, int ene_score, bool is_own_safe, bool ene_safe_afk, bool is_ene_safe, bool better_then_afk)
-  {
-    if (ene_safe_afk && !is_ene_safe)
-    {
-      if (is_own_safe)
-      {
-        return 1000000 - dist;
-      }
-      if (current_global_score + (own_score - ene_score) >= 1)
-      {
-        return 900000 - dist * 30 + (own_score - ene_score);
-      }
-    }
-    if (!is_own_safe)
-    {
-      return own_score - ene_score;
-    }
-    if (better_then_afk)
-    {
-      return (own_score - ene_score) * 5 - dist + 100000;
-    }
-    return -1;
-  }
-
-  void simulate_tick_akim(int tick, bitset<W> (&accessibleness_own)[H], bitset<W> (&accessibleness_ene)[H], bitset<W> (&current_field)[H], bitset<W * H> (&destroy_boxes)[2], Bomb (&bombs)[MAX_BOMB], int &bombs_count)
-  {
-    bitset<W> next_accessibleness_own[H];
-    bitset<W> next_accessibleness_ene[H];
-    bitset<W> destroy_field[H];
-
-    for (int i = 0; i < H; i++)
-    {
-      next_accessibleness_own[i] = accessibleness_own[i];
-      if (i + 1 < H)
-        next_accessibleness_own[i] |= accessibleness_own[i + 1];
-      if (i - 1 >= 0)
-        next_accessibleness_own[i] |= accessibleness_own[i - 1];
-      next_accessibleness_own[i] |= (accessibleness_own[i] << 1);
-      next_accessibleness_own[i] |= (accessibleness_own[i] >> 1);
-
-      next_accessibleness_ene[i] = accessibleness_ene[i];
-      if (i + 1 < H)
-        next_accessibleness_ene[i] |= accessibleness_ene[i + 1];
-      if (i - 1 >= 0)
-        next_accessibleness_ene[i] |= accessibleness_ene[i - 1];
-      next_accessibleness_ene[i] |= (accessibleness_ene[i] << 1);
-      next_accessibleness_ene[i] |= (accessibleness_ene[i] >> 1);
-    }
-
-    for (int i = 0; i < bombs_count; i++)
-    {
-      if (bombs[i].timer == tick || destroy_field[bombs[i].y][bombs[i].x])
-      {
-        destroy_field[bombs[i].y][bombs[i].x] = 1;
-        for (int dir = 0; dir < 4; dir++)
-        {
-          for (int j = 1; j <= bombs[i].range; j++)
-          {
-            int to_x = bombs[i].x + dx[dir] * j, to_y = bombs[i].y + dy[dir] * j;
-            if (to_x < 0 || to_x >= field.width ||
-                to_y < 0 || to_y >= field.height || field.cells[to_y][to_x].type == CELL_BLOCK)
-            {
-              break;
-            }
-            destroy_field[to_y][to_x] = 1;
-            if (field.cells[to_y][to_x].type == CELL_BOX && current_field[to_y][to_x] == 1)
-            {
-              destroy_boxes[bombs[i].owner_id == this->me->owner_id][to_y * W + to_x] = 1;
-              break;
-            }
-          }
-        }
-        swap(bombs[i], bombs[bombs_count - 1]);
-        bombs_count--;
-        i = -1;
-      }
-    }
-
-    for (int i = 0; i < bombs_count; i++)
-    {
-      int x = bombs[i].x;
-      int y = bombs[i].y;
-      next_accessibleness_own[y][x] = next_accessibleness_own[y][x] & accessibleness_own[y][x];
-      next_accessibleness_ene[y][x] = next_accessibleness_ene[y][x] & accessibleness_ene[y][x];
-    }
-
-    for (int i = 0; i < H; i++)
-    {
-      next_accessibleness_own[i] &= (next_accessibleness_own[i] ^ current_field[i]);
-      next_accessibleness_own[i] &= (next_accessibleness_own[i] ^ destroy_field[i]);
-
-      next_accessibleness_ene[i] &= (next_accessibleness_ene[i] ^ current_field[i]);
-      next_accessibleness_ene[i] &= (next_accessibleness_ene[i] ^ destroy_field[i]);
-
-      current_field[i] ^= (current_field[i] & destroy_field[i]);
-    }
-
-    for (int i = 0; i < H; i++)
-    {
-      accessibleness_own[i] = next_accessibleness_own[i];
-      accessibleness_ene[i] = next_accessibleness_ene[i];
-    }
-  }
-
-  tuple<bool, bool, int, int> check_safe_and_get_score_akim(int tick, int own_x, int own_y, bitset<W> (&previous_accessibleness_ene)[H], bitset<W> (&previous_field)[H], Bomb (&previous_bombs)[MAX_BOMB], int bombs_count, bool set_bomb)
-  {
-    Bomb bombs[MAX_BOMB];
-    for (int i = 0; i < bombs_count; i++)
-      bombs[i] = previous_bombs[i];
-    bitset<W> current_field[H];
-    for (int i = 0; i < H; i++)
-      current_field[i] = previous_field[i];
-    bitset<W> accessibleness_own[H];
-
-    bitset<W> accessibleness_ene[H];
-    for (int i = 0; i < H; i++)
-      accessibleness_ene[i] = previous_accessibleness_ene[i];
-
-    bitset<W * H> destroy_boxes[2];
-
-    accessibleness_own[own_y][own_x] = 1;
-    // check really tick + 6 or not
-    if (set_bomb)
-      bombs[bombs_count++] = Bomb(own_x, own_y, this->me->owner_id, tick + BOMB_TIMER, this->me->range);
-    while (bombs_count > 0)
-    {
-      simulate_tick_akim(tick, accessibleness_own, accessibleness_ene, current_field, destroy_boxes, bombs, bombs_count);
-      tick++;
-    }
-    bool is_own_safe = false, is_ene_safe = false;
-    for (int i = 0; i < H; i++)
-    {
-      is_own_safe |= (accessibleness_own[i].count() > 0);
-      is_ene_safe |= (accessibleness_ene[i].count() > 0);
-    }
-    int own_score = destroy_boxes[1].count();
-    int ene_score = destroy_boxes[0].count();
-    return make_tuple(is_own_safe, is_ene_safe, own_score, ene_score);
-  }
-
-  tuple<int, int, int, int> get_action_akim(vector<Bomb> vec_bombs, Field field, int own_x, int own_y, int ene_x, int ene_y, int next_tick_with_bomb)
-  {
-    int max_f = -1;
-    int go_x = own_x, go_y = own_y, go_tick = 20;
-
-    int bombs_count = vec_bombs.size();
-    Bomb bombs[MAX_BOMB];
-    for (int i = 0; i < bombs_count; i++)
-      bombs[i] = vec_bombs[i];
-
-    bitset<W * H> destroy_boxes[2];
-    bitset<W> accessibleness_own[H];
-    bitset<W> accessibleness_ene[H];
-
-    accessibleness_own[own_y][own_x] = 1;
-    if (ene_x != -1 && ene_y != -1)
-      accessibleness_ene[ene_y][ene_x] = 1;
-
-    bitset<W> current_field[H];
-
-    bool is_calced[H][W];
-    tuple<bool, bool, int, int> calced_value[H][W];
-    for (int i = 0; i < H; i++)
-      for (int j = 0; j < W; j++)
-        is_calced[i][j] = 0;
-
-    for (int i = 0; i < H; i++)
-    {
-      for (int j = 0; j < W; j++)
-      {
-        if (field.cells[i][j].type == CELL_BLOCK || field.cells[i][j].type == CELL_BOX)
-        {
-          current_field[i][j] = 1;
-        }
-      }
-    }
-    // cerr << "STATE" << endl;
-    // for (int i = 0; i < H; i++)
-    //   cerr << current_field[i] << endl;
-    // for (int i = 0; i < bombs_count; i++)
-    //   cerr << bombs[i].x << " " << bombs[i].y << endl;
-    // cerr << endl;
-    // cerr << "START SIMULATING IN GET ACTION" << endl;
-    bool own_safe_afk, ene_safe_afk;
-    int own_afk_score, ene_afk_score;
-    tie(own_safe_afk, ene_safe_afk, own_afk_score, ene_afk_score) = check_safe_and_get_score_akim(1, own_x, own_y, accessibleness_ene, current_field, bombs, bombs_count, false);
-    for (int tick = 1; tick < K; tick++)
-    {
-      bitset<W> prev_accessibleness_own[H];
-      bitset<W> prev_accessibleness_ene[H];
-      for (int i = 0; i < H; i++)
-      {
-        prev_accessibleness_own[i] = accessibleness_own[i];
-        prev_accessibleness_ene[i] = accessibleness_ene[i];
-      }
-
-      simulate_tick_akim(tick, accessibleness_own, accessibleness_ene, current_field, destroy_boxes, bombs, bombs_count);
-
-      int own_score = destroy_boxes[1].count();
-      int ene_score = destroy_boxes[0].count();
-      // cerr << "START CALCING" << endl;
-      if (tick >= next_tick_with_bomb + 1)
-      {
-        for (int y = 0; y < H; y++)
-        {
-          for (int x = 0; x < W; x++)
-          {
-            if (prev_accessibleness_own[y][x] && accessibleness_own[y][x])
-            {
-              bool is_own_safe, is_ene_safe;
-              int own_score_change, ene_score_change;
-
-              if (bombs_count > 0)
-              {
-                tie(is_own_safe, is_ene_safe, own_score_change, ene_score_change) = check_safe_and_get_score_akim(tick + 1, x, y, accessibleness_ene, current_field, bombs, bombs_count, true);
-              }
-              else
-              {
-                if (!is_calced[y][x])
-                {
-                  is_calced[y][x] = 1;
-                  calced_value[y][x] = check_safe_and_get_score_akim(tick + 1, x, y, accessibleness_ene, current_field, bombs, bombs_count, true);
-                }
-                tie(is_own_safe, is_ene_safe, own_score_change, ene_score_change) = calced_value[y][x];
-              }
-
-              {
-                int own_next_score = own_score + own_score_change;
-                int ene_next_score = ene_score + ene_score_change;
-                int cur_f = ff(tick - 1, own_next_score, ene_next_score, is_own_safe, ene_safe_afk, is_ene_safe, own_next_score - ene_next_score > own_afk_score - ene_afk_score);
-                if (max_f < cur_f)
-                {
-                  max_f = cur_f;
-                  go_x = x;
-                  go_y = y;
-                  go_tick = tick - 1;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    // cerr << "END GET ACTION" << endl;
-    //maybe cerr max_f == -1?
-    return make_tuple(go_tick, go_x, go_y, max_f);
-  }
-
-  tuple<int, int, int, int> get_action_with_move_akim(vector<Bomb> bombs, Field field, Player player, PlayerMove move)
-  {
-    if (!apply_move(bombs, field, player, move))
-    {
-      return make_tuple(0, player.x, player.y, -2);
-    }
-    bool our_bomb_destroyed = false;
-    bool bomb_hits_our_position = false;
-    next_tick(bombs, field, player, our_bomb_destroyed, bomb_hits_our_position);
-    int next_tick_with_bomb = get_bomb_restore_ticks(bombs, field, player);
-    if (bomb_hits_our_position)
-      return make_tuple(0, player.x, player.y, -2);
-    return get_action_akim(bombs, field, player.x, player.y, -1, -1, next_tick_with_bomb);
-  }
-
-  void prepare()
-  {
-    int next_tick_with_bomb = get_bomb_restore_ticks(this->bombs, this->field, *this->me);
-    cerr << "next_bomb: " << next_tick_with_bomb << endl;
-    int ene_x = -1, ene_y = -1;
-    if (this->enemy != nullptr)
-      ene_x = this->enemy->x, ene_y = this->enemy->y;
-    auto [tick, go_x, go_y, max_f] = get_action_akim(this->bombs, this->field, this->me->x, this->me->y, ene_x, ene_y, next_tick_with_bomb);
-    cerr << "GO TO: " << tick << " " << go_x << " " << go_y << " " << max_f << endl;
-
-    if (next_tick_with_bomb == 0 && max_f < 200000)
-    {
-      int prev_score = get_score(this->bombs, this->field, *this->me);
-      int new_score = get_score_with_bomb(bombs, this->field, *this->me);
-      cerr << "old and new score: " << prev_score << " " << new_score << endl;
-      if (prev_score < new_score)
-      {
-        auto [ntick, ngo_x, ngo_y, nmax_f] = get_action_with_move_akim(this->bombs, this->field, *this->me, PLAYER_BOMB);
-        cerr << "max f after placing bomb: " << nmax_f << endl;
-        if (nmax_f > max_f && ngo_x == go_x && ngo_y == go_y && ntick == tick)
-        {
-          cerr << "BOMB!" << endl;
-          this->me->action = PLAYER_BOMB;
-          return;
-        }
-      }
-    }
-
-    if (max_f >= 200000)
-    {
-      cerr << "------------------------------------------------------------------------------------DIE!"
-           << " " << max_f << endl;
-    }
-    if (max_f < 500)
-    {
-      cerr << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~PANIC!"
-           << " " << max_f << endl;
-    }
-    this->me->action = get_move(tick, go_x, go_y);
-    current_global_score += get_tick_score(this->bombs, this->field, *this->me);
-    cerr << "SCORE: " << current_global_score << endl;
+    int me_global_score_change, enemy_global_score_change;
+    tie(me_global_score_change, enemy_global_score_change) = get_tick_score(me, enemy, bit_field, bombs, features);
+    me_global_score += me_global_score_change;
+    enemy_global_score += enemy_global_score_change;
+    cerr << "SCORE: " << me_global_score - enemy_global_score << endl;
   }
 
   void apply()

@@ -106,7 +106,7 @@ def notify_update_leaderboard():
   msg_text = tabulate([[leader.place, leader.captain_name, leader.score] for leader in leaderboard], headers=['', 'PLAYER', 'SCORE'])
   chats = session.query(Chats).filter(Chats.is_active == True)
   for chat in chats:
-    bot.send_message(chat.chat_id, "`"+msg_text+"`", parse_mode="Markdown")
+    bot.send_message(chat.chat_id, "`"+msg_text+"`", parse_mode="Markdown", disable_notification=True)
   session.commit()
   session.close()
 

@@ -69,15 +69,19 @@ def replay_update(replay):
       features.append(FeatureAdd(x, y))
     elif entity_type == "f_r":
       features.append(FeatureRange(x, y))
+    elif entity_type == "f_t":
+      features.append(FeatureTeleport(x, y))
+    elif entity_type == "f_j":
+      features.append(FeatureJump(x, y))
   features_count = int(replay.readline())
   for i in range(features_count):
     owner, param = map(int, replay.readline().split())
     for player in players:
       if player.owner == owner:
         if param == 0:
-          player.teleport = True
-        else:
           player.jump = True
+        else:
+          player.teleport = True
 
   for bomb in bombs:
     for player in players:
