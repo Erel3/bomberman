@@ -39,6 +39,7 @@ if __name__ == "__main__":
       else:
         draw_count += 1
       print("game {:03}: result: {} file: {}".format(game_id, str(list(score.items())), log_filename)) 
+      print("win: {} lose: {} draw: {}".format(win_count, lose_count, draw_count))
     if win_count > 0:
       win_avg_diff /= win_count
     if lose_count > 0:

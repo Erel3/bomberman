@@ -739,7 +739,7 @@ public:
                   StateQuality cur_state_quality;
                   cur_state_quality.dist = state_quality.dist + tick + 1;
                   cur_state_quality.me_score = me_score;
-                  cur_state_quality.enemy_score = state_quality.enemy_score + enemy_score;
+                  cur_state_quality.enemy_score = enemy_score;
                   cur_state_quality.me_next_score = me_will_score;
                   cur_state_quality.enemy_next_score = enemy_will_score;
                   cur_state_quality.me_default_score = me_default_score;
@@ -855,7 +855,7 @@ public:
                     StateQuality cur_state_quality;
                     cur_state_quality.dist = state_quality.dist + tick + 1;
                     cur_state_quality.me_score = me_score;
-                    cur_state_quality.enemy_score = state_quality.enemy_score + enemy_score;
+                    cur_state_quality.enemy_score = enemy_score;
                     cur_state_quality.me_next_score = me_will_score;
                     cur_state_quality.enemy_next_score = enemy_will_score;
                     cur_state_quality.me_default_score = me_default_score;
@@ -875,6 +875,7 @@ public:
                       cur_target.tick = tick;
                       cur_target.type = 1; // TODO: find tp target
                     }
+
                     bool ok = result_bombs.size() < top_bombs;
                     if (!ok)
                     {
@@ -1013,7 +1014,7 @@ public:
               StateQuality cur_state_quality;
               cur_state_quality.dist = state_quality.dist + tick;
               cur_state_quality.me_score = me_score;
-              cur_state_quality.enemy_score = state_quality.enemy_score + enemy_score;
+              cur_state_quality.enemy_score = enemy_score;
               cur_state_quality.me_next_score = me_will_score;
               cur_state_quality.enemy_next_score = enemy_will_score;
               cur_state_quality.me_default_score = me_default_score;
@@ -1310,7 +1311,7 @@ public:
 
   void prepare()
   {
-    if (me == nullptr)
+    if (me == nullptr || this->tick >= 76)
       exit(1);
 
     for (Bomb &bomb : bombs)
