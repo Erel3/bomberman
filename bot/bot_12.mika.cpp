@@ -950,7 +950,7 @@ public:
             me_bomb.x = x;
             me_bomb.y = y;
 
-            vector<Feature> feature_bomb = features;
+            vector<Feature> features_bomb = features;
             int me_took_dist_penalty = 0;
             if (feature.type == FEATURE_AMOUNT) {
               if (me_bomb.max_bombs == 1) {
@@ -987,8 +987,8 @@ public:
               }
               me_bomb.teleport = true;
             }
-            swap(feature_bomb[id], feature_bomb.back());
-            feature_bomb.ppb();
+            swap(features_bomb[id], features_bomb.back());
+            features_bomb.ppb();
 
             bool me_will_alive, enemy_will_alive;
             int me_will_score, enemy_will_score;
@@ -1047,7 +1047,7 @@ public:
               {
                 result_features.push(
                     make_tuple(
-                        bombs_bomb, bit_field, me_bomb, enemy_bomb, enemy_possible_pos_bomb, features, cur_state_quality, cur_target));
+                        bombs_bomb, bit_field, me_bomb, enemy_bomb, enemy_possible_pos_bomb, features_bomb, cur_state_quality, cur_target));
                 if (result_features.size() > top_features)
                   result_features.pop();
               }
