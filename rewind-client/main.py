@@ -58,9 +58,11 @@ if __name__ == "__main__":
       if win:
         stat[state]['win'] += 1
         win_count += 1
+        win_avg_diff += score[0] - score[1]	
       elif lose:
         stat[state]['lose'] += 1
         lose_count += 1
+        lose_avg_diff += score[1] - score[0]	
       else:
         stat[state]['draw'] += 1
         draw_count += 1
