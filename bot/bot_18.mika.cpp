@@ -33,6 +33,12 @@ const int BOMB_TIMER = 6;
 const int W = 13, H = 11, K = W + H + 10;
 const int MAX_BOMB = 12;
 
+#ifdef DEBUG_TIME
+double comparing_states;
+double pure_comparing;
+double simulating;
+#endif
+
 enum PlayerMove
 {
   PLAYER_STAY,
@@ -262,6 +268,10 @@ public:
   {
     // return this->ff() > rhs.ff();
 
+#ifdef DEBUG_TIME
+    double pure_comparing_start = 1000. * clock() / CLOCKS_PER_SEC;
+#endif
+
     if (enemy_alive)
     {
       if (!enemy_will_alive && !rhs.enemy_will_alive)
@@ -323,6 +333,12 @@ public:
       else
         return dist < rhs.dist;
     }
+
+#ifdef DEBUG_TIME
+    double pure_comparing_end = 1000. * clock() / CLOCKS_PER_SEC;
+    pure_comparing += pure_comparing_end - pure_comparing_start;
+#endif
+
     return cost1 > cost2;
   }
 };
@@ -492,6 +508,9 @@ public:
 
   tuple<int, int, int> simulate_moves_and_bombs(Player &me, Player &enemy, vector<bitset<W>> &me_possible_pos, vector<bitset<W>> &enemy_possible_pos, vector<bitset<W>> &bit_field, vector<Bomb> &bombs, vector<Feature> &features, PlayerMove action = PLAYER_STAY, bool can_change_action = true)
   {
+#ifdef DEBUG_TIME
+    double simulating_start = 1000. * clock() / CLOCKS_PER_SEC;
+#endif
     int me_dist_penalty = 0;
 
     vector<bitset<W>> me_possible_pos_next = me_possible_pos;
@@ -633,6 +652,11 @@ public:
     }
     enemy_possible_pos = enemy_possible_pos_next;
 
+#ifdef DEBUG_TIME
+    double simulating_end = 1000. * clock() / CLOCKS_PER_SEC;
+    simulating += simulating_end - simulating_start;
+#endif
+
     return make_tuple(destroy_boxes[1].count(), destroy_boxes[0].count(), me_dist_penalty);
   }
 
@@ -764,6 +788,9 @@ public:
                 }
 
                 {
+#ifdef DEBUG_TIME
+                  double comparing_states_start = 1000. * clock() / CLOCKS_PER_SEC;
+#endif
                   StateQuality cur_state_quality;
                   cur_state_quality.dist = state_quality.dist + tick + 1;
                   cur_state_quality.me_score = me_score + me_cur_score;
@@ -804,6 +831,10 @@ public:
                     if (result_bombs.size() > top_bombs)
                       result_bombs.pop();
                   }
+#ifdef DEBUG_TIME
+                  double comparing_states_end = 1000. * clock() / CLOCKS_PER_SEC;
+                  comparing_states += comparing_states_end - comparing_states_start;
+#endif
                 }
               }
             }
@@ -888,6 +919,9 @@ public:
                   }
 
                   {
+#ifdef DEBUG_TIME
+                    double comparing_states_start = 1000. * clock() / CLOCKS_PER_SEC;
+#endif
                     StateQuality cur_state_quality;
                     cur_state_quality.dist = state_quality.dist + tick + 1;
                     cur_state_quality.me_score = me_score + me_cur_score;
@@ -928,6 +962,10 @@ public:
                       if (result_bombs.size() > top_bombs)
                         result_bombs.pop();
                     }
+#ifdef DEBUG_TIME
+                    double comparing_states_end = 1000. * clock() / CLOCKS_PER_SEC;
+                    comparing_states += comparing_states_end - comparing_states_start;
+#endif
                   }
                 }
               }
@@ -982,6 +1020,9 @@ public:
           tie(me_will_alive, enemy_will_alive, me_will_score, enemy_will_score, me_will_dist_penalty) = check_safe_and_get_score(me, enemy, enemy_possible_pos, bit_field, bombs, features);
 
           {
+#ifdef DEBUG_TIME
+            double comparing_states_start = 1000. * clock() / CLOCKS_PER_SEC;
+#endif
             StateQuality cur_state_quality;
             cur_state_quality.dist = state_quality.dist + tick + 1;
             cur_state_quality.me_score = me_score + me_cur_score;
@@ -1022,6 +1063,10 @@ public:
               if (result_bombs.size() > top_bombs)
                 result_bombs.pop();
             }
+#ifdef DEBUG_TIME
+            double comparing_states_end = 1000. * clock() / CLOCKS_PER_SEC;
+            comparing_states += comparing_states_end - comparing_states_start;
+#endif
           }
         }
       }
@@ -1151,6 +1196,9 @@ public:
 
             if (!took_calced)
             {
+#ifdef DEBUG_TIME
+              double comparing_states_start = 1000. * clock() / CLOCKS_PER_SEC;
+#endif
               StateQuality cur_state_quality;
               cur_state_quality.dist = state_quality.dist + tick;
               cur_state_quality.me_score = me_score;
@@ -1190,6 +1238,10 @@ public:
                 if (result_features.size() > top_bombs)
                   result_features.pop();
               }
+#ifdef DEBUG_TIME
+              double comparing_states_end = 1000. * clock() / CLOCKS_PER_SEC;
+              comparing_states += comparing_states_end - comparing_states_start;
+#endif
             }
           }
 
@@ -1552,6 +1604,13 @@ int main()
   Game game;
   while (true)
   {
+
+#ifdef DEBUG_TIME
+    comparing_states = 0;
+    pure_comparing = 0;
+    simulating = 0;
+#endif
+
     double tick_starttime = 1000. * clock() / CLOCKS_PER_SEC;
     game.prepare();
     game.apply();
@@ -1559,6 +1618,12 @@ int main()
     game.read_state(); // here we also wait for server response do we need to count it?
     max_tick_time = max(max_tick_time, tick_endtime - tick_starttime);
     fprintf(stderr, "tick %d time: %.3lf ms\n", game.tick, max_tick_time);
+
+#ifdef DEBUG_TIME
+    fprintf(stderr, "************** comparing_states: %.3lf ms\n", comparing_states);
+    fprintf(stderr, "************** pure comparing: %.3lf ms\n", pure_comparing);
+    fprintf(stderr, "************** simulating: %.3lf ms\n", simulating);
+#endif
   }
 
   return 0;
