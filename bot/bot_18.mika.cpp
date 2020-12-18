@@ -269,7 +269,7 @@ public:
     // return this->ff() > rhs.ff();
 
 #ifdef DEBUG_TIME
-    double pure_comparing_start = 1000. * clock() / CLOCKS_PER_SEC;
+    double pure_comparing_start = clock();
 #endif
 
     if (enemy_alive)
@@ -335,7 +335,7 @@ public:
     }
 
 #ifdef DEBUG_TIME
-    double pure_comparing_end = 1000. * clock() / CLOCKS_PER_SEC;
+    double pure_comparing_end = clock();
     pure_comparing += pure_comparing_end - pure_comparing_start;
 #endif
 
@@ -509,7 +509,7 @@ public:
   tuple<int, int, int> simulate_moves_and_bombs(Player &me, Player &enemy, vector<bitset<W>> &me_possible_pos, vector<bitset<W>> &enemy_possible_pos, vector<bitset<W>> &bit_field, vector<Bomb> &bombs, vector<Feature> &features, PlayerMove action = PLAYER_STAY, bool can_change_action = true)
   {
 #ifdef DEBUG_TIME
-    double simulating_start = 1000. * clock() / CLOCKS_PER_SEC;
+    double simulating_start = clock();
 #endif
     int me_dist_penalty = 0;
 
@@ -653,7 +653,7 @@ public:
     enemy_possible_pos = enemy_possible_pos_next;
 
 #ifdef DEBUG_TIME
-    double simulating_end = 1000. * clock() / CLOCKS_PER_SEC;
+    double simulating_end = clock();
     simulating += simulating_end - simulating_start;
 #endif
 
@@ -789,7 +789,7 @@ public:
 
                 {
 #ifdef DEBUG_TIME
-                  double comparing_states_start = 1000. * clock() / CLOCKS_PER_SEC;
+                  double comparing_states_start = clock();
 #endif
                   StateQuality cur_state_quality;
                   cur_state_quality.dist = state_quality.dist + tick + 1;
@@ -832,7 +832,7 @@ public:
                       result_bombs.pop();
                   }
 #ifdef DEBUG_TIME
-                  double comparing_states_end = 1000. * clock() / CLOCKS_PER_SEC;
+                  double comparing_states_end = clock();
                   comparing_states += comparing_states_end - comparing_states_start;
 #endif
                 }
@@ -920,7 +920,7 @@ public:
 
                   {
 #ifdef DEBUG_TIME
-                    double comparing_states_start = 1000. * clock() / CLOCKS_PER_SEC;
+                    double comparing_states_start = clock();
 #endif
                     StateQuality cur_state_quality;
                     cur_state_quality.dist = state_quality.dist + tick + 1;
@@ -963,7 +963,7 @@ public:
                         result_bombs.pop();
                     }
 #ifdef DEBUG_TIME
-                    double comparing_states_end = 1000. * clock() / CLOCKS_PER_SEC;
+                    double comparing_states_end = clock();
                     comparing_states += comparing_states_end - comparing_states_start;
 #endif
                   }
@@ -1021,7 +1021,7 @@ public:
 
           {
 #ifdef DEBUG_TIME
-            double comparing_states_start = 1000. * clock() / CLOCKS_PER_SEC;
+            double comparing_states_start = clock();
 #endif
             StateQuality cur_state_quality;
             cur_state_quality.dist = state_quality.dist + tick + 1;
@@ -1064,7 +1064,7 @@ public:
                 result_bombs.pop();
             }
 #ifdef DEBUG_TIME
-            double comparing_states_end = 1000. * clock() / CLOCKS_PER_SEC;
+            double comparing_states_end = clock();
             comparing_states += comparing_states_end - comparing_states_start;
 #endif
           }
@@ -1197,7 +1197,7 @@ public:
             if (!took_calced)
             {
 #ifdef DEBUG_TIME
-              double comparing_states_start = 1000. * clock() / CLOCKS_PER_SEC;
+              double comparing_states_start = clock();
 #endif
               StateQuality cur_state_quality;
               cur_state_quality.dist = state_quality.dist + tick;
@@ -1239,7 +1239,7 @@ public:
                   result_features.pop();
               }
 #ifdef DEBUG_TIME
-              double comparing_states_end = 1000. * clock() / CLOCKS_PER_SEC;
+              double comparing_states_end = clock();
               comparing_states += comparing_states_end - comparing_states_start;
 #endif
             }
@@ -1620,9 +1620,9 @@ int main()
     fprintf(stderr, "tick %d time: %.3lf ms\n", game.tick, max_tick_time);
 
 #ifdef DEBUG_TIME
-    fprintf(stderr, "************** comparing_states: %.3lf ms\n", comparing_states);
-    fprintf(stderr, "************** pure comparing: %.3lf ms\n", pure_comparing);
-    fprintf(stderr, "************** simulating: %.3lf ms\n", simulating);
+    fprintf(stderr, "************** comparing_states: %.3lf ms\n", comparing_states * 1000. / CLOCKS_PER_SEC);
+    fprintf(stderr, "************** pure comparing: %.3lf ms\n", pure_comparing * 1000. / CLOCKS_PER_SEC);
+    fprintf(stderr, "************** simulating: %.3lf ms\n", simulating * 1000. / CLOCKS_PER_SEC);
 #endif
   }
 
