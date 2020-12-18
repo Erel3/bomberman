@@ -294,16 +294,18 @@ def is_finished_game(field, players, score):
       if field.data[i][j] == ';':
         box_counts += 1
         has_box = True
-  if has_box == False and len(players) <= 1:
+  if has_box == False:
     return True
-  if len(players) == 0:
-    return True
+  # if has_box == False and len(players) <= 1:
+  #   return True
+  # if len(players) == 0:
+  #   return True
   
-  for player in players:
-    if score[player.owner] + box_counts + (0 if len(players) == 1 else 7) < score[enemy_owner(player.owner)]:
-      return True
-    if score[enemy_owner(player.owner)] + box_counts < score[player.owner] and len(players) == 1:
-      return True
+  # for player in players:
+  #   if score[player.owner] + box_counts + (0 if len(players) == 1 else 7) < score[enemy_owner(player.owner)]:
+  #     return True
+  #   if score[enemy_owner(player.owner)] + box_counts < score[player.owner] and len(players) == 1:
+  #     return True
 
   return False
 
