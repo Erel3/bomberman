@@ -355,7 +355,7 @@ def run():
   finish(helper, field, players, bombs, monsters, features, score)
   
   finish_log(log_output)
-  return score, log_filename
+  return score, players, log_filename
 
 def replay():
   # helper, field, players, bombs, monsters = init_from_file()
