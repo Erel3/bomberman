@@ -58,11 +58,11 @@ if __name__ == "__main__":
       if win:
         stat[state]['win'] += 1
         win_count += 1
-        win_avg_diff += score[0] - score[1]	
+        win_avg_diff += score[0] - score[1]
       elif lose:
         stat[state]['lose'] += 1
         lose_count += 1
-        lose_avg_diff += score[1] - score[0]	
+        lose_avg_diff += score[1] - score[0]
       else:
         stat[state]['draw'] += 1
         draw_count += 1
@@ -79,6 +79,6 @@ if __name__ == "__main__":
     print("total game count: {}\nwin: {} {:.2f} {:.2f}%\nlose: {} {:.2f} {:.2f}%\ndraw: {} {:.2f}%\n".format(config.game_count, win_count, win_avg_diff, win_percent, lose_count, lose_avg_diff, lose_percent, draw_count, draw_percent))
     #statistics with alive and dead
     for key in stat:
-      print("state: {}\nwin: {} {:.2f} %\nlose: {} {:.2f} %\ndraw: {} {:.2f}%\n".format(key, stat[key]['win'], stat[key]['win'] * 100 / config.game_count, stat[key]['lose'], stat[key]['lose'] * 100 / config.game_count, stat[key]['draw'], stat[key]['draw'] * 100 / config.game_count))
+      print("state: {}\nwin: {} {:.2f}%\nlose: {} {:.2f}%\ndraw: {} {:.2f}%\n".format(key, stat[key]['win'], stat[key]['win'] * 100 / config.game_count, stat[key]['lose'], stat[key]['lose'] * 100 / config.game_count, stat[key]['draw'], stat[key]['draw'] * 100 / config.game_count))
   else:
     game.replay()
