@@ -849,14 +849,14 @@ public:
 #ifdef DEBUG_TIME
                   double comparing_states_start = clock();
 #endif
-                  int enemy_target_penalty = 0;
-                  if (enemy_target.x == x && enemy_target.y == y)
-                  {
-                    if (enemy_target.tick < state_quality.dist + tick)
-                    {
-                      enemy_target_penalty = 4;
-                    }
-                  }
+                  // int enemy_target_penalty = 0;
+                  // if (enemy_target.x == x && enemy_target.y == y)
+                  // {
+                  //   if (enemy_target.tick < state_quality.dist + tick)
+                  //   {
+                  //     enemy_target_penalty = 4;
+                  //   }
+                  // }
 
                   StateQuality cur_state_quality;
                   cur_state_quality.dist = state_quality.dist + tick + 1;
@@ -866,7 +866,7 @@ public:
                   cur_state_quality.enemy_will_score = enemy_will_score;
                   cur_state_quality.me_default_score = me_default_score;
                   cur_state_quality.enemy_default_score = enemy_default_score;
-                  cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_cur_dist_penalty + enemy_target_penalty;
+                  cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_cur_dist_penalty; // + enemy_target_penalty;
                   cur_state_quality.me_will_dist_penalty = me_will_dist_penalty;
                   cur_state_quality.enemy_dist = 100; // TODO
                   cur_state_quality.me_alive = me_alive && me_cur_alive;
@@ -987,14 +987,14 @@ public:
                     double comparing_states_start = clock();
 #endif
 
-                    int enemy_target_penalty = 0;
-                    if (enemy_target.x == x && enemy_target.y == y)
-                    {
-                      if (enemy_target.tick < state_quality.dist + tick)
-                      {
-                        enemy_target_penalty = 4;
-                      }
-                    }
+                    // int enemy_target_penalty = 0;
+                    // if (enemy_target.x == x && enemy_target.y == y)
+                    // {
+                    //   if (enemy_target.tick < state_quality.dist + tick)
+                    //   {
+                    //     enemy_target_penalty = 4;
+                    //   }
+                    // }
 
                     StateQuality cur_state_quality;
                     cur_state_quality.dist = state_quality.dist + tick + 1;
@@ -1004,7 +1004,7 @@ public:
                     cur_state_quality.enemy_will_score = enemy_will_score;
                     cur_state_quality.me_default_score = me_default_score;
                     cur_state_quality.enemy_default_score = enemy_default_score;
-                    cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_cur_dist_penalty + enemy_target_penalty;
+                    cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_cur_dist_penalty; // + enemy_target_penalty;
                     cur_state_quality.me_will_dist_penalty = me_will_dist_penalty;
                     cur_state_quality.enemy_dist = 100; // TODO
                     cur_state_quality.me_alive = me_alive && me_cur_alive;
