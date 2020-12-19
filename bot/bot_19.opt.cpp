@@ -849,12 +849,14 @@ public:
 #ifdef DEBUG_TIME
                   double comparing_states_start = clock();
 #endif
-                    int enemy_target_penalty = 0;
-                    if (enemy_target.x == x && enemy_target.y == y) {
-                      if (enemy_target.tick < state_quality.dist + tick) {
-                        enemy_target_penalty = 4;
-                      }
+                  int enemy_target_penalty = 0;
+                  if (enemy_target.x == x && enemy_target.y == y)
+                  {
+                    if (enemy_target.tick < state_quality.dist + tick)
+                    {
+                      enemy_target_penalty = 4;
                     }
+                  }
 
                   StateQuality cur_state_quality;
                   cur_state_quality.dist = state_quality.dist + tick + 1;
@@ -986,8 +988,10 @@ public:
 #endif
 
                     int enemy_target_penalty = 0;
-                    if (enemy_target.x == x && enemy_target.y == y) {
-                      if (enemy_target.tick < state_quality.dist + tick) {
+                    if (enemy_target.x == x && enemy_target.y == y)
+                    {
+                      if (enemy_target.tick < state_quality.dist + tick)
+                      {
                         enemy_target_penalty = 4;
                       }
                     }
@@ -1601,7 +1605,8 @@ public:
     enemy_target.y = -1;
     enemy_initial_states.pb(make_tuple(bombs, bit_field, enemy, me, me_possible_pos, features, StateQuality(me_global_score, enemy_global_score), Target()));
     enemy_final_states = get_action(enemy_initial_states, 1, 0);
-    if(enemy_final_states.size()) {
+    if (enemy_final_states.size())
+    {
       tie(ignore, ignore, ignore, ignore, ignore, ignore, ignore, enemy_target) = enemy_final_states[0];
       cerr << "-------------------------------------- enemy target: " << enemy_target.x << " " << enemy_target.y << " " << enemy_target.tick << endl;
     }
