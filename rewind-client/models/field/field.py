@@ -34,7 +34,7 @@ def _default_gen(self, width, height):
       for j in range(height)
   ]
 def _file_gen(self, width, height):
-    fileName = random.randint(0, 9)
+    fileName = random.randint(0, 18)
     fileName = "../maps/1/" + str(fileName)
     with open(fileName, "r") as f:
       return [list(f.readline().strip()) for i in range(height)]    
