@@ -1274,9 +1274,6 @@ public:
             cur_state_quality.target_x = me.x;
             cur_state_quality.target_y = me.y;
 
-            if (dangerous_cells[min(cur_state_quality.dist - 1, 7)](cur_state_quality.target_y, cur_state_quality.target_x) == 1)
-              cur_state_quality.me_dist_penalty += 50;
-
             Target cur_target = target;
             if (target.type == -1)
             {
@@ -1997,8 +1994,6 @@ public:
     default:
       return false;
     }
-    cerr << "No move found" << endl;
-    return PLAYER_STAY;
     cerr << "predicted_dir " << predicted_dir << endl;
     for (int y = 0; y < H; y++)
     {
