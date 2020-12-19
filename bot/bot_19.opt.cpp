@@ -305,6 +305,8 @@ int fd(int dist)
   return 0;
 }
 
+BitField dangerous_cells[8];
+
 class StateQuality
 {
 public:
@@ -312,6 +314,8 @@ public:
 
   StateQuality(int me_score, int enemy_score) : me_score(me_score), enemy_score(enemy_score) {}
 
+  int target_x = 0;
+  int target_y = 0;
   int dist = 0;
   int me_score = 0;
   int enemy_score = 0;
@@ -399,10 +403,14 @@ public:
 
     int pen = 0;
     if (!(me_score + me_will_score > me_default_score || enemy_score + enemy_will_score < enemy_default_score))
-      pen = 10000;
+      pen += 10000;
+    if (dangerous_cells[min(dist - 1, 7)](target_y, target_x) == 1)
+      pen += 50;
     int rhspen = 0;
     if (!(rhs.me_score + rhs.me_will_score > rhs.me_default_score || rhs.enemy_score + rhs.enemy_will_score < rhs.enemy_default_score))
-      rhspen = 10000;
+      rhspen += 10000;
+    if (dangerous_cells[min(rhs.dist - 1, 7)](rhs.target_y, rhs.target_x) == 1)
+      pen += 50;
 
     int cost1 = (me_score + me_will_score - enemy_score - enemy_will_score) * 4 - (dist + me_dist_penalty + me_will_dist_penalty) - pen;
     int cost2 = (rhs.me_score + rhs.me_will_score - rhs.enemy_score - rhs.enemy_will_score) * 4 - (rhs.dist + rhs.me_dist_penalty + rhs.me_will_dist_penalty) - rhspen;
@@ -449,6 +457,7 @@ private:
   vector<Bomb> bombs;
   vector<Feature> features;
   BitField bit_field;
+  BitField bad_cells;
   bitset<W> bit_full, bit_empty;
   int me_global_score = 0;
   int enemy_global_score = 0;
@@ -591,6 +600,144 @@ public:
 
     this->tick = tick;
   }
+
+  void find_dangerous_cells(Player me, Player enemy, BitField bit_field, vector<Bomb> bombs)
+  {
+    if (me.teleport || me.jump)
+      return;
+    if (!enemy.teleport)
+      return;
+    vector<Feature> features;
+    int ddx[] = {2, 1, 0, -1, -2, -1, 0, 1}, ddy[] = {0, -1, -2, -1, 0, 1, 2, 1};
+
+    {
+      bool me_alive_default;
+      BitField me_possible_pos;
+      me_possible_pos(me.y, me.x, 1);
+      tie(ignore, me_alive_default, ignore, ignore, ignore) = check_safe_and_get_score(enemy, me, me_possible_pos, bit_field, bombs, features);
+      if (!me_alive_default)
+        return;
+    }
+    BitField me_possible_pos;
+    me_possible_pos(me.y, me.x, 1);
+    BitField enemy_possible_pos;
+    for (int tick = 0; tick < 8; tick++)
+    {
+      for (int y = 0; y < H; y++)
+      {
+        for (int x = 0; x < W; x++)
+        {
+          if (bit_field(y, x) == 1)
+            continue;
+          Player me_cur = me;
+          Player enemy_cur = enemy;
+          BitField bit_field_cur = bit_field;
+          vector<Bomb> bombs_cur = bombs;
+          BitField me_possible_pos_cur;
+          BitField enemy_possible_pos_cur;
+          me_cur.x = x;
+          me_cur.y = y;
+          me_possible_pos_cur(me_cur.y, me_cur.x, 1);
+          simulate_moves_and_bombs(me_cur, enemy_cur, me_possible_pos_cur, enemy_possible_pos_cur, bit_field_cur, bombs_cur, features, PLAYER_BOMB, false);
+          for (int dir = 0; dir < 8; dir++)
+          {
+            int to_x = x + ddx[dir], to_y = y + ddy[dir];
+            if (to_x < 0 || to_x >= W || to_y < 0 || to_y >= H)
+              continue;
+            if (bit_field_cur(to_y, to_x) == 1)
+              continue;
+
+            Player me_ = me_cur;
+            Player enemy_ = enemy_cur;
+            BitField bit_field_ = bit_field_cur;
+            vector<Bomb> bombs_ = bombs_cur;
+            BitField me_possible_pos_ = me_possible_pos_cur;
+            BitField enemy_possible_pos_ = enemy_possible_pos_cur;
+
+            enemy_.x = to_x;
+            enemy_.y = to_y;
+
+            bool me_alive = true;
+            simulate_moves_and_bombs(me_, enemy_, me_possible_pos_, enemy_possible_pos_, bit_field_, bombs_, features, PLAYER_STAY);
+            me_alive &= (me_possible_pos_.count() > 0);
+            simulate_moves_and_bombs(enemy_, me_, enemy_possible_pos_, me_possible_pos_, bit_field_, bombs_, features, PLAYER_BOMB);
+            me_alive &= (me_possible_pos_.count() > 0);
+            bool me_alive_;
+            tie(ignore, me_alive_, ignore, ignore, ignore) = check_safe_and_get_score(enemy_, me_, me_possible_pos_, bit_field_, bombs_, features);
+            me_alive &= me_alive_;
+
+            if (!me_alive)
+            {
+              dangerous_cells[tick](y, x, 1);
+              break;
+            }
+          }
+        }
+      }
+      simulate_moves_and_bombs(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs, features, PLAYER_STAY, false);
+    }
+  }
+
+  void find_bad_cells(Player me, Player enemy, BitField bit_field, vector<Bomb> bombs)
+  {
+    if (me.teleport || me.jump)
+      return;
+    vector<Feature> features;
+
+    {
+      bool me_alive_default;
+      BitField me_possible_pos;
+      me_possible_pos(me.y, me.x, 1);
+      tie(ignore, me_alive_default, ignore, ignore, ignore) = check_safe_and_get_score(enemy, me, me_possible_pos, bit_field, bombs, features);
+      if (!me_alive_default)
+        return;
+    }
+
+    for (int me_dir = 0; me_dir < 4; me_dir++)
+    {
+      for (int enemy_dir = 0; enemy_dir < 5; enemy_dir++)
+      {
+        Player me_cur = me;
+        Player enemy_cur = enemy;
+        BitField bit_field_cur = bit_field;
+        vector<Bomb> bombs_cur = bombs;
+        BitField me_possible_pos;
+        BitField enemy_possible_pos;
+        me_possible_pos(me_cur.y, me_cur.x, 1);
+        enemy_possible_pos(enemy_cur.y, enemy_cur.x, 1);
+        simulate_moves_and_bombs(enemy_cur, me_cur, enemy_possible_pos, me_possible_pos, bit_field_cur, bombs_cur, features, PLAYER_STAY, false);
+
+        int me_to_x = me_cur.x + dx[me_dir];
+        int me_to_y = me_cur.y + dy[me_dir];
+        int enemy_to_x = enemy_cur.x + dx[enemy_dir];
+        int enemy_to_y = enemy_cur.y + dy[enemy_dir];
+        if (me_to_x < 0 || me_to_x >= W || me_to_y < 0 || me_to_y >= H)
+          continue;
+        if (enemy_to_x < 0 || enemy_to_x >= W || enemy_to_y < 0 || enemy_to_y >= H)
+          continue;
+        if (me_possible_pos(me_to_y, me_to_x) == 0 || enemy_possible_pos(enemy_to_y, enemy_to_x) == 0)
+          continue;
+        me_cur.x = me_to_x;
+        me_cur.y = me_to_y;
+        enemy_cur.x = enemy_to_x;
+        enemy_cur.y = enemy_to_y;
+        me_possible_pos.set_empty();
+        enemy_possible_pos.set_empty();
+        me_possible_pos(me_cur.y, me_cur.x, 1);
+        enemy_possible_pos(enemy_cur.y, enemy_cur.x, 1);
+        simulate_moves_and_bombs(enemy_cur, me_cur, enemy_possible_pos, me_possible_pos, bit_field_cur, bombs_cur, features, enemy_cur.bombs ? PLAYER_BOMB : PLAYER_STAY, false);
+        if (enemy_possible_pos.count() == 0)
+          continue;
+        bool me_alive, enemy_alive;
+        tie(enemy_alive, me_alive, ignore, ignore, ignore) = check_safe_and_get_score(enemy_cur, me_cur, me_possible_pos, bit_field_cur, bombs_cur, features);
+        if (!me_alive && enemy_alive)
+        {
+          bad_cells(me_to_y, me_to_x, 1);
+        }
+      }
+    }
+  }
+
   tuple<int, int, int> simulate_moves_and_bombs(Player &me, Player &enemy, BitField &me_possible_pos, BitField &enemy_possible_pos, BitField &bit_field, vector<Bomb> &bombs, vector<Feature> &features, PlayerMove action = PLAYER_STAY, bool can_change_action = true)
   {
 #ifdef DEBUG_TIME
@@ -691,13 +838,13 @@ public:
     enemy_possible_pos_next &= enemy_possible_pos_next ^ destroy_field;
     bit_field ^= bit_field & destroy_field;
 
-    if (can_change_action && action == PLAYER_STAY && !me_alive && me.jump)
+    if (can_change_action && action == PLAYER_STAY && !me_alive && me.jump && me_possible_pos.count() > 0)
     {
       me_dist_penalty = 6;
       me_possible_pos_next = me_possible_pos;
       me.jump = false;
     }
-    else if (can_change_action && action == PLAYER_STAY && !me_alive && me.teleport)
+    else if (can_change_action && action == PLAYER_STAY && !me_alive && me.teleport && me_possible_pos.count() > 0)
     {
       me_dist_penalty = 10;
       me_possible_pos = destroy_field;
@@ -712,6 +859,8 @@ public:
       me_possible_pos = me_possible_pos_next;
     }
     enemy_possible_pos = enemy_possible_pos_next;
+
+    me_possible_pos ^= me_possible_pos & bad_cells;
 
 #ifdef DEBUG_TIME
     double simulating_end = clock();
@@ -803,6 +952,8 @@ public:
         me_default_score += state_quality.me_score, enemy_default_score += state_quality.enemy_score;
         for (int tick = 0; tick < K; tick++)
         {
+          if (me_possible_pos.count() == 0)
+            break;
           if (me.bombs > 0)
             for (int y = 0; y < H; y++)
             {
@@ -869,10 +1020,12 @@ public:
                   cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_cur_dist_penalty; // + enemy_target_penalty;
                   cur_state_quality.me_will_dist_penalty = me_will_dist_penalty;
                   cur_state_quality.enemy_dist = 100; // TODO
-                  cur_state_quality.me_alive = me_alive && me_cur_alive;
-                  cur_state_quality.enemy_alive = enemy_alive && enemy_cur_alive;
+                  cur_state_quality.me_alive = target.type == -1 ? (me_alive && me_cur_alive) : state_quality.me_alive;
+                  cur_state_quality.enemy_alive = target.type == -1 ? (enemy_alive && enemy_cur_alive) : state_quality.enemy_alive;
                   cur_state_quality.me_will_alive = me_will_alive && me_cur_alive;
                   cur_state_quality.enemy_will_alive = enemy_will_alive && enemy_cur_alive;
+                  cur_state_quality.target_x = x;
+                  cur_state_quality.target_y = y;
 
                   Target cur_target = target;
                   if (target.type == -1)
@@ -940,6 +1093,8 @@ public:
         if (me.teleport)
           for (int tick = 0; tick < K; tick++)
           {
+            if (me_possible_pos.count() == 0)
+              break;
             if (me.bombs > 0 && tick > 0)
               for (int y = 0; y < H; y++)
               {
@@ -1007,10 +1162,12 @@ public:
                     cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_cur_dist_penalty; // + enemy_target_penalty;
                     cur_state_quality.me_will_dist_penalty = me_will_dist_penalty;
                     cur_state_quality.enemy_dist = 100; // TODO
-                    cur_state_quality.me_alive = me_alive && me_cur_alive;
-                    cur_state_quality.enemy_alive = enemy_alive && enemy_cur_alive;
+                    cur_state_quality.me_alive = target.type == -1 ? (me_alive && me_cur_alive) : state_quality.me_alive;
+                    cur_state_quality.enemy_alive = target.type == -1 ? (enemy_alive && enemy_cur_alive) : state_quality.enemy_alive;
                     cur_state_quality.me_will_alive = me_will_alive && me_cur_alive;
                     cur_state_quality.enemy_will_alive = enemy_will_alive && enemy_cur_alive;
+                    cur_state_quality.target_x = x;
+                    cur_state_quality.target_y = y;
 
                     Target cur_target = target;
                     if (target.type == -1)
@@ -1105,10 +1262,12 @@ public:
             cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_cur_dist_penalty;
             cur_state_quality.me_will_dist_penalty = me_will_dist_penalty;
             cur_state_quality.enemy_dist = 100; // TODO
-            cur_state_quality.me_alive = me_alive && me_cur_alive;
-            cur_state_quality.enemy_alive = enemy_alive && enemy_cur_alive;
+            cur_state_quality.me_alive = target.type == -1 ? (me_alive && me_cur_alive) : state_quality.me_alive;
+            cur_state_quality.enemy_alive = target.type == -1 ? (enemy_alive && enemy_cur_alive) : state_quality.enemy_alive;
             cur_state_quality.me_will_alive = me_will_alive && me_cur_alive;
             cur_state_quality.enemy_will_alive = enemy_will_alive && enemy_cur_alive;
+            cur_state_quality.target_x = me.x;
+            cur_state_quality.target_y = me.y;
 
             Target cur_target = target;
             if (target.type == -1)
@@ -1167,6 +1326,8 @@ public:
         me_default_score += state_quality.me_score, enemy_default_score += state_quality.enemy_score;
         for (int tick = 0; tick < K; tick++)
         {
+          if (me_possible_pos.count() == 0)
+            break;
           for (int id = 0; id < features.size(); id++)
           {
             Feature &feature = features[id];
@@ -1282,10 +1443,12 @@ public:
               cur_state_quality.me_dist_penalty = state_quality.me_dist_penalty + me_dist_penalty + me_took_dist_penalty;
               cur_state_quality.me_will_dist_penalty = me_will_dist_penalty;
               cur_state_quality.enemy_dist = 100; // TODO
-              cur_state_quality.me_alive = me_alive;
-              cur_state_quality.enemy_alive = enemy_alive;
+              cur_state_quality.me_alive = target.type == -1 ? me_alive : state_quality.me_alive;
+              cur_state_quality.enemy_alive = target.type == -1 ? enemy_alive : state_quality.enemy_alive;
               cur_state_quality.me_will_alive = me_will_alive;
               cur_state_quality.enemy_will_alive = enemy_will_alive;
+              cur_state_quality.target_x = x;
+              cur_state_quality.target_y = y;
 
               Target cur_target = target;
               if (target.type == -1)
@@ -1307,7 +1470,7 @@ public:
                 result_features.push(
                     make_tuple(
                         bombs_bomb, bit_field_bomb, me_bomb, enemy_bomb, enemy_possible_pos_bomb, features_bomb, cur_state_quality, cur_target));
-                if (result_features.size() > top_bombs)
+                if (result_features.size() > top_features)
                   result_features.pop();
               }
 #ifdef DEBUG_TIME
@@ -1344,7 +1507,7 @@ public:
       Target target;
       StateQuality sq;
       tie(ignore, ignore, ignore, ignore, ignore, ignore, sq, target) = result[i];
-      cerr << target.x << " " << target.y << " " << target.tick << " " << sq.me_alive << " " << sq.me_dist_penalty << " " << target.type << endl;
+      cerr << target.x << " " << target.y << " " << target.tick << " " << sq.me_alive << " " << sq.enemy_alive << " " << sq.me_dist_penalty << " " << target.type << endl;
     }
     return result;
   }
@@ -1477,6 +1640,14 @@ public:
           current_field[i] ^= (current_field[i] & destroy_field[i]);
         }
 
+        for (int i = 0; i < H; i++)
+        {
+          for (int j = 0; j < W; j++)
+          {
+            next_accessibleness[i][j] = next_accessibleness[i][j] ^ (next_accessibleness[i][j] && bad_cells(i, j));
+          }
+        }
+
         bool is_alive = false;
         for (int i = 0; i < H; i++)
           is_alive |= next_accessibleness[i].count();
@@ -1600,6 +1771,12 @@ public:
       me_possible_pos(me.y, me.x, 1);
 
     ///////////////////////////////////////////////
+    bad_cells.set_empty();
+    for (int i = 0; i < 8; i++)
+    {
+      dangerous_cells[i].set_empty();
+    }
+    ///////////////////////////////////////////////
     enemy_target.tick = -1;
     enemy_target.x = -1;
     enemy_target.y = -1;
@@ -1610,6 +1787,29 @@ public:
       tie(ignore, ignore, ignore, ignore, ignore, ignore, ignore, enemy_target) = enemy_final_states[0];
       cerr << "-------------------------------------- enemy target: " << enemy_target.x << " " << enemy_target.y << " " << enemy_target.tick << endl;
     }
+    ///////////////////////////////////////////////
+    if (!enemy.dead)
+      find_bad_cells(me, enemy, bit_field, bombs);
+///////////////////////////////////////////////
+#ifdef DEBUG_TIME
+    double start = clock();
+#endif
+    if (!enemy.dead)
+      find_dangerous_cells(me, enemy, bit_field, bombs);
+
+    for (int y = 0; y < H; y++)
+    {
+      for (int x = 0; x < W; x++)
+      {
+        cerr << dangerous_cells[0](y, x);
+      }
+      cerr << endl;
+    }
+
+#ifdef DEBUG_TIME
+    double end = clock();
+    cerr << " ***********************------------------------------------ " << (end - start) * 1000. / CLOCKS_PER_SEC << endl;
+#endif
     ///////////////////////////////////////////////
 
     initial_states.pb(make_tuple(bombs, bit_field, me, enemy, enemy_possible_pos, features, StateQuality(me_global_score, enemy_global_score), Target()));
