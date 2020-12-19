@@ -148,6 +148,7 @@ public:
     this->range = range;
     this->teleport = false;
     this->jump = false;
+    this->dead = false;
   }
   Player(const Player &p)
   {
@@ -162,6 +163,7 @@ public:
     this->action = p.action;
     this->action_x = p.action_x;
     this->action_y = p.action_y;
+    this->dead = p.dead;
   }
   Player(const Player *p)
   {
@@ -181,13 +183,14 @@ public:
     this->action = p->action;
     this->action_x = p->action_x;
     this->action_y = p->action_y;
+    this->dead = p->dead;
   }
 
   int x, y;
   int owner_id;
   int max_bombs, bombs, range;
   bool teleport, jump;
-  bool dead = false;
+  bool dead;
 
   PlayerMove action = PLAYER_STAY;
   int action_x, action_y;
@@ -937,7 +940,7 @@ public:
             result_bombs.pop();
         }
 
-        if (!state_quality.me_alive)
+        if (!state_quality.me_alive || me.dead)
           continue;
 
         int me_score = state_quality.me_score, enemy_score = state_quality.enemy_score;
@@ -1519,15 +1522,15 @@ public:
     return simulate_moves_and_bombs(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs, features);
   }
 
-  PlayerMove get_move(Target target)
+  PlayerMove get_move(Player player, Target target)
   {
     int s_x = target.x, s_y = target.y, s_tick = target.tick;
     cerr << " DIR " << s_tick << " " << s_x << " " << s_y << endl;
     if (s_tick == 0)
       return PLAYER_BOMB;
 
-    int own_x = this->me->x;
-    int own_y = this->me->y;
+    int own_x = player.x;
+    int own_y = player.y;
 
     int features_count = this->features.size();
     Feature features[features_count];
@@ -1545,9 +1548,8 @@ public:
         for (int q = 0; q < W; q++)
           dp[i][j][q] = -1;
     pr[0][own_y][own_x] = -1;
-    dp[0][own_y][own_x] = this->me->max_bombs * 1000;
+    dp[0][own_y][own_x] = player.max_bombs * 1000;
 
-    bitset<W * H> destroy_boxes[2];
     bitset<W> accessibleness[H];
 
     accessibleness[own_y][own_x] = 1;
@@ -1605,7 +1607,6 @@ public:
                 destroy_field[to_y][to_x] = 1;
                 if (field.cells[to_y][to_x].type == CELL_BOX && current_field[to_y][to_x] == 1)
                 {
-                  destroy_boxes[bombs[i].owner_id == this->me->owner_id][to_y * W + to_x] = 1;
                   break;
                 }
               }
@@ -1707,11 +1708,11 @@ public:
                       else
                         dp_val += 1;
                     }
-                    if (features[i].type == FEATURE_JUMP && !this->me->jump)
+                    if (features[i].type == FEATURE_JUMP && !player.jump)
                     {
                       dp_val += 10;
                     }
-                    if (features[i].type == FEATURE_TELEPORT && !this->me->teleport)
+                    if (features[i].type == FEATURE_TELEPORT && !player.teleport)
                     {
                       dp_val += 100;
                     }
@@ -1749,9 +1750,271 @@ public:
     return PLAYER_STAY;
   }
 
+  bool check_safe_for_tp_kill(Player me, Player enemy, int y, int x, int dir, BitField bit_field, vector<Bomb> bombs)
+  {
+
+    BitField me_possible_pos, enemy_possible_pos;
+    //me tp and enemy move dir
+    {
+      int to_x = enemy.x + dx[dir];
+      int to_y = enemy.y + dy[dir];
+      if (to_x < 0 || to_x >= field.width ||
+          to_y < 0 || to_y >= field.height || field.cells[to_y][to_x].type == CELL_BLOCK)
+        return false;
+      enemy.y = to_y;
+      enemy.x = to_x;
+      me.y = y;
+      me.x = x;
+      me.teleport = false;
+      me_possible_pos(me.y, me.x, 1);
+      enemy_possible_pos(enemy.y, enemy.x, 1);
+      for (int i = 0; i < bombs.size(); i++)
+      {
+        int x = bombs[i].x;
+        int y = bombs[i].y;
+        me_possible_pos(y, x, 0);
+        enemy_possible_pos(y, x, 0);
+      }
+      me_possible_pos &= me_possible_pos ^ bit_field;
+      enemy_possible_pos &= enemy_possible_pos ^ bit_field;
+
+      if (!enemy_possible_pos.count())
+        return false;
+      if (!me_possible_pos.count())
+        return true;
+
+      BitField destroy_field;
+      for (Bomb &bomb : bombs)
+        bomb.timer--;
+      for (int i = 0; i < bombs.size(); i++)
+      {
+        if (bombs[i].timer == 0 || destroy_field(bombs[i].y, bombs[i].x))
+        {
+          destroy_field(bombs[i].y, bombs[i].x, 1);
+          for (int dir = 0; dir < 4; dir++)
+          {
+            for (int j = 1; j <= bombs[i].range; j++)
+            {
+              int to_x = bombs[i].x + dx[dir] * j, to_y = bombs[i].y + dy[dir] * j;
+              if (to_x < 0 || to_x >= field.width ||
+                  to_y < 0 || to_y >= field.height || field.cells[to_y][to_x].type == CELL_BLOCK)
+              {
+                break;
+              }
+              destroy_field(to_y, to_x, 1);
+              if (field.cells[to_y][to_x].type == CELL_BOX && bit_field(to_y, to_x) == 1)
+              {
+                break;
+              }
+            }
+          }
+          if (bombs[i].owner_id == me.owner_id)
+            me.bombs++;
+          if (bombs[i].owner_id == enemy.owner_id)
+            enemy.bombs++;
+          swap(bombs[i], bombs.back());
+          bombs.ppb();
+          i = -1;
+        }
+      }
+      me_possible_pos &= me_possible_pos ^ destroy_field;
+      enemy_possible_pos &= enemy_possible_pos ^ destroy_field;
+      bit_field ^= bit_field & destroy_field;
+    }
+    //we bomb and enemy move any
+    {
+      if (!me.bombs)
+        return true;
+      bombs.pb(Bomb(me.x, me.y, me.owner_id, BOMB_TIMER, me.range));
+      me.bombs--;
+      BitField prev_enemy_possible_pos = enemy_possible_pos;
+      enemy_possible_pos = enemy_possible_pos.move();
+      for (int i = 0; i < bombs.size(); i++)
+      {
+        int x = bombs[i].x;
+        int y = bombs[i].y;
+        enemy_possible_pos(y, x, prev_enemy_possible_pos(y, x) & 1);
+      }
+      me_possible_pos &= me_possible_pos ^ bit_field;
+      enemy_possible_pos &= enemy_possible_pos ^ bit_field;
+
+      BitField destroy_field;
+      for (Bomb &bomb : bombs)
+        bomb.timer--;
+      for (int i = 0; i < bombs.size(); i++)
+      {
+        if (bombs[i].timer == 0 || destroy_field(bombs[i].y, bombs[i].x))
+        {
+          destroy_field(bombs[i].y, bombs[i].x, 1);
+          for (int dir = 0; dir < 4; dir++)
+          {
+            for (int j = 1; j <= bombs[i].range; j++)
+            {
+              int to_x = bombs[i].x + dx[dir] * j, to_y = bombs[i].y + dy[dir] * j;
+              if (to_x < 0 || to_x >= field.width ||
+                  to_y < 0 || to_y >= field.height || field.cells[to_y][to_x].type == CELL_BLOCK)
+              {
+                break;
+              }
+              destroy_field(to_y, to_x, 1);
+              if (field.cells[to_y][to_x].type == CELL_BOX && bit_field(to_y, to_x) == 1)
+              {
+                break;
+              }
+            }
+          }
+          if (bombs[i].owner_id == me.owner_id)
+            me.bombs++;
+          if (bombs[i].owner_id == enemy.owner_id)
+            enemy.bombs++;
+          swap(bombs[i], bombs.back());
+          bombs.ppb();
+          i = -1;
+        }
+      }
+      me_possible_pos &= me_possible_pos ^ destroy_field;
+      enemy_possible_pos &= enemy_possible_pos ^ destroy_field;
+      bit_field ^= bit_field & destroy_field;
+    }
+
+    bool me_alive = false;
+    bool enemy_alive = false;
+    vector<Feature> features;
+
+    while (!bombs.empty())
+      simulate_moves_and_bombs(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs, features);
+    me_alive |= me_possible_pos.count();
+    enemy_alive |= enemy_possible_pos.count();
+    return !me_alive || enemy_alive;
+  }
+  bool check_safe_for_tp_kill(Player enemy, int dir, BitField bit_field, vector<Bomb> bombs)
+  {
+
+    BitField enemy_possible_pos;
+    if (dir != -1)
+    {
+      int to_x = enemy.x + dx[dir];
+      int to_y = enemy.y + dy[dir];
+      if (to_x < 0 || to_x >= field.width ||
+          to_y < 0 || to_y >= field.height || field.cells[to_y][to_x].type == CELL_BLOCK)
+        return false;
+      enemy.y = to_y;
+      enemy.x = to_x;
+      enemy_possible_pos(enemy.y, enemy.x, 1);
+      for (int i = 0; i < bombs.size(); i++)
+      {
+        int x = bombs[i].x;
+        int y = bombs[i].y;
+        enemy_possible_pos(y, x, 0);
+      }
+      enemy_possible_pos &= enemy_possible_pos ^ bit_field;
+
+      if (!enemy_possible_pos.count())
+        return false;
+
+      BitField destroy_field;
+      for (Bomb &bomb : bombs)
+        bomb.timer--;
+      for (int i = 0; i < bombs.size(); i++)
+      {
+        if (bombs[i].timer == 0 || destroy_field(bombs[i].y, bombs[i].x))
+        {
+          destroy_field(bombs[i].y, bombs[i].x, 1);
+          for (int dir = 0; dir < 4; dir++)
+          {
+            for (int j = 1; j <= bombs[i].range; j++)
+            {
+              int to_x = bombs[i].x + dx[dir] * j, to_y = bombs[i].y + dy[dir] * j;
+              if (to_x < 0 || to_x >= field.width ||
+                  to_y < 0 || to_y >= field.height || field.cells[to_y][to_x].type == CELL_BLOCK)
+              {
+                break;
+              }
+              destroy_field(to_y, to_x, 1);
+              if (field.cells[to_y][to_x].type == CELL_BOX && bit_field(to_y, to_x) == 1)
+              {
+                break;
+              }
+            }
+          }
+          swap(bombs[i], bombs.back());
+          bombs.ppb();
+          i = -1;
+        }
+      }
+      enemy_possible_pos &= enemy_possible_pos ^ destroy_field;
+      bit_field ^= bit_field & destroy_field;
+    }
+    else
+    {
+      enemy_possible_pos(enemy.y, enemy.x, 1);
+    }
+
+    bool enemy_alive = false;
+    vector<Feature> features;
+    Player me;
+    BitField me_possible_pos;
+    while (!bombs.empty())
+      simulate_moves_and_bombs(me, enemy, me_possible_pos, enemy_possible_pos, bit_field, bombs, features);
+
+    enemy_alive |= enemy_possible_pos.count();
+    return enemy_alive;
+  }
+
+  bool try_tp_and_predicted_kill(vector<Bomb> bombs, BitField bit_field, Player me, Player enemy, Target enemy_target)
+  {
+    if (!me.teleport || enemy.dead || enemy.teleport || enemy.jump)
+      return false;
+    //check enemy wiil die anyway
+    if (!check_safe_for_tp_kill(enemy, -1, bit_field, bombs))
+      return false;
+    int p_x, p_y;
+    p_x = p_y = -1;
+    int predicted_dir = get_move(enemy, enemy_target);
+    cerr << "predicted_dir " << predicted_dir << endl;
+    for (int y = 0; y < H; y++)
+    {
+      for (int x = 0; x < W; x++)
+      {
+        if (bit_field(y, x))
+          continue;
+        int cnt = 0, bad_dir;
+        for (int dir = 0; dir < 4; dir++)
+        {
+          if (!check_safe_for_tp_kill(enemy, dir, bit_field, bombs))
+            continue;
+          if (check_safe_for_tp_kill(me, enemy, y, x, dir, bit_field, bombs))
+            cnt++, bad_dir = dir;
+        }
+        if (cnt == 0)
+        {
+          cerr << "iron-concrete tp_kill" << endl;
+          this->me->action = PLAYER_TELEPORT;
+          this->me->action_x = x;
+          this->me->action_y = y;
+          return true;
+        }
+        if (cnt == 1 && bad_dir != predicted_dir)
+        {
+          p_x = x;
+          p_y = y;
+        }
+      }
+    }
+    if (p_x != -1 && p_y != -1)
+    {
+      cerr << "not iron-concrete tp_kill" << endl;
+      this->me->action = PLAYER_TELEPORT;
+      this->me->action_x = p_x;
+      this->me->action_y = p_y;
+      return true;
+    }
+    return false;
+  }
+
   void prepare()
   {
-    cerr << "tick " << this->tick << endl;
+    cerr << "tick " << tick << endl;
     if (me == nullptr)
       exit(1);
 
@@ -1786,26 +2049,26 @@ public:
     {
       tie(ignore, ignore, ignore, ignore, ignore, ignore, ignore, enemy_target) = enemy_final_states[0];
       cerr << "-------------------------------------- enemy target: " << enemy_target.x << " " << enemy_target.y << " " << enemy_target.tick << endl;
+      if (try_tp_and_predicted_kill(bombs, bit_field, me, enemy, enemy_target))
+      {
+        cerr << " ----------------------------- PREDICTED KILL " << this->me->action_x << " " << this->me->action_y << endl;
+        int me_global_score_change, enemy_global_score_change;
+        tie(me_global_score_change, enemy_global_score_change, ignore) = get_tick_score(me, enemy, bit_field, bombs, features);
+        me_global_score += me_global_score_change;
+        enemy_global_score += enemy_global_score_change;
+        cerr << "SCORE: " << me_global_score - enemy_global_score << endl;
+        return;
+      }
     }
     ///////////////////////////////////////////////
     if (!enemy.dead)
       find_bad_cells(me, enemy, bit_field, bombs);
-///////////////////////////////////////////////
+    ///////////////////////////////////////////////
 #ifdef DEBUG_TIME
     double start = clock();
 #endif
     if (!enemy.dead)
       find_dangerous_cells(me, enemy, bit_field, bombs);
-
-    for (int y = 0; y < H; y++)
-    {
-      for (int x = 0; x < W; x++)
-      {
-        cerr << dangerous_cells[0](y, x);
-      }
-      cerr << endl;
-    }
-
 #ifdef DEBUG_TIME
     double end = clock();
     cerr << " ***********************------------------------------------ " << (end - start) * 1000. / CLOCKS_PER_SEC << endl;
@@ -1825,7 +2088,7 @@ public:
 
     if (target.type == 0 || target.type == 2)
     {
-      this->me->action = get_move(target);
+      this->me->action = get_move(this->me, target);
       if (this->me->action == PLAYER_JUMP)
       {
         cerr << "----------------------------- JUMP!" << endl;
