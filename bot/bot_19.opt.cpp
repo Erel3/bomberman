@@ -407,13 +407,9 @@ public:
     int pen = 0;
     if (!(me_score + me_will_score > me_default_score || enemy_score + enemy_will_score < enemy_default_score))
       pen += 10000;
-    if (dangerous_cells[min(dist - 1, 7)](target_y, target_x) == 1)
-      pen += 50;
     int rhspen = 0;
     if (!(rhs.me_score + rhs.me_will_score > rhs.me_default_score || rhs.enemy_score + rhs.enemy_will_score < rhs.enemy_default_score))
       rhspen += 10000;
-    if (dangerous_cells[min(rhs.dist - 1, 7)](rhs.target_y, rhs.target_x) == 1)
-      pen += 50;
 
     int cost1 = (me_score + me_will_score - enemy_score - enemy_will_score) * 4 - (dist + me_dist_penalty + me_will_dist_penalty) - pen;
     int cost2 = (rhs.me_score + rhs.me_will_score - rhs.enemy_score - rhs.enemy_will_score) * 4 - (rhs.dist + rhs.me_dist_penalty + rhs.me_will_dist_penalty) - rhspen;
@@ -1030,6 +1026,9 @@ public:
                   cur_state_quality.target_x = x;
                   cur_state_quality.target_y = y;
 
+                  if (dangerous_cells[min(cur_state_quality.dist - 1, 7)](cur_state_quality.target_y, cur_state_quality.target_x) == 1)
+                    cur_state_quality.me_dist_penalty += 50;
+
                   Target cur_target = target;
                   if (target.type == -1)
                   {
@@ -1172,6 +1171,9 @@ public:
                     cur_state_quality.target_x = x;
                     cur_state_quality.target_y = y;
 
+                    if (dangerous_cells[min(cur_state_quality.dist - 1, 7)](cur_state_quality.target_y, cur_state_quality.target_x) == 1)
+                      cur_state_quality.me_dist_penalty += 50;
+
                     Target cur_target = target;
                     if (target.type == -1)
                     {
@@ -1271,6 +1273,9 @@ public:
             cur_state_quality.enemy_will_alive = enemy_will_alive && enemy_cur_alive;
             cur_state_quality.target_x = me.x;
             cur_state_quality.target_y = me.y;
+
+            if (dangerous_cells[min(cur_state_quality.dist - 1, 7)](cur_state_quality.target_y, cur_state_quality.target_x) == 1)
+              cur_state_quality.me_dist_penalty += 50;
 
             Target cur_target = target;
             if (target.type == -1)
@@ -1452,6 +1457,9 @@ public:
               cur_state_quality.enemy_will_alive = enemy_will_alive;
               cur_state_quality.target_x = x;
               cur_state_quality.target_y = y;
+
+              if (dangerous_cells[min(cur_state_quality.dist - 1, 7)](cur_state_quality.target_y, cur_state_quality.target_x) == 1)
+                cur_state_quality.me_dist_penalty += 50;
 
               Target cur_target = target;
               if (target.type == -1)
@@ -1970,7 +1978,27 @@ public:
       return false;
     int p_x, p_y;
     p_x = p_y = -1;
-    int predicted_dir = get_move(enemy, enemy_target);
+    PlayerMove predicted_move = get_move(enemy, enemy_target);
+    int predicted_dir;
+    switch (predicted_move)
+    {
+    case PLAYER_UP:
+      predicted_dir = 0;
+      break;
+    case PLAYER_LEFT:
+      predicted_dir = 1;
+      break;
+    case PLAYER_RIGHT:
+      predicted_dir = 2;
+      break;
+    case PLAYER_DOWN:
+      predicted_dir = 3;
+      break;
+    default:
+      return false;
+    }
+    cerr << "No move found" << endl;
+    return PLAYER_STAY;
     cerr << "predicted_dir " << predicted_dir << endl;
     for (int y = 0; y < H; y++)
     {
@@ -2063,7 +2091,7 @@ public:
     ///////////////////////////////////////////////
     if (!enemy.dead)
       find_bad_cells(me, enemy, bit_field, bombs);
-    ///////////////////////////////////////////////
+      ///////////////////////////////////////////////
 #ifdef DEBUG_TIME
     double start = clock();
 #endif
