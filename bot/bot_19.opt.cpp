@@ -393,7 +393,22 @@ public:
     }
     if (!me_will_alive && !rhs.me_will_alive)
     {
-      return me_score + me_will_score - enemy_score - enemy_will_score > rhs.me_score + rhs.me_will_score - rhs.enemy_score - rhs.enemy_will_score;
+      if (enemy_alive)
+      {
+        if (!enemy_will_alive && !rhs.enemy_will_alive)
+        {
+          return mp(me_score + me_will_score - enemy_score - enemy_will_score, -dist) > mp(rhs.me_score + rhs.me_will_score - rhs.enemy_score - rhs.enemy_will_score, -rhs.dist);
+        }
+        else if (!enemy_will_alive)
+        {
+          return true;
+        }
+        else if (!rhs.enemy_will_alive)
+        {
+          return false;
+        }
+      }
+      return mp(me_score + me_will_score - enemy_score - enemy_will_score, -dist) > mp(rhs.me_score + rhs.me_will_score - rhs.enemy_score - rhs.enemy_will_score, -rhs.dist);
     }
     else if (!me_will_alive)
     {
@@ -692,8 +707,10 @@ public:
         return;
     }
 
+    int cnt_good = 0;
     for (int me_dir = 0; me_dir < 4; me_dir++)
     {
+      bool good_move = false;
       for (int enemy_dir = 0; enemy_dir < 5; enemy_dir++)
       {
         Player me_cur = me;
@@ -716,6 +733,7 @@ public:
           continue;
         if (me_possible_pos(me_to_y, me_to_x) == 0 || enemy_possible_pos(enemy_to_y, enemy_to_x) == 0)
           continue;
+        good_move = true;
         me_cur.x = me_to_x;
         me_cur.y = me_to_y;
         enemy_cur.x = enemy_to_x;
@@ -734,6 +752,11 @@ public:
           bad_cells(me_to_y, me_to_x, 1);
         }
       }
+      cnt_good += good_move;
+    }
+    if (cnt_good == bad_cells.count())
+    {
+      bad_cells.set_empty();
     }
   }
 
@@ -1357,7 +1380,7 @@ public:
             {
               if (me_bomb.max_bombs == 1)
               {
-                me_took_dist_penalty = -3;
+                me_took_dist_penalty = -5;
               }
               else if (me_bomb.max_bombs == 2)
               {
@@ -1515,7 +1538,7 @@ public:
       Target target;
       StateQuality sq;
       tie(ignore, ignore, ignore, ignore, ignore, ignore, sq, target) = result[i];
-      cerr << target.x << " " << target.y << " " << target.tick << " " << sq.me_alive << " " << sq.enemy_alive << " " << sq.me_dist_penalty << " " << target.type << endl;
+      cerr << target.x << " " << target.y << " " << target.tick << " " << sq.me_alive << " " << sq.enemy_alive << " " << sq.me_will_alive << " " << sq.enemy_will_alive << " " << sq.dist << " " << sq.me_dist_penalty << " " << target.type << endl;
     }
     return result;
   }
@@ -2083,7 +2106,7 @@ public:
         return;
       }
     }
-    ///////////////////////////////////////////////
+    /////////////////////////////////////////////////
     if (!enemy.dead)
       find_bad_cells(me, enemy, bit_field, bombs);
       ///////////////////////////////////////////////
