@@ -1,6 +1,6 @@
 #!/usr/bin/bash
-g++ bot/bot_20.opt.cpp -o strategies/bot_20.opt -std=c++17 || exit -1
-g++ bot/bot_19.opt.cpp -o strategies/bot_19.opt -std=c++17 || exit -1
+# g++ bot/bot_20.opt.cpp -o strategies/bot_20.opt -std=c++17 || exit -1
+# g++ bot/bot_19.opt.cpp -o strategies/bot_19.opt -std=c++17 || exit -1
 
 # g++ bot/bot_20.opt.cpp -o strategies/bot_20.opt -std=c++17 -DDEBUG_TIME || exit -1
 

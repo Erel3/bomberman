@@ -426,8 +426,8 @@ public:
     if (!(rhs.me_score + rhs.me_will_score > rhs.me_default_score || rhs.enemy_score + rhs.enemy_will_score < rhs.enemy_default_score))
       rhspen += 10000;
 
-    int cost1 = (me_score + me_will_score - enemy_score - enemy_will_score) * 4 - (dist + me_dist_penalty + me_will_dist_penalty) - pen;
-    int cost2 = (rhs.me_score + rhs.me_will_score - rhs.enemy_score - rhs.enemy_will_score) * 4 - (rhs.dist + rhs.me_dist_penalty + rhs.me_will_dist_penalty) - rhspen;
+    int cost1 = (me_score + me_will_score - enemy_score - enemy_will_score) * 3800 - (dist + me_dist_penalty + me_will_dist_penalty + pen) * 1000;
+    int cost2 = (rhs.me_score + rhs.me_will_score - rhs.enemy_score - rhs.enemy_will_score) * 3800 - (rhs.dist + rhs.me_dist_penalty + rhs.me_will_dist_penalty + rhspen) * 1000;
     if (cost1 == cost2)
     {
       if ((me_score + me_will_score - enemy_score - enemy_will_score) == (rhs.me_score + rhs.me_will_score - rhs.enemy_score - rhs.enemy_will_score))
@@ -2131,7 +2131,7 @@ public:
 
     initial_states.pb(make_tuple(bombs, bit_field, me, enemy, enemy_possible_pos, features, StateQuality(me_global_score, enemy_global_score), Target()));
 
-    first_states = get_action(initial_states, 3, 2);
+    first_states = get_action(initial_states, 7, 2);
 
     // {
     //   Target me_target;
