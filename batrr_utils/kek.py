@@ -10,7 +10,7 @@ headers_dict = {
 def f(user_id):
     skip = 0
     iter_jump = 50
-    limit = datetime.strptime("2020-12-20T00:00:00", '%Y-%m-%dT%H:%M:%S')
+    limit = datetime.strptime("2020-12-20T18:00:00", '%Y-%m-%dT%H:%M:%S')
     fields = set()
 
     stat = dict()
@@ -26,10 +26,10 @@ def f(user_id):
         games = requests.get(url, headers=headers_dict).json()
         for game in games:
             created_at = game['created_at'] 
-            created_at = datetime.  strptime(created_at, '%Y-%m-%dT%H:%M:%S')
+            created_at = datetime.strptime(created_at, '%Y-%m-%dT%H:%M:%S')
             if created_at < limit:
                 skip = -1
-                break
+                continue
             enemy = game['captain_username']
             status = game['status']
             if not stat.get(enemy):
@@ -54,7 +54,7 @@ def f(user_id):
 url = "https://cup.alem.school/api/leaderboard/2"
 teams = requests.get(url, headers=headers_dict).json()
 
-for i in range(4):
+for i in range(5):
     team = teams[i]
     player = next(filter(lambda player: player['is_captain'], team['players']))
     username = player['username']
