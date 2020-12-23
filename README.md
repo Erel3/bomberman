@@ -18,4 +18,4 @@
 
 Сначала надо запустить сам визуализатор в папке **rewind-viewer/rewindviewer.exe** или **rewind-viewer/rewindviewer**
 
-А дальше посмотрите команды в **start.bat** и **start.sh**. Требуется Python версии не меньше 3.2
+А дальше посмотрите команды в **start.bat** и **start.sh**, либо запустите **python3 rewind-client/main.py --help**, чтобы получить список возможных команд. Требуется Python версии не меньше 3.2
