@@ -79,7 +79,7 @@ def leaderboard_top(message):
   if chat == None:
     return
   leaderboard = session.query(Leaderboard).order_by(
-      Leaderboard.place).all()[:10]
+      Leaderboard.place).all()[:5]
   msg_text = tabulate([[leader.place, leader.captain_name, leader.score] for leader in leaderboard], headers=['', 'PLAYER', 'SCORE'])
   session.commit()
   session.close()
@@ -99,11 +99,40 @@ def leaderboard_all(message):
   bot.reply_to(message, "`"+msg_text+"`", parse_mode="Markdown")
 
 
+@bot.message_handler(commands=['stat'])
+def leaderboard_stat(message):
+  session = Session()
+  chat = session.query(Chats).filter(Chats.chat_id == message.chat.id).first()
+  if chat == None:
+    return
+  leaderboard = session.query(Leaderboard).order_by(
+      Leaderboard.place).all()[:10]
+  msg_text = tabulate([[leader.place, leader.captain_name, leader.win, leader.lose, leader.draw] for leader in leaderboard], headers=['', 'PLAYER', 'W', 'L', 'D'])
+  session.commit()
+  session.close()
+  bot.reply_to(message, "`"+msg_text+"`", parse_mode="Markdown")
+
+
+@bot.message_handler(commands=['stat_all'])
+def leaderboard_stat(message):
+  session = Session()
+  chat = session.query(Chats).filter(Chats.chat_id == message.chat.id).first()
+  if chat == None:
+    return
+  leaderboard = session.query(Leaderboard).order_by(Leaderboard.place).all()
+  msg_text = tabulate([[leader.place, leader.captain_name, leader.win, leader.lose, leader.draw] for leader in leaderboard], headers=['', 'PLAYER', 'W', 'L', 'D'])
+  session.commit()
+  session.close()
+  bot.reply_to(message, "`"+msg_text+"`", parse_mode="Markdown")
+
+
 def notify_update_leaderboard():
   session = Session()
   leaderboard = session.query(Leaderboard).order_by(
-      Leaderboard.place).all()[:10]
+      Leaderboard.place).all()[:5]
   msg_text = tabulate([[leader.place, leader.captain_name, leader.score] for leader in leaderboard], headers=['', 'PLAYER', 'SCORE'])
+  diff = leaderboard[0].score - leaderboard[1].score
+  msg_text = "{:.02f}\n{}".format(diff, msg_text)
   chats = session.query(Chats).filter(Chats.is_active == True)
   for chat in chats:
     bot.send_message(chat.chat_id, "`"+msg_text+"`", parse_mode="Markdown", disable_notification=True)
@@ -141,11 +170,20 @@ def update_leaderboard(leaderboard_data):
       leaderboard_participant.place = place
       if leaderboard_participant.score != score:
         leaderboard_participant.delta = score - leaderboard_participant.score
-        if place <= 10:
+        if place <= 5:
           top_updated = True
       leaderboard_participant.score = score
       leaderboard_participant.mu = mu
       leaderboard_participant.sigma = sigma
+      for game in participant['last_games']:
+        if leaderboard_participant.last_game == game["game_session_id"]:
+          break
+        if game["status"] == "win":
+          leaderboard_participant.win += 1
+        if game["status"] == "lose":
+          leaderboard_participant.lose += 1
+        if game["status"] == "draw":
+          leaderboard_participant.draw += 1
       leaderboard_participant.last_game = last_game
 
     session.add(leaderboard_participant)
@@ -204,3 +242,4 @@ def start():
 
 if __name__ == "__main__":
   start()
+
