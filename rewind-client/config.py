@@ -9,6 +9,8 @@ config = SimpleNamespace()
 class ConfigParser(ArgumentParser):
   def __init__(self, config, prog, description):
     ArgumentParser.__init__(self, prog, description, add_help=False)
+    self.add_argument('--help', action='store_true',
+                      default=False, dest='help', help='show this help')
     self.add_argument('-w', '--width', action='store', type=int,
                       default=config.width, metavar=config.width, dest='width', help='width of field')
     self.add_argument('-h', '--height', action='store', type=int,
@@ -39,6 +41,9 @@ class ConfigParser(ArgumentParser):
 
   def parse(self):
     self.parse_args(namespace=self.namespace)
+    if self.namespace.help == True:
+      self.print_help()
+      sys.exit(0)
     if len(self.namespace.replay_file) > 0:
       self.namespace.is_replay = True
       return
@@ -90,3 +95,4 @@ config.replay_file = ""
 
 # with keyboard player
 config.with_keyboard_player = False
+config.help = False
